@@ -1,0 +1,1 @@
+# for some reason rspec looks for application.rb

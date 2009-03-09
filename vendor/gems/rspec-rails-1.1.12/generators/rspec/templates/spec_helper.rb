@@ -43,51 +43,5 @@ Spec::Runner.configure do |config|
   #
   # == Notes
   # 
-  # For more information take a look at Spec::Example::Configuration and Spec::Runner
+  # For more information take a look at Spec::Runner::Configuration and Spec::Runner
 end
-
-%w( video profile job ).each do |model|
-  eval %{
-    def #{model}(name)
-        path = File.join(RAILS_ROOT, "spec", "remote_fixtures", "#{model}s", "\#\{name\}.xml")
-        return nil unless File.exists?(path)
-        File.read path
-    end    
-    
-  }
-end
-
-def videos(name)
-    case name
-    when :kites then Video.find(1)
-    else nil
-    end
-end
-
-def jobs(name)
-    case name
-    when :kites_to_flv then Job.find(1)
-    else nil
-    end
-end
-
-def profiles(name)  
-    case name
-    when :flv then Profile.find(1)
-    else nil
-    end
-end
-  
-def remote_fixtures
-  require 'active_resource/http_mock'
-  # @kites  = { :id => 1, :name => 'Kites.mp4' }.to_xml(:root => 'video')
-
-  ActiveResource::HttpMock.respond_to do |mock|
-    mock.get "/videos/1.xml", {}, video(:kites)
-    mock.get "/jobs/1.xml", {}, job(:kites_to_flv)    
-    mock.get "/profiles/1.xml", {}, profile(:flv)
-    # mock.get "/tools/1/users/0.xml", {}, nil, 404
-    # mock.get "/tools/1/users/.xml", {}, nil, 404
-  end
-end
-  

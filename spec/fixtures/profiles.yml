@@ -1,0 +1,19 @@
+flash_video: 
+  video_codec: flv
+  name: Flash video
+  category: Format
+  extra_param: -aspect 4:3
+  audio_rate: "22050"
+  video_bitrate: "200"
+  audio_channel: "1"
+  audio_bitrate: "56"
+  video_format: flv
+  audio_codec: mp3
+  keep_aspect: 
+  height: "0"
+  width: "0"
+  add_padding: 
+  is_public: true
+  user_id: 
+  video_fps: "12"
+  created_at: <%= Time.now.to_s(:db) %> 

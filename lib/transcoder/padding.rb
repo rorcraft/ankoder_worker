@@ -14,9 +14,9 @@ module Transcoder
     end
 
     def padding(profile_width, profile_height, video_width, video_height)
-      return {"result_width" => 320 , "result_height" => 240} if profile_width <= 0 && video_width <= 0
-      return {"result_width" => profile_width , "result_height" => profile_height} if video_width < 0 or video_height < 0      
-      return {"result_width" => even_size(video_width), "result_height" => even_size(video_height) } if profile_width == 0       
+      return {"result_width" => 320 , "result_height" => 240} if profile_width.to_i <= 0 && video_width.to_i <= 0
+      return {"result_width" => profile_width , "result_height" => profile_height} if video_width.to_i < 0 or video_height.to_i < 0      
+      return {"result_width" => even_size(video_width), "result_height" => even_size(video_height) } if profile_width.to_i == 0       
 
       result = {}
       %w{profile_width profile_height video_width video_height}.each do |measure|
