@@ -17,7 +17,8 @@ module Transcoder
       cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{} 2>&1"
       cmd
     # rescue Exception => e
-    #   false
+    # logger.debug $!
+    # false
     end
     
     private

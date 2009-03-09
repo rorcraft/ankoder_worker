@@ -16,16 +16,39 @@ describe Transcoder::FFmpeg do
   
   before :each do
     @ff = TestFFmpeg.new    
-    @ff.video = videos(:kites)
-    @ff.profile = profiles(:flv)
-    @ff.job = jobs(:kites_to_flv)
   end
   
-  it "should generate ffmpeg command " do
-        
-    puts @ff.command(@ff.job)
+  it "should generate ffmpeg command " do        
+    puts @ff.command(jobs(:kites_to_flv))
   end
   
+  it  "should convert mp4 to flv" do
+    # @ff.execute(jobs(:kites_to_flv))
+    # File.exists? convert_file
+    # convert_file.inspector.format.should == flv    
+  end
+
+  it  "should convert avi to flv" do
+    # @ff.execute(jobs(:avi_to_flv))
+    # File.exists? convert_file
+    # convert_file.inspector.format.should == flv    
+  end
+
+  # write a generator to do this e.g.
+  # from = %w{ mp4 avi flv wmv mov ogg divx m4v rmvb }
+  # to = %{ mp4 avi flv wmv ogg divx m4v }
+  # from.each do |f| 
+  #   to.each do |t|
+  #     eval %{ it "should convert #{f} to #{t}" do
+  #                @ff.execute(jobs(:#{f}_to_#{t}))
+  #                \# file exists
+  #                \# inspect
+  #             end
+  #           }
+  #    end
+  # end
+    
+    
   def test_file 
     File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
   end
