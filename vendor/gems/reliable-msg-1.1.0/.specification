@@ -1,0 +1,83 @@
+--- !ruby/object:Gem::Specification 
+name: reliable-msg
+version: !ruby/object:Gem::Version 
+  version: 1.1.0
+platform: ruby
+authors: 
+- Assaf Arkin
+autorequire: reliable-msg.rb
+bindir: bin
+cert_chain: 
+date: 2005-11-26 00:00:00 +11:00
+default_executable: queues
+dependencies: 
+- !ruby/object:Gem::Dependency 
+  name: uuid
+  type: :runtime
+  version_requirement: 
+  version_requirements: !ruby/object:Gem::Requirement 
+    requirements: 
+    - - ">="
+      - !ruby/object:Gem::Version 
+        version: 1.0.0
+    version: 
+description: This package provides reliable messaging and persistent queues for building asynchronous applications in Ruby.  It supports transaction processing, message selectors, priorities, delivery semantics, remote queue managers, disk-based and MySQL message stores and more.
+email: assaf@labnotes.org
+executables: 
+- queues
+extensions: []
+
+extra_rdoc_files: 
+- README
+files: 
+- bin/queues
+- test/test-queue.rb
+- test/test-rails.rb
+- test/test-topic.rb
+- lib/reliable-msg
+- lib/reliable-msg.rb
+- lib/reliable-msg/cli.rb
+- lib/reliable-msg/client.rb
+- lib/reliable-msg/message-store.rb
+- lib/reliable-msg/mysql.sql
+- lib/reliable-msg/queue-manager.rb
+- lib/reliable-msg/queue.rb
+- lib/reliable-msg/rails.rb
+- lib/reliable-msg/selector.rb
+- lib/reliable-msg/topic.rb
+- README
+- MIT-LICENSE
+- Rakefile
+- changelog.txt
+has_rdoc: true
+homepage: http://trac.labnotes.org/cgi-bin/trac.cgi/wiki/Ruby/ReliableMessaging
+post_install_message: 
+rdoc_options: 
+- --main
+- README
+- --title
+- Reliable Messaging for Ruby
+- --line-numbers
+require_paths: 
+- lib
+required_ruby_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">"
+    - !ruby/object:Gem::Version 
+      version: 0.0.0
+  version: 
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      version: "0"
+  version: 
+requirements: 
+- MySQL for database store, otherwise uses the file system
+rubyforge_project: reliable-msg
+rubygems_version: 1.3.1
+signing_key: 
+specification_version: 1
+summary: Reliable messaging and persistent queues for building asynchronous applications in Ruby
+test_files: []
+
