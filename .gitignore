@@ -5,4 +5,5 @@ tmp/*
 doc/api
 doc/app
 queues
+file_system
 uuid.state

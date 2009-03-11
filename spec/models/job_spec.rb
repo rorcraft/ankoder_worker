@@ -17,4 +17,8 @@ describe Job do
     jobs(:kites_to_flv).profile.should == profiles(:flv)
   end
   
+  it "should generate a convert_file filename" do
+    jobs(:kites_to_flv).generate_convert_filename.should == "#{videos(:kites).filename}.flv"
+  end
+  
 end

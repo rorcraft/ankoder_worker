@@ -16,5 +16,6 @@
   <is_public>true</is_public>
   <user_id />
   <video_fps>12</video_fps>
+  <suffix>flv</suffix>  
   <created_at></created_at>
 </profile>

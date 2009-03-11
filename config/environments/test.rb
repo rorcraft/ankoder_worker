@@ -27,5 +27,9 @@ config.action_mailer.delivery_method = :test
 # like if you have constraints or database-specific column types
 # config.active_record.schema_format = :sql
 
+require 'ruby-debug'
+
 AR_SITE       = "http://localhost"
-FILE_FOLDER   = "/file_system"
+FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
+FFMPEG_PATH   = "/opt/local/bin/ffmpeg"
+MENCODER_PATH   = "/opt/local/bin/mencoder"
