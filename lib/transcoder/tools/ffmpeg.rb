@@ -30,7 +30,8 @@ module Transcoder
         progress_finalise
 
         raise TranscoderError::MediaFormatException if $?.exitstatus != 0
-        raise TranscoderError::MediaFormatException unless File.exist?(job.generate_convert_filename)      
+        # Fixme: When doing 2-pass the output is not the job.generate_convert_filename
+        # raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       
       rescue TranscoderError => e
         Transcoder.logger.error e.message
