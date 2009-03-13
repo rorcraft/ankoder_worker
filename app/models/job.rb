@@ -37,7 +37,7 @@ class Job < ActiveResource::Base
 
   def generate_convert_filename
     if convert_file.nil?
-      "#{original_file.filename.split(".")[0]}.#{profile.suffix}" 
+      "#{original_file.filename.split(".")[0]}.#{profile.suffix}"
     else
       convert_file.filename
     end

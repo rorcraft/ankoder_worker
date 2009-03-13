@@ -10,7 +10,7 @@ describe Transcoder::Tools::Mencoder do
   # cp spec/fixtures/kites.mp4 file_system/
   
   class TestMencoder
-    Transcoder::Tools::Mencoder::MENCODER_PATH = "/opt/local/bin/mencoder"
+    Transcoder::Tools::Mencoder::MENCODER_PATH = "/usr/bin/mencoder"
     include Transcoder::Tools::Mencoder
        
     attr_accessor :video, :profile, :job                

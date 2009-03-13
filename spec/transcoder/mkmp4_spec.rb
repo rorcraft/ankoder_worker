@@ -9,7 +9,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/tools/m
 describe Transcoder::Tools::Mkmp4 do
   remote_fixtures
 
-  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/opt/local/bin/ffmpeg"  
+  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg"  
     
   it "should create mp4" do      
     Transcoder::Tools::Mkmp4.run(jobs(:kites_to_flv))

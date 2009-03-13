@@ -8,7 +8,7 @@ flash_video:
   audio_channel: "1"
   audio_bitrate: "56"
   video_format: flv
-  audio_codec: mp3
+  audio_codec: libmp3lame
   keep_aspect: 
   height: "0"
   width: "0"

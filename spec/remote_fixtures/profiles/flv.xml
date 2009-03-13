@@ -8,7 +8,7 @@
   <audio_channel>1</audio_channel>
   <audio_bitrate>56</audio_bitrate>
   <video_format>flv</video_format>
-  <audio_codec>mp3</audio_codec>
+  <audio_codec>libmp3lame</audio_codec>
   <keep_aspect />
   <height>0</height>
   <width>0</width>

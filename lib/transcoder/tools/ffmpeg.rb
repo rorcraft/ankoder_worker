@@ -46,7 +46,7 @@ module Transcoder
         # optional params
         cmd += " -bt #{job.profile.video_bitrate}k " if job.profile.video_bitrate.to_i > 0
                                 # can use S3 link directly here? if the file is public
-        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{job.generate_convert_filename} 2>&1"
+        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
         cmd
       end
     
@@ -98,6 +98,10 @@ module Transcoder
         else
           nil
         end
+      end
+
+      def self.print_progress(progress)
+        puts "Progress: #{progress}"
       end
     
     
