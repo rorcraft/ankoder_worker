@@ -18,7 +18,7 @@ describe Job do
   end
   
   it "should generate a convert_file filename" do
-    jobs(:kites_to_flv).generate_convert_filename.should == "#{videos(:kites).filename}.flv"
+    jobs(:kites_to_flv).generate_convert_filename.should == "#{videos(:kites).filename.split('.')[0]}.flv"
   end
   
 end

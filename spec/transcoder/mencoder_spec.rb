@@ -8,9 +8,8 @@ require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/tools/f
 describe Transcoder::Tools::Mencoder do
   remote_fixtures
   # cp spec/fixtures/kites.mp4 file_system/
-  Transcoder::Tools::Mencoder::MENCODER_PATH = "/opt/local/bin/mencoder"  
-
-  
+  Transcoder::Tools::Mencoder::MENCODER_PATH = "/opt/local/bin/mencoder"  unless defined? "Transcoder::Tools::Mencoder::MENCODER_PATH"
+    
   it "proprocess_command should generate command " do        
     cmd = Transcoder::Tools::Mencoder.preprocess_command(jobs(:kites_to_flv))
     cmd.should_not be_empty

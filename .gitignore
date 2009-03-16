@@ -2,8 +2,7 @@ log/*.log
 tmp/**/*
 tmp/*
 .DS_Store
-doc/api
-doc/app
 queues
 file_system
 uuid.state
+db/*.sqlite3

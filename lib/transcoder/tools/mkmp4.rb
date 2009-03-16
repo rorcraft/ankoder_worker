@@ -27,17 +27,11 @@ module Transcoder
 
         # FIXME: Does 2-pass have to do it this way?
         # FIXME: Where is the support for custom bitrate , width, height etc here??
-        FFmpeg.run_command %{ cd #{file_dir} && #{FFmpeg::FFMPEG_PATH} -y -i "#{file_path}" #{watermark} #{FFmpeg.padding_command(job.profile, job.original_file)} -an 
-        -pass 1 -vcodec libx264 -b 384k -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -flags2 +mixed_refs -me umh -subq 5 -trellis 1
-        -refs 3 -bf 3 -b_strategy 1 -coder 1 -me_range 16 -g 250 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 384k -rc_eq 'blurCplx^(1-qComp)'
-        -qcomp 0.8 -qmin 10 -qmax 51 -qdiff 4 "#{file_path}.temp.mp4" }
+        FFmpeg.run_command %{ cd #{file_dir} && #{FFmpeg::FFMPEG_PATH} -y -i "#{file_path}" #{watermark} #{FFmpeg.padding_command(job.profile, job.original_file)} -an -pass 1 -vcodec libx264 -b 384k -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -flags2 +mixed_refs -me_method umh -subq 5 -trellis 1 -refs 3 -bf 3 -b_strategy 1 -coder 1 -me_range 16 -g 250 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 384k -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.8 -qmin 10 -qmax 51 -qdiff 4 "#{file_path}.temp.mp4" }
         
         Transcoder.logger.debug "FFMPEG Second Pass"
         
-        FFmpeg.run_command %{ cd #{file_dir} && #{FFmpeg::FFMPEG_PATH} -y -i "#{file_path}" #{watermark} #{FFmpeg.padding_command(job.profile, job.original_file)} 
-        -an -pass 2 -vcodec libx264 -b 384k -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -flags2 +mixed_refs -me umh 
-        -subq 5 -trellis 1 -refs 3 -bf 3 -b_strategy 1 -coder 1 -me_range 16 -g 250 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 
-        -bt 384k -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.8 -qmin 10 -qmax 51 -qdiff 4 "#{file_path}_temp.mp4" }
+        FFmpeg.run_command %{ cd #{file_dir} && #{FFmpeg::FFMPEG_PATH} -y -i "#{file_path}" #{watermark} #{FFmpeg.padding_command(job.profile, job.original_file)} -an -pass 2 -vcodec libx264 -b 384k -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -flags2 +mixed_refs -me_method umh -subq 5 -trellis 1 -refs 3 -bf 3 -b_strategy 1 -coder 1 -me_range 16 -g 250 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 384k -rc_eq 'blurCplx^(1-qComp)' -qcomp 0.8 -qmin 10 -qmax 51 -qdiff 4 "#{file_path}_temp.mp4" }
       
         # myfile.avi -> myfile.avi_temp.mp4
                 
@@ -46,7 +40,7 @@ module Transcoder
         # myfile.avi_temp.mp4 -> myfile.avi_temp.264        
          
         Transcoder.logger.debug "Extract Audio from \"#{file_path}\""
-        Ffmpeg.run_command("cd #{file_dir} && #{FFMPEG_PATH} -i \"#{file_path}\"  -ar 48000 -ac 2 \"#{file_path}_temp.wav\"")        
+        FFmpeg.run_command("cd #{file_dir} && #{FFMPEG_PATH} -i \"#{file_path}\"  -ar 48000 -ac 2 \"#{file_path}_temp.wav\"")        
         # myfile.avi -> myfile.avi_temp.wav
       
         if ( platform == "Mac" ) 

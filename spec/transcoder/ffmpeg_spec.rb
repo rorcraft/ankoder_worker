@@ -9,7 +9,7 @@ describe Transcoder::Tools::FFmpeg do
   remote_fixtures
   # cp spec/fixtures/kites.mp4 file_system/
 
-  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/opt/local/bin/ffmpeg"
+  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg"
 
     
   it "should generate ffmpeg command " do        
@@ -29,9 +29,10 @@ describe Transcoder::Tools::FFmpeg do
   
   it  "should convert mp4 to flv" do
     Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
-    File.exists? jobs(:kites_to_flv).generate_convert_filename
+    file_path = File.join(FILE_FOLDER, jobs(:kites_to_flv).generate_convert_filename)
+    File.should be_exists(file_path )
     # convert_file.inspector.format.should == flv 
-    FileUtils.rm jobs(:kites_to_flv).generate_convert_filename
+    FileUtils.rm file_path
   end
 
   it "given a block, can retrieve progress"
