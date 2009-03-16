@@ -1,0 +1,3 @@
+class ConvertFile < Video
+
+end

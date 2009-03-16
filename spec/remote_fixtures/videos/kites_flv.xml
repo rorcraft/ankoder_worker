@@ -1,0 +1,29 @@
+<original-file>
+  <audio type="boolean" nil="true"></audio>
+  <audio-codec nil="true"></audio-codec>
+  <content-type nil="true"></content-type>
+  <created-at type="datetime">2007-12-04T12:09:42+11:00</created-at>
+  <deleted-at type="datetime" nil="true"></deleted-at>
+  <duration type="integer">100000</duration>
+  <filename>kites.flv</filename>
+  <finished-at type="datetime" nil="true"></finished-at>
+  <fps type="float" nil="true"></fps>
+  <height type="integer" nil="true"></height>
+  <id type="integer">1</id>
+  <is-public type="boolean" nil="true"></is-public>
+  <name>kites.flv</name>
+  <original-filename>kites.flv</original-filename>
+  <postback-url nil="true"></postback-url>
+  <progress type="integer" nil="true"></progress>
+  <readable type="boolean" nil="true"></readable>
+  <s3-created-at type="datetime" nil="true"></s3-created-at>
+  <size type="integer" nil="true"></size>
+  <source-url nil="true"></source-url>
+  <thumbnail nil="true"></thumbnail>
+  <thumbnail-uploaded type="boolean">false</thumbnail-uploaded>
+  <uploaded type="boolean">true</uploaded>
+  <user-id type="integer">114388343</user-id>
+  <video type="boolean" nil="true"></video>
+  <video-codec nil="true"></video-codec>
+  <width type="integer" nil="true"></width>
+</original-file>

@@ -26,6 +26,7 @@ module Transcoder
         # watermark = download_watermark ? "-vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}'" : ""
 
         # FIXME: Does 2-pass have to do it this way?
+        # FIXME: Where is the support for custom bitrate , width, height etc here??
         FFmpeg.run_command %{ cd #{file_dir} && #{FFmpeg::FFMPEG_PATH} -y -i "#{file_path}" #{watermark} #{FFmpeg.padding_command(job.profile, job.original_file)} -an 
         -pass 1 -vcodec libx264 -b 384k -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -flags2 +mixed_refs -me umh -subq 5 -trellis 1
         -refs 3 -bf 3 -b_strategy 1 -coder 1 -me_range 16 -g 250 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 384k -rc_eq 'blurCplx^(1-qComp)'

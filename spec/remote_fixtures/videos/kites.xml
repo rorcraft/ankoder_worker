@@ -1,5 +1,6 @@
 <video>
   <id>1</id>
+  <name>Title of the video</name>
   <filename>kites.mp4</filename>
   <video_format>mp4</video_format>
   <height>240</height>
