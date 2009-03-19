@@ -36,5 +36,6 @@ if `hostname`.strip.match 'rexchung'
   FFMPEG_PATH   = "/opt/local/bin/ffmpeg"
   MENCODER_PATH   = "/opt/local/bin/mencoder"
 else
-  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg"
+  FFMPEG_PATH = "/usr/local/bin/ffmpeg"
+  MENCODER_PATH   = "/usr/local/bin/mencoder"
 end
