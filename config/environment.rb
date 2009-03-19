@@ -21,6 +21,7 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem "reliable-msg", :lib => "reliable-msg"
   config.gem "json", :lib => "json"
+  config.gem "rvideo", :lib => "rvideo", :version => "1.0.0", :source => "git://github.com/jagthedrummer/rvideo.git"
   # config.gem 'rspec-rails', :lib => "rspec-rails", :version => "1.1.12"
   
   # Only load the plugins named here, in the order given (default is alphabetical).
