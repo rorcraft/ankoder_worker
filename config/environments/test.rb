@@ -33,3 +33,9 @@ AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
 FFMPEG_PATH   = "/opt/local/bin/ffmpeg"
 MENCODER_PATH   = "/opt/local/bin/mencoder"
+
+if `hostname`.strip.match 'rexchung'
+  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/opt/local/bin/ffmpeg"
+else
+  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg"
+end

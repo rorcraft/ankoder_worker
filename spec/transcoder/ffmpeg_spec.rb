@@ -7,10 +7,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/tools/f
 
 describe Transcoder::Tools::FFmpeg do
   remote_fixtures
-  # cp spec/fixtures/kites.mp4 file_system/
-
-  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg"
-
+  # mkdir file_system && cp spec/fixtures/kites.mp4 file_system/
+  
+  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg" unless defined? "Transcoder::Tools::FFmpeg::FFMPEG_PATH"
+  
     
   it "should generate ffmpeg command " do        
     cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv))
@@ -20,10 +20,12 @@ describe Transcoder::Tools::FFmpeg do
   end
   
   it "command should support watermark"
-  
-  it "command should support threads option when mp4"
 
-  it "should support 2-pass" 
+  it "should keep same quality"
+  
+  # it "command should support threads option when mp4"
+
+  # it "should support 2-pass" 
   
   it "run should catch ffmpeg exceptions"
   

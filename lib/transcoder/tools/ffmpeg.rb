@@ -22,7 +22,7 @@ module Transcoder
             p = parse_progress(line,duration)
             if progress_need_refresh? progress, p
               progress = p 
-              block_given? ? yield(p) : print_progress(p)
+              block_given? ? yield(p) : stdout_progress(p)
               $defout.flush
             end
           end
@@ -30,8 +30,10 @@ module Transcoder
         progress_finalise
 
         raise TranscoderError::MediaFormatException if $?.exitstatus != 0
+        
         # Fixme: When doing 2-pass the output is not the job.generate_convert_filename
-        # raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
+        # not supporting 2-pass for now.
+        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       
       rescue TranscoderError => e
         Transcoder.logger.error e.message
@@ -41,11 +43,12 @@ module Transcoder
       def self.command(job)
         cmd = ''
         cmd += " -y -f #{job.profile.video_format} -vcodec #{job.profile.video_codec} -r #{job.profile.video_fps} "
-        cmd += " -acodec #{job.profile.audio_codec} -ab #{job.profile.audio_bitrate}k -ar #{job.profile.audio_rate} -ac #{job.profile.audio_channel} #{job.profile.extra_param} "
+        cmd += " -acodec #{job.profile.audio_codec} -ab #{job.profile.audio_bitrate}k -ar #{job.profile.audio_rate} -ac #{job.profile.audio_channel} #{job.profile.extra_param}"
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
         cmd += padding_command(job.profile, job.original_file)
         # optional params
-        cmd += " -bt #{job.profile.video_bitrate}k " if job.profile.video_bitrate.to_i > 0
+        cmd += " -b #{job.profile.video_bitrate}k" if job.profile.video_bitrate.to_i > 0
+        
                                 # can use S3 link directly here? if the file is public
         cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
         cmd
@@ -101,9 +104,6 @@ module Transcoder
         end
       end
 
-      def self.print_progress(progress)
-        puts "Progress: #{progress}"
-      end
     
     
     end

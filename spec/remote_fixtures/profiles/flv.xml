@@ -2,9 +2,9 @@
   <video_codec>flv</video_codec>
   <name>Flash video</name>
   <category>Format</category>
-  <extra_param>-aspect 4:3</extra_param>
+  <extra_param></extra_param>
   <audio_rate>22050</audio_rate>
-  <video_bitrate>200</video_bitrate>
+  <video_bitrate>500</video_bitrate>
   <audio_channel>1</audio_channel>
   <audio_bitrate>56</audio_bitrate>
   <video_format>flv</video_format>
@@ -15,7 +15,7 @@
   <add_padding />
   <is_public>true</is_public>
   <user_id />
-  <video_fps>12</video_fps>
+  <video_fps>24</video_fps>
   <suffix>flv</suffix>  
   <created_at></created_at>
 </profile>
