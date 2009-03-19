@@ -9,7 +9,7 @@ describe Transcoder::Tools::FFmpeg do
   remote_fixtures
   # mkdir file_system && cp spec/fixtures/kites.mp4 file_system/
   
-  Transcoder::Tools::FFmpeg::FFMPEG_PATH = "/usr/bin/ffmpeg" unless defined? "Transcoder::Tools::FFmpeg::FFMPEG_PATH"
+  FFMPEG_PATH = "/usr/local/bin/ffmpeg" unless defined? "FFMPEG_PATH"
   
     
   it "should generate ffmpeg command " do        
