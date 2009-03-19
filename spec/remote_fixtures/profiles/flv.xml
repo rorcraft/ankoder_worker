@@ -4,7 +4,7 @@
   <category>Format</category>
   <extra_param></extra_param>
   <audio_rate>22050</audio_rate>
-  <video_bitrate>500</video_bitrate>
+  <video_bitrate>98</video_bitrate>
   <audio_channel>1</audio_channel>
   <audio_bitrate>56</audio_bitrate>
   <video_format>flv</video_format>
@@ -18,4 +18,5 @@
   <video_fps>24</video_fps>
   <suffix>flv</suffix>  
   <created_at></created_at>
+  <keep_quality>true</keep_quality>
 </profile>

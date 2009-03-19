@@ -30,7 +30,7 @@ describe Transcoder::Tools::FFmpeg do
     # debugger
     converted_inspector = RVideo::Inspector.new(:file => jobs(:kites_to_flv).convert_file_full_path, :ffmpeg_binary => FFMPEG_PATH)
 
-    original_inspector.bitrate.should == converted_inspector.bitrate
+    original_inspector.bitrate.should <= converted_inspector.bitrate.to_i 
     puts original_inspector.bitrate
     puts original_inspector.fps
 
@@ -46,7 +46,7 @@ describe Transcoder::Tools::FFmpeg do
     file_path = File.join(FILE_FOLDER, jobs(:kites_to_flv).generate_convert_filename)
     File.should be_exists(file_path )
     # convert_file.inspector.format.should == flv 
-    FileUtils.rm file_path
+    #FileUtils.rm file_path
   end
 
   it "given a block, can retrieve progress"

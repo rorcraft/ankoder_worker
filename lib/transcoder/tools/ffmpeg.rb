@@ -47,7 +47,11 @@ module Transcoder
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
         cmd += padding_command(job.profile, job.original_file)
         # optional params
-        cmd += " -b #{job.profile.video_bitrate}k" if job.profile.video_bitrate.to_i > 0
+        if job.profile.keep_quality?
+          cmd += " -sameq " 
+        elsif job.profile.video_bitrate.to_i > 0
+          cmd += " -b #{job.profile.video_bitrate}k" 
+        end
         
                                 # can use S3 link directly here? if the file is public
         cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
