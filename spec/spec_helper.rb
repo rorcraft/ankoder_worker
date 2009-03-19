@@ -65,15 +65,19 @@ def videos(name)
 end
 
 def jobs(name)
-    case name
-    when :kites_to_flv then Job.find(1)
-    else nil
-    end
+    args = name.to_s.split "_"
+    _video = args[0]
+    _profile = args[2]
+    _j = Job.new :id => rand(12345)
+    _j.original_file_id =  videos(_video.to_sym).id
+    _j.profile_id = profiles(_profile.to_sym).id
+    _j
 end
 
 def profiles(name)  
     case name
     when :flv then Profile.find(1)
+    when :flv320x240 then Profile.find(2)
     else nil
     end
 end
@@ -86,6 +90,7 @@ def remote_fixtures
     mock.get "/videos/1.xml", {}, video(:kites)
     mock.get "/jobs/1.xml", {}, job(:kites_to_flv)    
     mock.get "/profiles/1.xml", {}, profile(:flv)
+    mock.get "/profiles/2.xml", {}, profile(:flv320x240)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404
   end

@@ -42,23 +42,35 @@ module Transcoder
     
       def self.command(job)
         cmd = ''
-        cmd += " -y -f #{job.profile.video_format} -vcodec #{job.profile.video_codec} -r #{job.profile.video_fps} "
-        cmd += " -acodec #{job.profile.audio_codec} -ab #{job.profile.audio_bitrate}k -ar #{job.profile.audio_rate} -ac #{job.profile.audio_channel} #{job.profile.extra_param}"
+        cmd += " -y -f #{job.profile.video_format} -vcodec #{job.profile.video_codec}"
+        cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
+        cmd += " -acodec #{job.profile.audio_codec}"
+        cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
+        cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
+        cmd +=" -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
+
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
-        cmd += padding_command(job.profile, job.original_file)
-        # optional params
+
+        # bitrate
         if job.profile.keep_quality?
           cmd += " -sameq " 
         elsif job.profile.video_bitrate.to_i > 0
           cmd += " -b #{job.profile.video_bitrate}k" 
         end
         
+        if job.profile.add_padding?
+          cmd += padding_command(job.profile, job.original_file) 
+        elsif job.profile.width.to_i > 0
+          cmd += "-s #{job.profile.width}x#{job.profile.height}"
+        end          
+                
+        cmd += " #{job.profile.extra_param}"
                                 # can use S3 link directly here? if the file is public
         cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
         cmd
       end
     
-      def self.padding_command(profile, video)
+      def self.padding_command(profile, video)        
         cmd = ""
         padding_info = padding(profile.width, profile.height, video.width, video.height)
         cmd += " -padleft #{padding_info["padleft"]} " unless padding_info["padleft"].blank? 

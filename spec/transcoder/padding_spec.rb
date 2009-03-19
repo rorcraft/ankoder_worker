@@ -27,8 +27,8 @@ describe Transcoder::Padding do
   describe ".padding(profile_width,profile_height,video_width,video_height)" do
     it "defaults to 320x240" do
       result = @p.padding(0,0,-1,-1)
-      result["result_height"].should == 240
-      result["result_width"].should == 320      
+      result["result_height"].should == -1
+      result["result_width"].should == -1      
     end
     
     it "if video_height < 0 or video_width < 0, padding should return profile dimensions" do    

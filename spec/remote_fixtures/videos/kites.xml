@@ -3,6 +3,6 @@
   <name>Title of the video</name>
   <filename>kites.mp4</filename>
   <video_format>mp4</video_format>
-  <height>240</height>
-  <width>320</width>  
+  <height>144</height>
+  <width>176</width>  
 </video>
