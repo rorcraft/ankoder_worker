@@ -4,7 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/transco
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/padding")
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/helper")
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/tools/ffmpeg")
-
+require "rvideo"
 describe Transcoder::Tools::FFmpeg do
   remote_fixtures
   # mkdir file_system && cp spec/fixtures/kites.mp4 file_system/
@@ -21,8 +21,21 @@ describe Transcoder::Tools::FFmpeg do
   
   it "command should support watermark"
 
-  it "should keep same quality"
-  
+  it "should keep same quality" do
+    original_file = jobs(:kites_to_flv).original_file	  
+    debugger
+    original_inspector = RVideo::Inspector.new(:file=> original_file.file_path, :ffmpeg_binary => FFMPEG_PATH)
+    Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
+    				  
+    File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)    
+    
+    converted_inspector = RVideo::Inspector.new(:file => jobs(:kites_to_flv).convert_file_full_path, :ffmpeg_binary => FFMPEG_PATH)
+
+#    original_inspector.bitrate.should == converted_inspector.bitrate
+    puts original_inspector.bitrate
+    puts original_inspector.fps
+
+  end
   # it "command should support threads option when mp4"
 
   # it "should support 2-pass" 

@@ -33,7 +33,7 @@ module Transcoder
         
         # Fixme: When doing 2-pass the output is not the job.generate_convert_filename
         # not supporting 2-pass for now.
-        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
+#        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       
       rescue TranscoderError => e
         Transcoder.logger.error e.message

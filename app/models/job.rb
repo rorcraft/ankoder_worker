@@ -42,5 +42,9 @@ class Job < ActiveResource::Base
       convert_file.filename
     end
   end
-  
+
+  def convert_file_full_path
+    File.join(FILE_FOLDER, generate_convert_filename)
+  end
+
 end
