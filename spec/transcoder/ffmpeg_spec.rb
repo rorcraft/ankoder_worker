@@ -18,6 +18,7 @@ describe Transcoder::Tools::FFmpeg do
     puts cmd
     `#{cmd}`
   end
+<<<<<<< HEAD:spec/transcoder/ffmpeg_spec.rb
   
 #   it "command should support watermark"
 
@@ -33,24 +34,62 @@ describe Transcoder::Tools::FFmpeg do
     original_inspector.bitrate.should <= converted_inspector.bitrate.to_i 
     puts original_inspector.bitrate
     puts original_inspector.fps
+=======
+>>>>>>> eee90c014c121cfa429f44a19fe1159770fb6d53:spec/transcoder/ffmpeg_spec.rb
 
+  it "should keep same quality" do      
+    cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv))
+    assert cmd.match('-sameq')	  
   end
-  # it "command should support threads option when mp4"
 
-  # it "should support 2-pass" 
+  it "should keep original size" do
+    cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv))
+    width = video_inspect(jobs(:kites_to_flv).original_file.file_path).width
+    height= video_inspect(jobs(:kites_to_flv).original_file.file_path).height
+    p cmd
+    assert !cmd.include?("-s #{width}x#{height}")
+  end
   
+  it "should add padding if it is set"  do
+    cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv320x240))
+    p cmd
+    assert cmd.include?("-padleft")        
+  end
+  
+  it "should use profile size if it is set" do
+    cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv320x240))
+    p cmd
+    assert cmd.include?("-s 320x240")    
+  end
+
   it "run should catch ffmpeg exceptions"
   
   it  "should convert mp4 to flv" do
     Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
-    file_path = File.join(FILE_FOLDER, jobs(:kites_to_flv).generate_convert_filename)
-    File.should be_exists(file_path)
-    File.size(file_path).should > 0 
-#     FileUtils.rm file_path
+    File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)
+    video_inspect(jobs(:kites_to_flv).convert_file_full_path).container.should == "flv" 
+    FileUtils.rm file_path
   end
-  
-  it "given a block, can retrieve progress"
 
+  it  "should convert mp4 to flv320x240 (qvga)" do
+    Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv320x240))
+    File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)
+    video_inspect(jobs(:kites_to_flv).convert_file_full_path).width.should == "320"
+    FileUtils.rm file_path
+  end
+
+  it "command should support watermark"
+  
+  # it  "should convert mp4 to flv852x480 (hd480)"   
+  # it  "should convert mp4 to flv1280x720 (hd720)"
+  # it  "should convert mp4 to flv1920x1080 (hd1080)"  
+
+  
+  # postpone
+  # it "given a block, can retrieve progress"
+  # it "command should support threads option when mp4"
+  # it "should support 2-pass" 
+    
   # TODO
   # write a generator to do this e.g. (need to create a bunch of XML files)
 #   it "should convert mp4 to other formats" do
@@ -74,5 +113,10 @@ describe Transcoder::Tools::FFmpeg do
     file_path = File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
 #     `gnome-open $file_path`
   end
+  
+  def video_inspect(file_path)
+    RVideo::Inspector.new(:file => file_path, :ffmpeg_binary => FFMPEG_PATH)
+  end
+  
   
 end

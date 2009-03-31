@@ -1,5 +1,5 @@
 <profile>
-  <id>1</id>
+  <id>2</id>
   <video_codec>flv</video_codec>
   <name>Flash video</name>
   <category>Format</category>
@@ -11,9 +11,9 @@
   <video_format>flv</video_format>
   <audio_codec>libmp3lame</audio_codec>
   <keep_aspect />
-  <height>0</height>
-  <width>0</width>
-  <add_padding />
+  <height>240</height>
+  <width>320</width>
+  <add_padding>true</add_padding>
   <is_public>true</is_public>
   <user_id />
   <video_fps>24</video_fps>
