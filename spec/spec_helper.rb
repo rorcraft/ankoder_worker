@@ -67,6 +67,10 @@ end
 def jobs(name)
     case name
     when :kites_to_flv then Job.find(1)
+    when :kites_to_wmv then Job.find(2)
+    when :kites_to_divx then Job.find(3)
+    when :kites_to_mov then Job.find(4)
+    when :kites_to_rm then Job.find(5)
     else nil
     end
 end
@@ -74,6 +78,10 @@ end
 def profiles(name)  
     case name
     when :flv then Profile.find(1)
+    when :wmv then Profile.find(2)
+    when :divx then Profile.find(3)
+    when :mov then Profile.find(4)
+    when :rm then Profile.find(5)
     else nil
     end
 end
@@ -85,7 +93,15 @@ def remote_fixtures
   ActiveResource::HttpMock.respond_to do |mock|
     mock.get "/videos/1.xml", {}, video(:kites)
     mock.get "/jobs/1.xml", {}, job(:kites_to_flv)    
+    mock.get "/jobs/2.xml", {}, job(:kites_to_wmv)    
+    mock.get "/jobs/3.xml", {}, job(:kites_to_divx)    
+    mock.get "/jobs/4.xml", {}, job(:kites_to_mov)    
+    mock.get "/jobs/5.xml", {}, job(:kites_to_rm)    
     mock.get "/profiles/1.xml", {}, profile(:flv)
+    mock.get "/profiles/2.xml", {}, profile(:wmv)
+    mock.get "/profiles/3.xml", {}, profile(:divx)
+    mock.get "/profiles/4.xml", {}, profile(:mov)
+    mock.get "/profiles/5.xml", {}, profile(:rm)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404
   end

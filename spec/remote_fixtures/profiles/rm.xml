@@ -1,0 +1,22 @@
+<profile>
+  <video_codec>rv20</video_codec>
+  <name>Real Media</name>
+  <category>Format</category>
+  <extra_param></extra_param>
+  <audio_rate>22050</audio_rate>
+  <video_bitrate>600</video_bitrate>
+  <audio_channel>2</audio_channel>
+  <audio_bitrate>64</audio_bitrate>
+  <video_format>flv</video_format>
+  <audio_codec>libmp3lame</audio_codec>
+  <keep_aspect />
+  <height>0</height>
+  <width>0</width>
+  <add_padding />
+  <is_public>true</is_public>
+  <user_id />
+  <video_fps>25</video_fps>
+  <suffix>rm</suffix>  
+  <created_at></created_at>
+  <keep_quality>true</keep_quality>
+</profile>

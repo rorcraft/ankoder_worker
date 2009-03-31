@@ -19,7 +19,7 @@ describe Transcoder::Tools::FFmpeg do
     `#{cmd}`
   end
   
-  it "command should support watermark"
+#   it "command should support watermark"
 
   it "should keep same quality" do
     original_file = jobs(:kites_to_flv).original_file	  
@@ -44,37 +44,35 @@ describe Transcoder::Tools::FFmpeg do
   it  "should convert mp4 to flv" do
     Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
     file_path = File.join(FILE_FOLDER, jobs(:kites_to_flv).generate_convert_filename)
-    File.should be_exists(file_path )
-    # convert_file.inspector.format.should == flv 
-    #FileUtils.rm file_path
+    File.should be_exists(file_path)
+    File.size(file_path).should > 0 
+#     FileUtils.rm file_path
   end
-
+  
   it "given a block, can retrieve progress"
-
-  it  "should convert avi to flv" do
-    # @ff.execute(jobs(:avi_to_flv))
-    # File.exists? convert_file
-    # convert_file.inspector.format.should == flv    
-  end
 
   # TODO
   # write a generator to do this e.g. (need to create a bunch of XML files)
-  # from = %w{ mp4 avi flv wmv mov ogg divx m4v rmvb }
-  # to = %{ mp4 avi flv wmv ogg divx m4v }
-  # from.each do |f| 
-  #   to.each do |t|
-  #     eval %{ it "should convert #{f} to #{t}" do
-  #                @ff.execute(jobs(:#{f}_to_#{t}))
-  #                \# file exists
-  #                \# inspect
-  #             end
-  #           }
-  #    end
-  # end
+#   it "should convert mp4 to other formats" do
+#     debugger
+#     from = ["mp4"]
+#     to = ["divx", "flv", "mov", "rm", "wmv"]
+#     from.each do |f| 
+#       to.each do |t|
+#         eval %{ it "should convert #{f} to #{t}" do
+#                  @ff.execute(jobs(:#{f}_to_#{t}))
+#                  file_path = File.join(FILE_FOLDER, jobs(:#{f}_to_#{t}).generate_convert_filename)
+#                  File.should be_exists(file_path)
+#               end
+#             }
+#       end
+#     end
+#   end
     
     
   def test_file 
-    File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
+    file_path = File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
+#     `gnome-open $file_path`
   end
   
 end
