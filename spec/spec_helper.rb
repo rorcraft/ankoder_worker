@@ -94,7 +94,7 @@ def profiles(name)
     end
 end
   
-def remote_fixtures
+  def remote_fixtures
   require 'active_resource/http_mock'
   # @kites  = { :id => 1, :name => 'Kites.mp4' }.to_xml(:root => 'video')
 
@@ -114,5 +114,7 @@ def remote_fixtures
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404
   end
+  
+  
 end
   

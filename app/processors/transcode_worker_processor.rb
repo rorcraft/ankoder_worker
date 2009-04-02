@@ -7,7 +7,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
 
   include Transcoder::InstanceMethods
   
-  def on_message(message)
+  def on_message(message) 
     logger.debug "TranscodeWorkerProcessor received: " + message
     puts "TranscodeWorkerProcessor received: " + message
     
@@ -15,10 +15,10 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     transcode(job)
         
   end
-  
+   
   #  {"type": "ASSIGN", "content": {"config": {"OriginalFile": "1", "ConvertJob": "1"}, "node_name": "Converter"}}
-  def get_job_id(message)
-    msg = JSON.parse(message)
+  def get_job_id message
+    msg = JSON.parse message
     msg["content"]["config"]["ConvertJob"]
   end
   

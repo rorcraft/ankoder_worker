@@ -9,7 +9,7 @@ describe Transcoder::Tools::FFmpeg do
   remote_fixtures
   # mkdir file_system && cp spec/fixtures/kites.mp4 file_system/
   
-  FFMPEG_PATH = "/usr/local/bin/ffmpeg" unless defined? "FFMPEG_PATH"
+  FFMPEG_PATH = "/usr/local/bin/ffmpeg" unless defined? FFMPEG_PATH
   
     
   it "should generate ffmpeg command " do        
@@ -18,25 +18,7 @@ describe Transcoder::Tools::FFmpeg do
     puts cmd
     `#{cmd}`
   end
-<<<<<<< HEAD:spec/transcoder/ffmpeg_spec.rb
   
-#   it "command should support watermark"
-
-  it "should keep same quality" do
-    original_file = jobs(:kites_to_flv).original_file	  
-    original_inspector = RVideo::Inspector.new(:file=> original_file.file_path, :ffmpeg_binary => FFMPEG_PATH)
-    Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
-    				  
-    File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)    
-    # debugger
-    converted_inspector = RVideo::Inspector.new(:file => jobs(:kites_to_flv).convert_file_full_path, :ffmpeg_binary => FFMPEG_PATH)
-
-    original_inspector.bitrate.should <= converted_inspector.bitrate.to_i 
-    puts original_inspector.bitrate
-    puts original_inspector.fps
-=======
->>>>>>> eee90c014c121cfa429f44a19fe1159770fb6d53:spec/transcoder/ffmpeg_spec.rb
-
   it "should keep same quality" do      
     cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv))
     assert cmd.match('-sameq')	  

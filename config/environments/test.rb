@@ -33,9 +33,13 @@ AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
 
 if `hostname`.strip.match 'rexchung'
-  FFMPEG_PATH   = "/opt/local/bin/ffmpeg"
+  FFMPEG_PATH     = "/opt/local/bin/ffmpeg"
   MENCODER_PATH   = "/opt/local/bin/mencoder"
+  CURL            = "/usr/bin/curl"
 else
-  FFMPEG_PATH = "/usr/local/bin/ffmpeg"
+  FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
+  CURL            = "/usr/bin/curl"
 end
+
+S3BUCKET = TEST_BUCKET = "ankodertest"
