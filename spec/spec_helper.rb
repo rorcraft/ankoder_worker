@@ -46,7 +46,7 @@ Spec::Runner.configure do |config|
   # For more information take a look at Spec::Example::Configuration and Spec::Runner
 end
 
-%w( video profile job ).each do |model|
+%w( video profile job user).each do |model|
   eval %{
     def #{model}(name)
         path = File.join(RAILS_ROOT, "spec", "remote_fixtures", "#{model}s", "\#\{name\}.xml")
@@ -93,6 +93,13 @@ def profiles(name)
     else nil
     end
 end
+
+def users(name)
+  case name
+  when :edwin then User.find(1)
+  else nil
+  end
+end
   
   def remote_fixtures
   require 'active_resource/http_mock'
@@ -110,6 +117,7 @@ end
     mock.get "/profiles/3.xml", {}, profile(:divx)
     mock.get "/profiles/4.xml", {}, profile(:mov)
     mock.get "/profiles/5.xml", {}, profile(:rm)
+    mock.get "/users/1.xml", {}, user(:edwin)
 #     mock.get "/profiles/2.xml", {}, profile(:flv320x240)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404

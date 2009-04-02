@@ -8,7 +8,15 @@ describe Transcoder::Tools::Http do
   remote_fixtures
 
     
-  it "should postback" 
+  # watch request from localhost:3000
+  
+
+  it "should postback fail message" do
+    result = Transcoder::Tools::Http.post_back(jobs(:kites_to_divx), "fail")
+  end
     
+  it "should postback success message" do
+    result = Transcoder::Tools::Http.post_back(jobs(:kites_to_divx), "success")
+  end
     
 end

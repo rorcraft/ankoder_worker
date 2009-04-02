@@ -2,4 +2,8 @@
   <id>3</id>
   <original_file_id>1</original_file_id>
   <profile_id>3</profile_id>
+  <convert_file_id>3</convert_file_id>
+  <convert_file_s3_name>kites.divx</convert_file_s3_name>
+  <postback_url>http://localhost:3000</postback_url>
+  <user_id>1</user_id> 
 </job>
