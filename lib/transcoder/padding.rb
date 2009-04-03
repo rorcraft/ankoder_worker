@@ -4,7 +4,7 @@ module Transcoder
     
     def split_padding length
       pad1 = pad2 = even_size(length)/2
-      return pad1, pad2
+      return even_size(pad1), even_size(pad2) #padding must be even number themselves.
     end 
 
     def even_size(size)

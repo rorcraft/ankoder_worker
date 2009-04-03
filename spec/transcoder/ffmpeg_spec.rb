@@ -37,12 +37,21 @@ describe Transcoder::Tools::FFmpeg do
     p cmd
     assert cmd.include?("-padleft")        
   end
+
+  it "should not padding if it is set to false"  do
+    job = jobs(:kites_to_flv320x240)
+    job.profile.add_padding = false
+    cmd = Transcoder::Tools::FFmpeg.command(job)
+    p cmd
+    assert !cmd.include?("-padleft")        
+  end
   
   it "should use profile size if it is set" do
     cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv320x240))
     p cmd
-    assert cmd.include?("-s 320x240")    
+    assert cmd.include?("-s 294x240")    
   end
+
 
   it "run should catch ffmpeg exceptions"
   
@@ -50,14 +59,14 @@ describe Transcoder::Tools::FFmpeg do
     Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv))
     File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)
     video_inspect(jobs(:kites_to_flv).convert_file_full_path).container.should == "flv" 
-    FileUtils.rm file_path
+    FileUtils.rm jobs(:kites_to_flv).convert_file_full_path
   end
 
   it  "should convert mp4 to flv320x240 (qvga)" do
     Transcoder::Tools::FFmpeg.run(jobs(:kites_to_flv320x240))
-    File.should be_exists(jobs(:kites_to_flv).convert_file_full_path)
-    video_inspect(jobs(:kites_to_flv).convert_file_full_path).width.should == "320"
-    FileUtils.rm file_path
+    File.should be_exists(jobs(:kites_to_flv320x240).convert_file_full_path)
+    video_inspect(jobs(:kites_to_flv320x240).convert_file_full_path).width.should == "322" # added padding.
+    FileUtils.rm jobs(:kites_to_flv320x240).convert_file_full_path
   end
 
   it "command should support watermark"
@@ -92,7 +101,7 @@ describe Transcoder::Tools::FFmpeg do
     
     
   def test_file 
-    file_path = File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
+    File.expand_path(File.dirname(__FILE__) + "/../fixtures/kites.mp4")
 #     `gnome-open $file_path`
   end
   

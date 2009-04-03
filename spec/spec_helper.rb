@@ -65,21 +65,22 @@ def videos(name)
 end
 
 def jobs(name)
-    case name
-    when :kites_to_flv then Job.find(1)
-    when :kites_to_wmv then Job.find(2)
-    when :kites_to_divx then Job.find(3)
-    when :kites_to_mov then Job.find(4)
-    when :kites_to_rm then Job.find(5)
-    else nil
-    end
-#     args = name.to_s.split "_"
-#     _video = args[0]
-#     _profile = args[2]
-#     _j = Job.new :id => rand(12345)
-#     _j.original_file_id =  videos(_video.to_sym).id
-#     _j.profile_id = profiles(_profile.to_sym).id
-#     _j
+  case name
+   when :kites_to_flv then Job.find(1)
+   when :kites_to_wmv then Job.find(2)
+   when :kites_to_divx then Job.find(3)
+   when :kites_to_mov then Job.find(4)
+   when :kites_to_rm then Job.find(5)
+   when :kites_to_flv320x240 then Job.find(6)
+   else nil
+   end
+     # args = name.to_s.split "_"
+     # _video = args[0]
+     # _profile = args[2]
+     # _j = Job.new :id => rand(12345)
+     # _j.original_file_id =  videos(_video.to_sym).id
+     # _j.profile_id = profiles(_profile.to_sym).id
+     # _j
 end
 
 def profiles(name)  
@@ -89,7 +90,7 @@ def profiles(name)
     when :divx then Profile.find(3)
     when :mov then Profile.find(4)
     when :rm then Profile.find(5)
-#     when :flv320x240 then Profile.find(2)
+    when :flv320x240 then Profile.find(6)
     else nil
     end
 end
@@ -111,12 +112,14 @@ end
     mock.get "/jobs/2.xml", {}, job(:kites_to_wmv)    
     mock.get "/jobs/3.xml", {}, job(:kites_to_divx)    
     mock.get "/jobs/4.xml", {}, job(:kites_to_mov)    
-    mock.get "/jobs/5.xml", {}, job(:kites_to_rm)    
+    mock.get "/jobs/5.xml", {}, job(:kites_to_rm)   
+    mock.get "/jobs/6.xml", {}, job(:kites_to_flv320x240) 
     mock.get "/profiles/1.xml", {}, profile(:flv)
     mock.get "/profiles/2.xml", {}, profile(:wmv)
     mock.get "/profiles/3.xml", {}, profile(:divx)
     mock.get "/profiles/4.xml", {}, profile(:mov)
     mock.get "/profiles/5.xml", {}, profile(:rm)
+    mock.get "/profiles/6.xml", {}, profile(:flv320x240)
     mock.get "/users/1.xml", {}, user(:edwin)
 #     mock.get "/profiles/2.xml", {}, profile(:flv320x240)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
