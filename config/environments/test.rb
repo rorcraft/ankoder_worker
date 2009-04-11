@@ -31,6 +31,8 @@ require 'ruby-debug'
 
 AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
+S3_ON         = false
+THUMBNAIL_FOLDER = File.join RAILS_ROOT, "public", "thumbnails"
 
 if `hostname`.strip.match 'rexchung'
   FFMPEG_PATH     = "/opt/local/bin/ffmpeg"

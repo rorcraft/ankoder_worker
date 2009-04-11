@@ -67,6 +67,7 @@ module Transcoder
         cmd += " #{job.profile.extra_param}"
                                 # can use S3 link directly here? if the file is public
         cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
+        Transcoder.logger.debug cmd
         cmd
       end
     
@@ -81,6 +82,35 @@ module Transcoder
         return cmd
       end
          
+         
+      # def create_thumbnail( time = nil, sizes = Video::SIZES)
+      #   return unless file_exist?
+      #   time = default_sec(time)    
+      #     
+      #   ffmpeg_thumbnail(time)
+      #     
+      #   sizes.each do |key,value|
+      #     image_resize(time, key, value)
+      #   end
+      #     
+      #   if S3_ON
+      #     s3_connect
+      #     AWS::S3::S3Object.store(thumbnail_name(time), open(self.thumbnail_full_path(time)), ::S3_BUCKET ,  :access => :public_read)
+      #     
+      #     sizes.each { |key,value|
+      #       count = 0
+      #       begin
+      #         AWS::S3::S3Object.store(thumbnail_name(time,key), open(self.thumbnail_full_path(time,key)), ::S3_BUCKET ,  :access => :public_read)
+      #       rescue
+      #         count += 1
+      #         retry if count < 3
+      #         raise
+      #       end
+      #     }
+      #     self.thumbnail_uploaded = true
+      #   end
+      # end
+
       
       private
     

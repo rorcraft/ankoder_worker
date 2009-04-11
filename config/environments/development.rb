@@ -16,4 +16,22 @@ config.action_controller.perform_caching             = false
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
 
-AR_SITE = 'localhost'
+if `hostname`.strip.match 'rexchung'
+  AR_SITE          = 'http://mancjew:pianoman@ar.localankoder.com'
+  FFMPEG_PATH      = "/opt/local/bin/ffmpeg"
+  MENCODER_PATH    = "/opt/local/bin/mencoder"
+  CURL             = "/usr/bin/curl"
+  FILE_FOLDER      = "/Users/rexchung/workspace/ankoder/api/file_system"
+  THUMBNAIL_FOLDER = "/Users/rexchung/workspace/ankoder/api/public/thumbnails"
+else
+  AR_SITE = 'http://admin:admin@ar.localankoder.com'
+  FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
+  MENCODER_PATH   = "/usr/local/bin/mencoder"
+  CURL            = "/usr/bin/curl"  
+  FILE_FOLDER   = "/Users/rexchung/workspace/ankoder/api/file_system"
+  THUMBNAIL_FOLDER = "/Users/rexchung/workspace/ankoder/api/public/thumbnails"
+end
+
+
+S3_ON         = false
+S3BUCKET = "ankoderdev"

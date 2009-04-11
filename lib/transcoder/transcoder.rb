@@ -39,7 +39,7 @@ module Transcoder
   module InstanceMethods
     
     def transcode(job)
-      # job.set_status(:processing) (update started_at = time.now)
+      job.set_status("processing") # (update started_at = time.now)
       
       # download job.original_file from S3 if S3_ON
       
@@ -51,9 +51,9 @@ module Transcoder
         # FFmpeg2Theora.run(job)
       # else Transcode the video
       Tools::FFmpeg.run(job)
-        
-  
+          
       # create the converted file
+      create_convert_file(job)
       
       # if flv - add title
       # Flvtool2.add_title(job)
@@ -80,13 +80,26 @@ module Transcoder
       # remove local original file
       # remove local convert file
       
-      # job.set_status(:complete)
+      job.set_status("complete")
       
     rescue TranscoderError
-      # job.set_status(:failed)
+      job.set_status("failed")
       
     end
     
+    def create_convert_file(job)
+      converted_video = ConvertFile.new
+      converted_video.read_metadata
+      converted_video.filename          = job.generate_convert_filename
+      converted_video.original_filename = job.generate_convert_file_original_filename
+      converted_video.size              = File.size(job.convert_file_full_path)  
+      converted_video.user_id           = job.user_id
+      # converted_video.video_codec       = 
+      converted_video.save
+      
+      job.convert_file_id = converted_video.id
+      job.save
+    end
     
   end
   

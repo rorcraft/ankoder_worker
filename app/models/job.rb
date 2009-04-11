@@ -1,6 +1,8 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
   
+  STATUS = %w{ submit transcode complete }
+  
   def profile
     @profile ||= Profile.find(profile_id) if profile_id
     @profile
@@ -35,6 +37,7 @@ class Job < ActiveResource::Base
     save
   end
 
+  # TODO: add job_id to filename otherwise multiple jobs with same suffix can overwrite each other
   def generate_convert_filename
     if convert_file.nil? or convert_file.filename.nil?
       "#{original_file.filename.split(".")[0]}.#{profile.suffix}" 
@@ -43,8 +46,20 @@ class Job < ActiveResource::Base
     end
   end
 
+  def generate_convert_file_original_filename
+    if convert_file.nil? or convert_file.original_filename.nil?
+      "#{original_file.original_filename.split(".")[0]}.#{profile.suffix}"
+    else
+      convert_file.original_filename
+    end  
+  end
+
   def convert_file_full_path
     File.join(FILE_FOLDER, generate_convert_filename)
+  end
+  
+  def set_status(_status)
+    put(:set_status, :status => _status)
   end
 
 end
