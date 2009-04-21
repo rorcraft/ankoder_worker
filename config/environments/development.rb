@@ -22,16 +22,18 @@ if `hostname`.strip.match 'rexchung'
   MENCODER_PATH    = "/opt/local/bin/mencoder"
   CURL             = "/usr/bin/curl"
   FILE_FOLDER      = "/Users/rexchung/workspace/ankoder/api/file_system"
-  THUMBNAIL_FOLDER = "/Users/rexchung/workspace/ankoder/api/public/thumbnails"
+  PUBLIC_FOLDER    = "/Users/rexchung/workspace/ankoder/api/public"
+  THUMBNAIL_FOLDER = "#{PUBLIC_FOLDER}/thumbnails"
 else
-  AR_SITE = 'http://admin:admin@ar.localankoder.com'
+  AR_SITE = 'http://workflow:r0rcr4ft@trunk.localankoder.com'
   FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
   CURL            = "/usr/bin/curl"  
-  FILE_FOLDER   = "/Users/rexchung/workspace/ankoder/api/file_system"
-  THUMBNAIL_FOLDER = "/Users/rexchung/workspace/ankoder/api/public/thumbnails"
+  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
+  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
+  THUMBNAIL_FOLDER = "#{PUBLIC_FOLDER}/thumbnails"
 end
 
 
-S3_ON         = false
-S3BUCKET = "ankoderdev"
+S3_ON         = true
+S3BUCKET = "devbucket.ankoder.com"

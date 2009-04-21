@@ -1,2 +1,2 @@
 # Include hook code here
-require 's3curl'
+require 's3_curl'

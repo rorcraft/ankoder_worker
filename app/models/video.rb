@@ -1,5 +1,7 @@
 class Video < ActiveResource::Base
   self.site = AR_SITE
+  DEFAULT_SEC = 0
+  SIZES = {:medium=>300,:small=>150, :tiny => 50}
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(filename = nil)
@@ -26,7 +28,7 @@ class Video < ActiveResource::Base
   end
   
   def s3_exist?
-    AWS::S3::S3Object.exists?(self.s3_name, S3_BUCKET) 
+    S3Curl.exists?(self.s3_name) 
   end
   
   def s3_name
@@ -42,6 +44,9 @@ class Video < ActiveResource::Base
     (0 < time && time < duration_in_secs) ? time : (duration_in_secs / 2).to_i #if default secs in outside of video duration
   end
 
+  def duration_in_secs                                                      
+     duration.nil? ? 0 : (duration / 1000).to_i
+  end
  
   def ffmpeg_thumbnail(time= nil)
     time = default_sec time
@@ -72,25 +77,30 @@ class Video < ActiveResource::Base
     return unless file_exist?
     time = default_sec(time)    
         
-    s3_connect
-    AWS::S3::S3Object.store(thumbnail_name(time), open(self.thumbnail_full_path(time)), ::S3_BUCKET ,  :access => :public_read)
-        
+    #s3_connect
+    #AWS::S3::S3Object.store(thumbnail_name(time), open(self.thumbnail_full_path(time)), ::S3_BUCKET ,  :access => :public_read)
+    S3Curl.upload(thumbnail_name(time), thumbnail_full_path(time))    
     Video::SIZES.each { |key,value|
       count = 0
       begin
-        AWS::S3::S3Object.store(thumbnail_name(time,key), open(self.thumbnail_full_path(time,key)), ::S3_BUCKET ,  :access => :public_read)
+        #AWS::S3::S3Object.store(thumbnail_name(time,key), open(self.thumbnail_full_path(time,key)), ::S3_BUCKET ,  :access => :public_read)
+        S3Curl.upload(thumbnail_name(time, key), thumbnail_full_path(time, key))    
       rescue
         count += 1
         retry if count < 3
         raise
       end
     }
-    self.update_attribute(:thumbnail_uploaded, true)
+    self.thumbnail_uploaded = true
+    self.save
   end
   
   def upload_to_s3
     S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})    
-    self.update_attribute(:uploaded,true) if s3_exist?
+    if s3_exist?
+      self.thumbnail_uploaded = true
+      self.save
+    end
   end
   
   def thumbnail_path(time=nil, size = nil)
@@ -100,5 +110,32 @@ class Video < ActiveResource::Base
   def thumbnail_full_path(time=nil, size = nil)    
     "#{PUBLIC_FOLDER}/#{thumbnail_path(time,size)}"
   end
+
+  # TODO: Need to create models for thumbnails.  
+  def thumbnail_name(time=nil,size = nil)
+    time = default_sec time
+    size = default_thumb_size size
   
+    filename + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
+  end
+
+  def default_thumb_size(size)                                              
+    Video::SIZES.has_key?(size) ? size : "small"
+  end
+
+  def image_resize(time, size, width)
+    # MiniMagick had problems with mod_rails
+    # image = MiniMagick::Image.new thumbnail_full_path(time)
+    # image.resize width
+    # image.write output
+    # logger.info "image_resize"
+    # logger.info "#{size}, #{width}"
+    #trying imagescience
+    ImageScience.with_image(thumbnail_full_path(time)) do |img|
+      img.thumbnail(width) do |thumb|
+        thumb.save thumbnail_full_path(time,size)
+      end
+    end
+  end
+
 end
