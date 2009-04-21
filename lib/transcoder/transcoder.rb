@@ -40,8 +40,9 @@ module Transcoder
     
     def transcode(job)
       job.set_status("processing") # (update started_at = time.now)
-      
-      # download job.original_file from S3 if S3_ON
+
+      # download from S3
+      S3curl.download(job.original_file.s3_name,job.original_file.file_path) if S3_ON
       
       # download watermark
       
@@ -53,7 +54,7 @@ module Transcoder
       Tools::FFmpeg.run(job)
           
       # create the converted file
-      create_convert_file(job)
+      convert_file = create_convert_file(job)
       
       # if flv - add title
       # Flvtool2.add_title(job)
@@ -62,14 +63,18 @@ module Transcoder
       # QtFaststart.run(job)
 
       # generate thumbnail for converted file
-      # upload thumbnail to S3
+      convert_file.generate_thumbnails
       
-      # upload converted file back to S3 is S3_ON
-    
+      if S3_ON
+        # upload thumbnail to S3
+        convert_file.upload_thumbnails_to_s3      
+        # upload converted file back to S3 
+        convert_file.upload_to_s3
+      end
+      
       # FTP the file. 
       # send to ftp queue and ftp worker to ftp? from another machine
-      # FTP the thumbnail as well
-      
+      # FTP the thumbnail as well      
       
       # Upload to Client's S3 ?
       
@@ -99,6 +104,8 @@ module Transcoder
       
       job.convert_file_id = converted_video.id
       job.save
+      
+      return converted_video
     end
     
   end

@@ -1,7 +1,7 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
   
-  STATUS = %w{ submit transcode complete }
+  STATUS = %w{ submitting queuing processing complete }
   
   def profile
     @profile ||= Profile.find(profile_id) if profile_id
