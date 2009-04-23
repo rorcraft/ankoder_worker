@@ -14,9 +14,11 @@ module Transcoder
     end
 
     def padding(profile_width, profile_height, video_width, video_height)
-      return {"result_width" => 320 , "result_height" => 240} if profile_width.to_i <= 0 && video_width.to_i <= 0
-      return {"result_width" => profile_width , "result_height" => profile_height} if video_width.to_i < 0 or video_height.to_i < 0      
-      return {"result_width" => even_size(video_width), "result_height" => even_size(video_height) } if profile_width.to_i == 0       
+      return {"result_width" => 320, "result_height" => 240} if profile_width.to_i <= 0 && video_width.to_i <= 0
+      return {"result_width" => video_width, "result_height" => video_height} if profile_width.to_i <= 0 && profile_height.to_i <= 0
+      return {"result_width" => profile_width, "result_height" => profile_height} if video_width.to_i < 0 or video_height.to_i < 0      
+      return {"result_width" => profile_width, "result_height" => even_size(profile_width * video_height / video_width) } if profile_width.to_i > 0 && profile_height.to_i == 0      
+      return {"result_width" => even_size(profile_height * video_width / video_height), "result_height" => profile_height } if profile_width.to_i == 0 && profile_height.to_i > 0      
 
       result = {}
       %w{profile_width profile_height video_width video_height}.each do |measure|
@@ -25,17 +27,29 @@ module Transcoder
       ratio_width , ratio_height  = profile_width / video_width , profile_height / video_height
       result_width, result_height = profile_width, profile_height 
 
+      #ratio = even_size(video_width).to_f / even_size(video_height).to_f      
+      ratio = even_size(profile_width).to_f / even_size(profile_height).to_f      
+      if (ratio > 1.555)
+        result["aspect_ratio"] = "16:9"
+        ratio_width = 16 
+        ratio_height = 9
+      else 
+        result["aspect_ratio"] = "4:3"
+        ratio_width = 4 
+        ratio_height = 3
+      end
+
       if profile_height == 0 #auto get height
         result_height = profile_width * video_height / video_width.to_i
       else  
           # pad top and bottom 
-          if ratio_width < ratio_height 
-            result_height = even_size ratio_width * video_height 
-            result["padtop"], result["padbottom"] = split_padding profile_height - result_height            
+          if ratio_height * video_width / ratio_width > video_height 
+            result_height = even_size video_width / ratio
+            result["padtop"], result["padbottom"] = split_padding result_height - video_height           
           # pad left and right
-          elsif ratio_width > ratio_height 
-            result_width = even_size ratio_height * video_width
-            result["padleft"], result["padright"] = split_padding profile_width - result_width
+          elsif ratio_width * video_height / ratio_height> video_width 
+            result_width = even_size video_height * ratio
+            result["padleft"], result["padright"] = split_padding result_width - video_width
           end                                    
       end
       

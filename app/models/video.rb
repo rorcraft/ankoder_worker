@@ -28,7 +28,7 @@ class Video < ActiveResource::Base
   end
   
   def s3_exist?
-    S3Curl.exists?(self.s3_name) 
+    S3Curl.exist?(self.s3_name) 
   end
   
   def s3_name

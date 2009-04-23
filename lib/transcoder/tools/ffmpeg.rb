@@ -78,6 +78,7 @@ module Transcoder
         cmd += " -padright #{padding_info["padright"]} " unless padding_info["padright"].blank? 
         cmd += " -padtop #{padding_info["padtop"]} " unless padding_info["padtop"].blank? 
         cmd += " -padbottom #{padding_info["padbottom"]} " unless padding_info["padbottom"].blank? 
+        cmd += " -aspect #{padding_info["aspect_ratio"]} " unless padding_info["aspect_ratio"].blank? 
         cmd += " -s #{padding_info["result_width"]}x#{padding_info["result_height"]} "
         return cmd
       end
