@@ -4,9 +4,22 @@ class Video < ActiveResource::Base
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
-  def file_path(filename = nil)
-    filename = filename || self.filename
+  def file_path(_filename = nil)
+    filename = _filename || self.filename
     File.join(FILE_FOLDER,filename) unless filename.nil?
+  end
+  
+  def set_filename
+    return unless original_filename.nil?
+    if !name.nil?
+      self.original_filename = "#{name}"
+    elsif !filename.nil?
+      p "filename = #{filename}"
+      self.original_filename = "#{filename}"
+    end
+    if name.nil? and !self.original_filename.blank?
+      self.name = self.original_filename
+    end
   end
     
   def read_metadata

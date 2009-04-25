@@ -27,7 +27,6 @@ module Transcoder
       ratio_width , ratio_height  = profile_width / video_width , profile_height / video_height
       result_width, result_height = profile_width, profile_height 
 
-      #ratio = even_size(video_width).to_f / even_size(video_height).to_f      
       ratio = even_size(profile_width).to_f / even_size(profile_height).to_f      
       if (ratio > 1.555)
         result["aspect_ratio"] = "16:9"

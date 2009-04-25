@@ -13,6 +13,8 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     
     job = Job.find(get_job_id(message))
     transcode(job)
+    
+    # postback? - job complete
         
   end
    
