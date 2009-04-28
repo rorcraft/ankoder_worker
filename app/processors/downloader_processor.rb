@@ -5,13 +5,16 @@ class DownloaderProcessor < ApplicationProcessor
   def on_message(message)
     logger.debug "DownloaderProcessor received: " + message
     video  = get_video(message)
-    Downloader.download(video.source_url)
+    
+    video.filename = video.make_hashed_name
+    temp_filepath  = Downloader.download(video.source_url, video.filename)
     
     # move file from tmp folder to usual file_path 
-    # FileUtils.cp File.join(TEMP_FOLDER,tempfile) , @original_file.file_path(File.basename(hashed_name))
-    # FileUtils.rm File.join(TEMP_FOLDER,tempfile) if File.exist?@original_file.file_path(File.basename(hashed_name))
- 
+    FileUtils.mv temp_filepath , video.file_path if temp_filepath
+    
+    ### return , log error if temp_filepath is false    
     video.read_metadata
+    video.extract_file_information
     video.generate_thumbnails
     video.save
     

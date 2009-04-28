@@ -16,7 +16,7 @@
 
 # TODO: more test with redirects... 
 class Downloader
-  
+    
     TEMP_FOLDER = "/tmp" unless defined? TEMP_FOLDER
     USER_AGENT  = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.11) Gecko/20071231 Firefox/2.0.0.11 Flock/1.0.5" unless defined? USER_AGENT
     
@@ -25,25 +25,24 @@ class Downloader
     end
 
     def self.command(url, local_filename )
+      # url = VideoSiteUrlParse.parse_video_url(url)
       url = "http://" + url if (url =~ /^(http|ftp):\/\//).nil?
       url.gsub!(/ /,'')
       # "curl -o \"#{hashed_name}\" -L -A \"#{USER_AGENT}\" \"#{URI.parse(url)}\"  2>&1"
-      "axel -o \"#{local_filename}\" -U \"#{USER_AGENT}\" \"#{URI.parse(url)}\"  2>&1"
+      "axel -o \"#{File.join(TEMP_FOLDER,local_filename)}\" -U \"#{USER_AGENT}\" \"#{URI.parse(url)}\"  2>&1"
     end
     
-    def self.download(url)
+    def self.download(url, local_filename)
       progress = nil
 
       raise DownloadError if url.blank?
-
-      hashed_name = Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{url}--")
       
-      _command = "cd #{TEMP_FOLDER} &&  #{command(url,hashed_name)}"
+      _command = "cd #{TEMP_FOLDER} && #{command(url,local_filename)}"
       logger.debug _command
       IO.popen(_command) do |pipe|
         pipe.each("\r") do |line|
-          if line =~ /(\d+)/
-            p = $1.to_i
+          if line =~ /(\d+)/ #TODO: not parsing progress from axel
+            p = $1.to_i 
             p = 100 if p > 100
             # limit the update rate to prevent too many progress update requests
             # flushing our mongrels
@@ -56,9 +55,14 @@ class Downloader
           end
         end
       end
+      # TODO: Need to catch different types of errors
+      # HTTP/1.1 403 Forbidden
+      # 404
+      # Timeout (if nothing received in 20mins? check 'axel' interface)
+      # failed to login FTP
       raise DownloadError if $?.exitstatus != 0
-      return File.join(TEMP_FOLDER,hashed_name)
-
+      file_path = File.join(TEMP_FOLDER,local_filename)
+      return File.exists?(file_path) ? file_path : false
     end
     
     def self.logger

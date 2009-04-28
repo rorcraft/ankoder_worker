@@ -60,6 +60,7 @@ end
 def videos(name)
     case name
     when :kites then Video.find(1)
+    when :downloaded then Video.find(2)
     else nil
     end
 end
@@ -108,6 +109,7 @@ end
 
   ActiveResource::HttpMock.respond_to do |mock|
     mock.get "/videos/1.xml", {}, video(:kites)
+    mock.get "/videos/2.xml", {}, video(:downloaded)
     mock.get "/jobs/1.xml", {}, job(:kites_to_flv)    
     mock.get "/jobs/2.xml", {}, job(:kites_to_wmv)    
     mock.get "/jobs/3.xml", {}, job(:kites_to_divx)    
