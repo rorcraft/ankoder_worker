@@ -6,8 +6,14 @@
 ActiveMessaging::Gateway.define do |s|
   #s.filter :some_filter, :only=>:orders
   s.processor_group :transcoder, :transcoder_worker
-  s.processor_group :downloader, :downloader
+  s.processor_group :downloader, :downloader_worker
     
-  s.destination :transcode_worker, '/queue/Converter'
-  s.destination :downloader, '/queue/Downloader'  
+  if ENV['RAILS_ENV'] != "production"
+    s.destination :transcode_worker, '/queue/dev/Converter2'
+    s.destination :downloader_worker, '/queue/dev/Downloader2'  
+  else
+    s.destination :transcode_worker, '/queue/Converter2'
+    s.destination :downloader_worker, '/queue/Downloader2'  
+  end
+
 end

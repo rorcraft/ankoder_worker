@@ -1,6 +1,6 @@
 class DownloaderProcessor < ApplicationProcessor
 
-  subscribes_to :downloader
+  subscribes_to :downloader_worker
 
   def on_message(message)
     logger.debug "DownloaderProcessor received: " + message

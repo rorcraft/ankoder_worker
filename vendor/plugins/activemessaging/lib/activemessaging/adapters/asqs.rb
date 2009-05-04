@@ -1,5 +1,7 @@
 require 'rubygems'
 require 'net/http'
+require 'net/https'
+require 'uri'
 require 'openssl'
 require 'base64'
 require 'cgi'
@@ -59,6 +61,7 @@ module ActiveMessaging
         # queue_name string, headers hash
         # for sqs, make sure queue exists, if not create, then add to list of polled queues
         def subscribe queue_name, message_headers={}
+          queue_name = sanitize_queue_name queue_name
           # look at the existing queues, create any that are missing
           queue = get_or_create_queue queue_name
           if @subscriptions.has_key? queue.name
@@ -71,6 +74,7 @@ module ActiveMessaging
         # queue_name string, headers hash
         # for sqs, attempt delete the queues, won't work if not empty, that's ok
         def unsubscribe queue_name, message_headers={}
+          queue_name = sanitize_queue_name queue_name
           if @subscriptions[queue_name]
             @subscriptions[queue_name].remove
             @subscriptions.delete(queue_name) if @subscriptions[queue_name].count <= 0
@@ -80,6 +84,7 @@ module ActiveMessaging
         # queue_name string, body string, headers hash
         # send a single message to a queue
         def send queue_name, message_body, message_headers={}
+          queue_name = sanitize_queue_name queue_name
           queue = get_or_create_queue queue_name
           send_messsage queue, message_body
         end
@@ -160,10 +165,6 @@ module ActiveMessaging
           response = make_request('SetQueueAttributes', "#{queue.queue_url}", params)
         end
 
-        def delete_queue queue
-          validate_queue queue
-          response = make_request('DeleteQueue', "#{queue.queue_url}")
-        end
 
         # in progress
         def send_messsage queue, message
@@ -191,7 +192,10 @@ module ActiveMessaging
 
       	def make_request(action, url=nil, params = {})
           # puts "make_request a=#{action} u=#{url} p=#{params}"
-      	  url ||= @aws_url
+          
+         #sometimes the url comes in as nil, or something like /QueueName?Action=
+         #make sure it always starts with @aws_url
+         url = @aws_url + (url || '')
       	  
       		# Add Actions
       		params['Action'] = action
@@ -214,27 +218,34 @@ module ActiveMessaging
           # Put these together to get the request query string
           request_url = "#{url}?#{query_params}"
           # puts "request_url = #{request_url}"
-          request = Net::HTTP::Get.new(request_url)
+          request = Net::HTTP::Get.new(URI.parse(request_url).request_uri)
 
           retry_count = 0
           while retry_count < @request_retry_count.to_i
       		  retry_count = retry_count + 1
-            # puts "make_request try retry_count=#{retry_count}"
+            puts "make_request try retry_count=#{retry_count}"
             begin
               response = SQSResponse.new(http_request(host,port,request))
+              puts response.inspect
               check_errors(response)
               return response
-            rescue Object=>ex
-              # puts "make_request caught #{ex}"
-              raise ex unless reliable
-        		  sleep(@reconnect_delay)
+            # rescue Object=>ex
+            #   # puts "make_request caught #{ex}"
+            #   raise ex unless reliable
+            #               sleep(@reconnect_delay)
             end
           end
         end
 
         # I wrap this so I can move to a different client, or easily mock for testing
         def http_request h, p, r
-          return Net::HTTP.start(h, p){ |http| http.request(r) }
+          # return Net::HTTP.start(h, p){ |http| http.request(r) }
+          http = Net::HTTP.new(h, p)
+          http.use_ssl = true if "https" == @protocol
+          # Don't carp about SSL cert verification
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+          return http.request(r)          
         end
 
         def check_errors(response)
@@ -244,6 +255,10 @@ module ActiveMessaging
         end
         
         private
+
+        def sanitize_queue_name(name)
+          name.gsub(/[^\w]/, "_")
+        end      
         
         # internal data structure methods
         def add_queue(url)
@@ -370,8 +385,13 @@ module ActiveMessaging
         attr_accessor :name, :pathinfo, :domain, :visibility_timeout
 
         def self.from_url url
-          return Queue.new($2,$1) if (url =~ /^http:\/\/(.+)\/([-a-zA-Z0-9_]+)$/)
-          raise "Bad Queue URL: #{url}"
+          # return Queue.new($2,$1) if (url =~ /^http:\/\/(.+)\/([-a-zA-Z0-9_]+)$/)
+          # raise "Bad Queue URL: #{url}"
+          u = URI.parse(url)
+          name = u.path.gsub(/\//, "")
+          domain  = u.host
+          return Queue.new(name,domain) 
+          #raise "Bad Queue URL: #{url}"
         end
 
         def queue_url
