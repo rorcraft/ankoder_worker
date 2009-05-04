@@ -223,16 +223,16 @@ module ActiveMessaging
           retry_count = 0
           while retry_count < @request_retry_count.to_i
       		  retry_count = retry_count + 1
-            puts "make_request try retry_count=#{retry_count}"
+            # puts "make_request try retry_count=#{retry_count}"
             begin
               response = SQSResponse.new(http_request(host,port,request))
               puts response.inspect
               check_errors(response)
               return response
-            # rescue Object=>ex
-            #   # puts "make_request caught #{ex}"
-            #   raise ex unless reliable
-            #               sleep(@reconnect_delay)
+            rescue Object=>ex
+              # puts "make_request caught #{ex}"
+              raise ex unless reliable
+                          sleep(@reconnect_delay)
             end
           end
         end
