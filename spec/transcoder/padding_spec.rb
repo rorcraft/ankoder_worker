@@ -55,9 +55,24 @@ describe Transcoder::Padding do
     
     it "should return correct aspect ratio" do
       result = @p.padding(1600,900,400,300)
-      result["aspect_ratio"].should == "4:3"  
-      result = @p.padding(400,300,1600,900)
       result["aspect_ratio"].should == "16:9"  
+      result = @p.padding(400,300,1600,900)
+      result["aspect_ratio"].should == "4:3"  
+    end
+
+    it "if resize 640x480 to 320x240, it should return correct width and height" do
+      result = @p.padding(320,240,640,480)
+      result["result_height"].should == 240 
+      result["result_width"].should == 320
+    end
+
+    it "if resize 688x368 to 320x240, it should return correct width and height" do
+      result = @p.padding(320,240,688,368)
+      result["result_height"].should == 172 
+      result["result_width"].should == 320
+      result["aspect_ratio"].should == "4:3"  
+      result["padtop"].to_i.should == 34 
+      result["padbottom"].to_i.should == 34 
     end
     # TODO: need to add more test cases for padding
     
