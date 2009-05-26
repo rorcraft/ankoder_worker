@@ -41,9 +41,10 @@ module Transcoder
     def transcode(job)
       job.set_status("processing") # (update started_at = time.now)
 
-      Transcoder.logger.debug "download from S3"
-      S3Curl.download(job.original_file.s3_name,job.original_file.file_path) if S3_ON
-      
+      if S3_ON
+        Transcoder.logger.debug "download from S3"
+        S3Curl.download(job.original_file.s3_name,job.original_file.file_path) 
+      end
       # download watermark
       
       # if HD Flash 
