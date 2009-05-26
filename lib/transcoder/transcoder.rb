@@ -4,6 +4,9 @@ require 'rorcraft_helper'
 module Transcoder
   
   class TranscoderError < RuntimeError
+    class MetaInjectionException < TranscoderError
+    end
+
     class MediaFormatException < TranscoderError
     end
     

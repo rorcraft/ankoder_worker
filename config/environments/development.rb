@@ -35,5 +35,5 @@ else
 end
 
 
-S3_ON         = true
+S3_ON         = false
 S3BUCKET = "devbucket.ankoder.com"
