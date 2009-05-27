@@ -4,6 +4,9 @@ require 'rorcraft_helper'
 module Transcoder
   
   class TranscoderError < RuntimeError
+    class MP4BoxHintingException < TranscoderError
+    end
+
     class MetaInjectionException < TranscoderError
     end
 
@@ -64,7 +67,11 @@ module Transcoder
       # Flvtool2.add_title(job)
       
       # if MP4 for Flash
-      # QtFaststart.run(job)
+      # QtFast(start.run(job)
+      if convert_file.video_codec == "h264" 
+        Transcoder.logger.debug "hinting the converted file"
+        Tools::Mp4box.run(job.convert_file_full_path)  
+      end
 
       Transcoder.logger.debug "generate thumbnail for converted file"
       convert_file.generate_thumbnails
