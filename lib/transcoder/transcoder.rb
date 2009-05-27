@@ -61,10 +61,10 @@ module Transcoder
       convert_file = create_convert_file(job)
       
       # if flv - add title
-      # Flvtool2.add_title(job)
+      # Flvtool.add_title(job)
       
       # if MP4 for Flash
-      # QtFaststart.run(job)
+      # Mp4Box.run_job(job)
 
       Transcoder.logger.debug "generate thumbnail for converted file"
       convert_file.generate_thumbnails

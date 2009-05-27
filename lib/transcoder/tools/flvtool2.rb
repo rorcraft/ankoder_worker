@@ -1,6 +1,6 @@
 module Transcoder
   module Tools
-    class Flvtool2
+    class Flvtool2 # this may be very slow for large files
 
       include Transcoder
       class << self
