@@ -16,7 +16,6 @@ describe Transcoder::Tools::FFmpeg do
     cmd = Transcoder::Tools::FFmpeg.command(jobs(:kites_to_flv))
     cmd.should_not be_empty
     puts cmd
-    `#{cmd}`
   end
   
   it "should keep same quality" do      

@@ -4,6 +4,9 @@ require 'rorcraft_helper'
 module Transcoder
   
   class TranscoderError < RuntimeError
+    class MP4BoxHintingException < TranscoderError
+    end
+
     class MetaInjectionException < TranscoderError
     end
 
@@ -50,8 +53,6 @@ module Transcoder
       end
       # download watermark
       
-      # if HD Flash 
-        # Mkmp4.run(job) why do we need this? MP4Box
       # if Theora
         # FFmpeg2Theora.run(job)
       # else Transcode the video
@@ -64,7 +65,10 @@ module Transcoder
       # Flvtool.add_title(job)
       
       # if MP4 for Flash
-      # Mp4Box.run_job(job)
+      if convert_file.video_codec == "h264" 
+        Transcoder.logger.debug "hinting the converted file"
+        Tools::Mp4box.run(job.convert_file_full_path)  
+      end
 
       Transcoder.logger.debug "generate thumbnail for converted file"
       convert_file.generate_thumbnails
