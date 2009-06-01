@@ -13,11 +13,11 @@ ActiveMessaging::Gateway.define do |s|
   # sqs "_queue_dev_Converter"
   
   if ENV['RAILS_ENV'] != "production"
-    s.destination :transcode_worker, '_queue_dev_Converter2' 
-    s.destination :downloader_worker, '_queue_dev_Downloader2'  
+    s.destination :transcode_worker, '_queue_dev_Converter_edwin2' 
+    s.destination :downloader_worker, '_queue_dev_Downloader_edwin2'  
   else
-    s.destination :transcode_worker, '_queue_Converter2'
-    s.destination :downloader_worker, '_queue_Downloader2'  
+    s.destination :transcode_worker, '_queue_Converter_edwin_2'
+    s.destination :downloader_worker, '_queue_Downloader_edwn_2'  
   end
 
 end
