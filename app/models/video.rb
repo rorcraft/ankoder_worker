@@ -28,7 +28,7 @@ class Video < ActiveResource::Base
     %w(width height duration video? audio? audio_codec video_codec fps bitrate).each do |attr|
       eval("self.#{attr.delete('?')} = f.send(attr)")   rescue false 
     end   
-    readable = f.valid?     
+    self.readable = f.valid?     
     unless filename_has_container?         
       old_file_path = file_path
       self.filename = "#{filename}.#{f.container.split(",").first}" 
@@ -143,7 +143,7 @@ class Video < ActiveResource::Base
   end
 
   def thumbnail_full_path(time=nil, size = nil)    
-    "#{PUBLIC_FOLDER}/#{thumbnail_path(time,size)}"
+    File.join "#{PUBLIC_FOLDER}", "#{thumbnail_path(time,size)}"
   end
 
   # TODO: Need to create models for thumbnails.  
