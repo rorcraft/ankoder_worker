@@ -16,8 +16,8 @@ ActiveMessaging::Gateway.define do |s|
     s.destination :transcode_worker, "/queue/dev/Converter"
     s.destination :downloader_worker, "/queue/dev/Downloader"
   else
-    s.destination :transcode_worker, '_queue_Converter2'
-    s.destination :downloader_worker, '_queue_Downloader2'  
+    s.destination :transcode_worker, '_queue_Converter_edwin_2'
+    s.destination :downloader_worker, '_queue_Downloader_edwn_2'  
   end
 
 end

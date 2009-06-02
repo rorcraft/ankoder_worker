@@ -55,7 +55,7 @@ module Transcoder
         if job.profile.keep_quality?
           cmd += " -sameq " 
         elsif job.profile.video_bitrate.to_i > 0
-          cmd += " -b #{job.profile.video_bitrate}k" 
+          cmd += " -b #{job.profile.video_bitrate}k " 
         end
         
         if job.profile.add_padding?
