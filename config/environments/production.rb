@@ -26,3 +26,25 @@ config.action_view.cache_template_loading            = true
 
 # Enable threaded mode
 # config.threadsafe!
+#
+if `hostname`.strip.match 'rexchung'
+  AR_SITE          = 'http://mancjew:pianoman@ar.localankoder.com'
+  FFMPEG_PATH      = "/opt/local/bin/ffmpeg"
+  MENCODER_PATH    = "/opt/local/bin/mencoder"
+  CURL             = "/usr/bin/curl"
+  FILE_FOLDER      = "/Users/rexchung/workspace/ankoder/api/file_system"
+  PUBLIC_FOLDER    = "/Users/rexchung/workspace/ankoder/api/public"
+  THUMBNAIL_FOLDER = "/thumbnail"
+else
+  AR_SITE = 'http://workflow:r0rcr4ft@trunk.localankoder.com'
+  FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
+  MENCODER_PATH   = "/usr/local/bin/mencoder"
+  CURL            = "/usr/bin/curl"  
+  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
+  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
+  THUMBNAIL_FOLDER = "/thumbnail"
+end
+
+
+S3_ON         = false
+S3BUCKET = "devbucket.ankoder.com"
