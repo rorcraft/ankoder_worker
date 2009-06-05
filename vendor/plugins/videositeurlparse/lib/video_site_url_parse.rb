@@ -6,11 +6,11 @@ module VideoSiteUrlParse
   # get the flv download address from the url
   def parse_video_url(url)
     url_video = case url.downcase
-                when /youtube/
+                when /^http:\/\/(www\.)?youtube\.com/
                   parse_youtube(url)
                 # when /tudou/
                 #   parse_tudou(url)
-                when /dailymotion/
+                when /^http:\/\/(www\.)?dailymotion\.com/
                   parse_dailymotion(url)
                 # when /metacafe/
                 #   parse_metacafe(url)

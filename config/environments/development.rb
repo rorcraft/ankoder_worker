@@ -25,12 +25,12 @@ if `hostname`.strip.match 'rexchung'
   PUBLIC_FOLDER    = "/Users/rexchung/workspace/ankoder/api/public"
   THUMBNAIL_FOLDER = "#{PUBLIC_FOLDER}/thumbnails"
 else
-  AR_SITE = 'http://workflow:r0rcr4ft@trunk.localankoder.com'
+  AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
   FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
   CURL            = "/usr/bin/curl"  
-  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
-  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
+  FILE_FOLDER   = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/file_system"
+  PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/public"
   THUMBNAIL_FOLDER = "#{PUBLIC_FOLDER}/thumbnails"
 end
 

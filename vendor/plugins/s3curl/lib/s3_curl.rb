@@ -66,16 +66,16 @@
          def self.download(filename , local_file, options = {} )
            #./lib/transcoder/bin/s3curl.pl --id=ankoder --debug -- http://s3.amazonaws.com/moming2k/test.txt -o ~/test.txt  2>&1
            progress = nil        
-           bucket = S3BUCKET || options.delete(:bucket)   
+           bucket = options.delete(:bucket) || S3BUCKET
            command = get_curl_command("#{S3CURL} #{access_param} -- http://s3.amazonaws.com/#{bucket}/#{filename}")
-           command += " -o #{local_file}  2>&1"
+           command += " -# -o #{local_file}  2>&1"
            
            logger.debug command
            
            IO.popen("#{command}") do |pipe|
              pipe.each("\r") do |line|
-               if line =~ /(\d+)/
-                 p = $1.to_i
+               if line =~ /(\d+\.\d+)%/
+                 p = $1.to_i.round
                  p = 100 if p > 100
                  if progress != p
                    progress = p
@@ -91,7 +91,7 @@
          end
         
         def self.head(filename, options  = {} )
-          bucket = S3BUCKET || options.delete(:bucket)
+          bucket = options.delete(:bucket) || S3BUCKET
           cmd = get_curl_command("#{S3CURL} #{access_param} --head http://s3.amazonaws.com/#{bucket}/#{filename}")
           output = IO.popen("#{cmd}  2>&1") 
           output.read
@@ -103,7 +103,7 @@
         end
         
         def self.delete(filename, options = {})
-          bucket = S3BUCKET || options.delete(:bucket)
+          bucket = options.delete(:bucket) || S3BUCKET
           cmd = get_curl_command("#{S3CURL} #{access_param} --delete http://s3.amazonaws.com/#{bucket}/#{filename}")
           output = IO.popen("#{cmd}  2>&1") 
           output.read          
