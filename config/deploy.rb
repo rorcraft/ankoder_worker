@@ -1,0 +1,19 @@
+set :default_stage, "ec2"                                                                        
+set :stages, %w(staging production ec2 localec2 ec2_cluster local)
+require 'capistrano/ext/multistage'
+
+set :repository_cache, "svn_trunk"
+set :deploy_via, :remote_cache
+set :use_sudo, false
+
+# Make symlink for for app
+after "deploy:symlink", "app:symlink"
+namespace :app do
+  task :symlink do
+    sudo "mkdir -p /mnt/file_system"
+    sudo "chown workflow /mnt/file_system"
+    run "ln -s /mnt/file_system #{deploy_to}/current/file_system"
+    #run "cd #{deploy_to}/current/config && rm -f mongrel_cluster.yml && ln -s #{shared_path}/svn_trunk/config/mongrel_cluster.yml"
+    run "cd #{deploy_to}/current/config && rm -f database.yml && ln -s #{shared_path}/svn_trunk/config/database.yml"
+  end
+end         

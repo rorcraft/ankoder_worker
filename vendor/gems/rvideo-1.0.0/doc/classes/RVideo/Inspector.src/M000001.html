@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>new (RVideo::Inspector)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rvideo/inspector.rb, line 26</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">options</span> = {})
+      <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">not</span> (<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:raw_response</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:file</span>])
+        <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Must supply either an input file or a pregenerated response&quot;</span>
+      <span class="ruby-keyword kw">end</span>
+      
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:raw_response</span>]
+        <span class="ruby-identifier">initialize_with_raw_response</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:raw_response</span>])
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:file</span>]
+        <span class="ruby-identifier">initialize_with_file</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:file</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:ffmpeg_binary</span>])
+      <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">metadata</span> = <span class="ruby-regexp re">/(Input \#.*)\n.+\n\Z/</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">match</span>(<span class="ruby-ivar">@raw_response</span>)
+      
+      <span class="ruby-keyword kw">if</span> <span class="ruby-regexp re">/Unknown format/i</span>.<span class="ruby-identifier">match</span>(<span class="ruby-ivar">@raw_response</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">metadata</span>.<span class="ruby-identifier">nil?</span>
+        <span class="ruby-ivar">@unknown_format</span> = <span class="ruby-keyword kw">true</span>
+      <span class="ruby-keyword kw">elsif</span> <span class="ruby-regexp re">/Duration: N\/A/i</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">match</span>(<span class="ruby-ivar">@raw_response</span>)
+        <span class="ruby-comment cmt"># in this case, we can at least still get the container type</span>
+        <span class="ruby-ivar">@unreadable_file</span> = <span class="ruby-keyword kw">true</span>
+        <span class="ruby-ivar">@raw_metadata</span> = <span class="ruby-identifier">metadata</span>[<span class="ruby-value">1</span>]
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-ivar">@raw_metadata</span> = <span class="ruby-identifier">metadata</span>[<span class="ruby-value">1</span>]
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>
