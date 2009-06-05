@@ -39,7 +39,10 @@ development:
     ################################
     # Amazon SQS Adapter Properties #
     ################################
+<<<<<<< HEAD:config/broker.yml
 #    adapter: asqs
+=======
+#adapter: asqs
 #    access_key_id: 04WAVZJW4HAZZQTWKCR2
 #    secret_access_key: /iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI
 #    
@@ -52,9 +55,6 @@ development:
 #    # aws_version: 2007-05-01 
 #    # 2009-02-01 
 #    aws_version: 2008-01-01 
-#    # 2007-05-01 have been deprecated
-#    # 2006-04-01 have been deprecated
-#    
 #    content_type: text/plain
 #    poll_interval: 1
 #    cache_queue_list: true
@@ -77,19 +77,25 @@ test:
     reliable: true  
 
 production:
-    #################################
+    ################################
     # Amazon SQS Adapter Properties #
-    #################################
+    ################################
     adapter: asqs
-    access_key_id: XXXXXXXXXXXXXXXXXXXX
-    secret_access_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
+    access_key_id: 04WAVZJW4HAZZQTWKCR2
+    secret_access_key: /iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI
+    
     ## properties below are all defaults for this adapter
     host: queue.amazonaws.com
-    port: 80
+    port: 443
+    protocol: https
     reliable: true
     reconnectDelay: 5
-    aws_version: 2006-04-01 
+    # aws_version: 2007-05-01 
+    # 2009-02-01 
+    aws_version: 2008-01-01 
+    # 2007-05-01 have been deprecated
+    # 2006-04-01 have been deprecated
+    
     content_type: text/plain
     poll_interval: 1
     cache_queue_list: true

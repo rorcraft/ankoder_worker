@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+  <title>capture_frame (RVideo::Inspector)</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+</head>
+<body class="standalone-code">
+  <pre><span class="ruby-comment cmt"># File lib/rvideo/inspector.rb, line 131</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">capture_frame</span>(<span class="ruby-identifier">timecode</span>, <span class="ruby-identifier">output_file</span> = <span class="ruby-keyword kw">nil</span>)
+      <span class="ruby-identifier">t</span> = <span class="ruby-identifier">calculate_time</span>(<span class="ruby-identifier">timecode</span>)
+      <span class="ruby-identifier">output_file</span> <span class="ruby-operator">||=</span> <span class="ruby-node">&quot;#{TEMP_PATH}/#{File.basename(@full_filename, &quot;.*&quot;)}-#{timecode.gsub(&quot;%&quot;,&quot;p&quot;)}.jpg&quot;</span>
+      <span class="ruby-identifier">command</span> = <span class="ruby-node">&quot;ffmpeg -i #{@full_filename.shell_quoted} -ss #{t} -t 00:00:01 -r 1 -vframes 1 -f image2 #{output_file.shell_quoted}&quot;</span>
+      
+      <span class="ruby-constant">RVideo</span>.<span class="ruby-identifier">logger</span>.<span class="ruby-identifier">info</span>(<span class="ruby-node">&quot;\nCreating Screenshot: #{command}\n&quot;</span>)
+      <span class="ruby-identifier">frame_result</span> = <span class="ruby-node">`#{command} 2&gt;&amp;1`</span>
+      <span class="ruby-constant">RVideo</span>.<span class="ruby-identifier">logger</span>.<span class="ruby-identifier">info</span>(<span class="ruby-node">&quot;\nScreenshot results: #{frame_result}&quot;</span>)
+      
+      <span class="ruby-identifier">output_file</span>
+    <span class="ruby-keyword kw">end</span></pre>
+</body>
+</html>

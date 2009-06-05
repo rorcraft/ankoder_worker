@@ -3,6 +3,7 @@ module Transcoder
   module Tools
     class Yamdi
       include Transcoder
+      YAMDI_PATH = "/usr/local/bin/yamdi" unless defined? YAMDI_PATH      
       
       class << self 
         include Transcoder::Helper
@@ -26,7 +27,7 @@ module Transcoder
         convert_file = path
         tmp_file = "#{path}.tmp"
         cmd = "mv #{convert_file} #{tmp_file} "
-        cmd += ";yamdi " 
+        cmd += ";#{YAMDI_PATH} " 
         cmd += " -i #{tmp_file} "
         cmd += " -o #{convert_file}"
         cmd += ";rm #{tmp_file}"

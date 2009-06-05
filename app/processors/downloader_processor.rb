@@ -12,7 +12,8 @@ class DownloaderProcessor < ApplicationProcessor
     # move file from tmp folder to usual file_path 
     FileUtils.mv temp_filepath , video.file_path if temp_filepath
     
-    ### return , log error if temp_filepath is false    
+    ### return , log error if temp_filepath is false   
+    video.progress = 100 
     video.read_metadata
     video.extract_file_information
     video.generate_thumbnails
