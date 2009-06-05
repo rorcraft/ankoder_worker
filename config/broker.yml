@@ -39,9 +39,6 @@ development:
     ################################
     # Amazon SQS Adapter Properties #
     ################################
-<<<<<<< HEAD:config/broker.yml
-#    adapter: asqs
-=======
 #adapter: asqs
 #    access_key_id: 04WAVZJW4HAZZQTWKCR2
 #    secret_access_key: /iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI
