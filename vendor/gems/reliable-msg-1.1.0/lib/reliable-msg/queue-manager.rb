@@ -18,7 +18,7 @@ begin
   require 'uuid'
 rescue LoadError
   require 'rubygems'
-  require_gem 'uuid'
+  gem 'uuid'
 end
 require 'reliable-msg/client'
 require 'reliable-msg/message-store'
