@@ -7,7 +7,10 @@ class DownloaderProcessor < ApplicationProcessor
     video  = get_video(message)
     video.filename = video.make_hashed_name
     temp_filepath  = Downloader.download(
-      :url => video.source_url, :local_filename => video.filename)
+      :url => video.source_url, :local_filename => video.filename) do |progress|
+         video.progress = progress
+	 video.save
+    end
     
     # move file from tmp folder to usual file_path 
     FileUtils.mv temp_filepath , video.file_path if temp_filepath
