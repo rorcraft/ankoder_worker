@@ -22,5 +22,16 @@ namespace 'config' do
     task :sqs do |t|
       copy 'sqs'
     end
+
+    desc 'set all broker.yml, messaging.rb for production'
+    task :production do |t| 
+      broker = "config/template/broker.production.yml"
+      messaging = "config/template/messaging.production.rb"
+      PATHS.each do |path|
+        `cp #{broker} #{path}/broker.yml`
+        `cp #{messaging} #{path}/messaging.rb`
+      end 
+    end 
+
   end
 end
