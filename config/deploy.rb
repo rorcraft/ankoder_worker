@@ -11,7 +11,7 @@ after "deploy:symlink", "app:symlink"
 namespace :app do
   task :symlink do
     sudo "mkdir -p /mnt/file_system"
-    sudo "chown workflow /mnt/file_system"
+    sudo "chown #{user} /mnt/file_system"
     run "ln -s /mnt/file_system #{deploy_to}/current/file_system"
     #run "cd #{deploy_to}/current/config && rm -f mongrel_cluster.yml && ln -s #{shared_path}/svn_trunk/config/mongrel_cluster.yml"
     run "cd #{deploy_to}/current/config && rm -f database.yml && ln -s #{shared_path}/svn_trunk/config/database.yml"
