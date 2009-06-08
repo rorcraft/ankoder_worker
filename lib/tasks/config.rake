@@ -1,8 +1,6 @@
 namespace 'config' do
   PATHS = %W{
     config
-    ../api/config
-    ../developer/config
   }
 
   namespace 'messaging' do
