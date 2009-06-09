@@ -1,3 +1,6 @@
+require 'hmac'
+require 'hmac-sha1'
+
 class Video < ActiveResource::Base
 
   include PostbackHelper
@@ -192,10 +195,27 @@ class Video < ActiveResource::Base
     extract_filename_from_url  if (original_filename.blank?) and (respond_to?("source_url") and !source_url.blank?)
     Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{original_filename}--")
   end
-  
+
   def extract_file_information(_file_path = file_path)
     self.filename = File.basename(_file_path)
     self.size = File.size(_file_path)
+  end
+
+  def user(force = false)
+    if force
+      @user = User.find(self.user_id)
+    else
+      @user ||= User.find(self.user_id)
+    end
+    return @user
+  end
+
+  def logger
+    @logger = RAILS_DEFAULT_LOGGER if !defined?(@logger) &&
+      (defined?(RAILS_DEFAULT_LOGGER) && !RAILS_DEFAULT_LOGGER.nil?)
+    @logger = ActiveRecord::Base.logger unless defined?(@logger)
+    @logger = Logger.new(STDOUT) unless defined?(@logger)
+    @logger
   end
 
 end

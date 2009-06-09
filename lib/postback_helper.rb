@@ -2,7 +2,7 @@ module PostbackHelper
 
   def upload_post_back( video , result, error="")
     return if video.postback_url.blank?
-    message = {"result" => result, "error" => error , "custom_fields"=> video.custom_fields , "type" => "Upload" , 
+    message = {"result" => result, "error" => error, "type" => "Download" , 
       "video_id"=> video.id, "video_name" => video.name }.to_json
     private_key = video.user.private_key
     
