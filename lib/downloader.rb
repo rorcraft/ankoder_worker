@@ -146,6 +146,7 @@ class Downloader
 		  else "\n"
 		  end
       pipe.each(separator) do |line|
+        logger.debug line
         p = case application
             when 'axel'
               line =~ /^\[ *(\d+)%\]/ ? $1.to_i : p
