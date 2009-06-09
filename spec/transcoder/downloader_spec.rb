@@ -174,8 +174,7 @@ describe Downloader do
   end
 
   it 'should download from youtube' do
-    download 'http://youtube.com/watch?v=9uDgJ9_H0gg',\
-      {:size => 29714}
+    download 'http://www.youtube.com/watch?v=EhgZCTB0Qoc'
   end
 
   it 'should download from dailymotion', {:size => 23442} do
