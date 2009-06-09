@@ -31,7 +31,7 @@ else
   CURL            = "/usr/bin/curl"  
   FILE_FOLDER   = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/file_system"
   PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/public"
-  THUMBNAIL_FOLDER = "#{PUBLIC_FOLDER}/thumbnails"
+  THUMBNAIL_FOLDER = "/thumbnail"
 end
 
 

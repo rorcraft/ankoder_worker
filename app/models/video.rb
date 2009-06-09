@@ -1,4 +1,7 @@
 class Video < ActiveResource::Base
+
+  include PostbackHelper
+
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
