@@ -12,6 +12,11 @@ class DownloaderProcessor < ApplicationProcessor
 	 video.save
     end
     
+    # avoid collision
+    while (File.exist?(video.file_path))
+      video.filename = Digest::SHA1.hexdigest \
+        "--#{video.filename}--#{(rand*Time.now.to_i).to_i}--"
+    end
     # move file from tmp folder to usual file_path 
     FileUtils.mv temp_filepath , video.file_path if temp_filepath
     
@@ -19,7 +24,7 @@ class DownloaderProcessor < ApplicationProcessor
     video.progress = 100 
     video.read_metadata
     video.extract_file_information
-    video.generate_thumbnails
+    logger.debug "Thumbnail generation: #{video.generate_thumbnails}"
     video.save
     
     if S3_ON

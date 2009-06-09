@@ -34,7 +34,13 @@ class Video < ActiveResource::Base
     self.readable = f.valid?     
     unless filename_has_container?         
       old_file_path = file_path
-      self.filename = "#{filename}.#{f.container.split(",").first}" 
+      extension = f.container.split(",").first
+      self.filename = "#{filename}.#{extension}" 
+      while File.exist?(self.file_path)
+        self.filename = Digest::SHA1.hexdigest \
+          "--#{self.filename}--#{(rand*Time.now.to_i)}--"
+        self.filename = "#{self.filename}.#{extension}"
+      end
       FileUtils.mv old_file_path, file_path
     end
   end
