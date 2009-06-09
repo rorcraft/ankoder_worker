@@ -68,7 +68,7 @@ describe Downloader do
   end
 
   it 'should output youtube command' do
-    url = 'http://www.youtube.com/watch?v=9uDgJ9_H0gg'
+    url = 'http://www.youtube.com/watch?v=EhgZCTB0Qoc'
     cmd = Downloader.command url, file='useless_file'
     cmd.should_not be_nil
     return unless cmd

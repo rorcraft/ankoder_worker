@@ -88,7 +88,13 @@ class Downloader
     url = parse_video_url url if url_protocol(url)=='http'
     case (protocol = url_protocol url)
     when 'http','ftp'
-      if options[:username] && options[:password]
+      if (options[:username] && options[:password] || \
+          url =~ /^http:\/\/(www\.)?youtube\.com/
+         )
+        if !(options[:username] && options[:password])
+          options[:username] = 'user'
+          options[:password] = 'password'
+        end
 	%Q(curl -L -# -u "#{escape_quote options[:username]}:)+
 	%Q(#{escape_quote options[:password]}" )+
 	%Q(-A "#{USER_AGENT}" "#{URI.parse(url)}")+
