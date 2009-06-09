@@ -25,7 +25,7 @@ if `hostname`.strip.match 'rexchung'
   PUBLIC_FOLDER    = "/Users/rexchung/workspace/ankoder/api/public"
   THUMBNAIL_FOLDER = "/thumbnail"
 else
-  AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
+  AR_SITE = 'http://workflow:r0rcr4ft@trunk.localankoder.com'
   FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
   CURL            = "/usr/bin/curl"  
