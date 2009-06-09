@@ -33,7 +33,7 @@ class Downloader
 
 
     _command = "cd #{TEMP_FOLDER} && #{command(url,local_filename)}"
-    logger.debug _command
+    logger.info _command
     IO.popen(_command) do |pipe|
       pipe.each("\n") do |line|
 
@@ -137,7 +137,7 @@ class Downloader
     local_filename = options[:local_filename]
     _command = command(url, local_filename, options)
     application = _command.slice /\S+/
-    logger.debug _command
+    logger.info _command
     p = progress = nil; # to force 0% update
     IO.popen(_command) do |pipe|
       separator = case application
