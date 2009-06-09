@@ -25,12 +25,32 @@ namespace 'config' do
 
     desc 'set all broker.yml, messaging.rb for production'
     task :production do |t| 
-      broker = "config/template/broker.production.yml"
-      messaging = "config/template/messaging.production.rb"
+      copy 'production'
+    end 
+
+    desc 'set all broker.yml, messaging.rb for localproduction'
+    task :localproduction do |t| 
+      copy 'localproduction'
+    end 
+
+  end
+
+  namespace 'environment' do
+    def copy state
+      file = "config/template/#{state}.rb"
       PATHS.each do |path|
-        `cp #{broker} #{path}/broker.yml`
-        `cp #{messaging} #{path}/messaging.rb`
-      end 
+        `cp #{file} #{path}/environments/production.rb`
+      end
+    end
+
+    desc 'set environments/production.rb for ec2'
+    task :production do |t| 
+      copy 'production'
+    end 
+
+    desc 'set environments/production.rb for local deployment'
+    task :localproduction do |t| 
+      copy 'localproduction'
     end 
 
   end
