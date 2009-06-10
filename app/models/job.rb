@@ -60,6 +60,7 @@ class Job < ActiveResource::Base
   
   def set_status(_status)
     put(:set_status, :status => _status)
+    self.status = _status
   end
 
 end

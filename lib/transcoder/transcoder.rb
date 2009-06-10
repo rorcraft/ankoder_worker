@@ -97,6 +97,7 @@ module Transcoder
       
     rescue TranscoderError
       job.set_status("failed")
+      Transcoder.logger.error "#{$!.class}: #{$!.message}"
       
     end
     
