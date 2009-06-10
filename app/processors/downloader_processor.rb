@@ -35,7 +35,7 @@ class DownloaderProcessor < ApplicationProcessor
     end
     
     # postback? - file downloaded
-    video.upload_post_back(v,'success')
+    video.upload_post_back(video,'success')
   end
 
   # message = {"type"=>"ASSIGN" , "content" => {"node_name" => "Downloader" , "config" => {"OriginalFile"=> self.id } }}.to_json
