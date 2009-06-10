@@ -99,7 +99,7 @@ class Video < ActiveResource::Base
     time = default_sec time
     FileUtils.mkdir_p File.dirname(self.thumbnail_full_path(time))    
     # sleep(1) # ?
-    command = "#{FFMPEG_PATH} -i #{self.file_path} -y -f image2 -ss #{time} -t 0.001 #{self.thumbnail_full_path(time)}"
+    command = "#{FFMPEG_PATH} -ss #{time} -i #{self.file_path} -y -f image2 -t 0.001 #{self.thumbnail_full_path(time)}"
     # logger.info command
     f = IO.popen(command)
     f.close
