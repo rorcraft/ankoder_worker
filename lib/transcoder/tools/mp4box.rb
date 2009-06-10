@@ -13,9 +13,11 @@ module Transcoder
       end
       
       def self.run_command(command)
-        io = IO.popen(command) 
+        io = IO.popen(command + " 2>&1") 
+        error = io.read
         io.close
-      raise TranscoderError::MP4BoxHintingException if $?.exitstatus != 0
+      raise TranscoderError::MP4BoxHintingException.new(error)\
+        if $?.exitstatus != 0
         
       end
     

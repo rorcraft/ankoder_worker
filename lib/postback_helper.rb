@@ -14,8 +14,39 @@ module PostbackHelper
     result = f.read
     f.close
   rescue Exception => e
-    logger.debug e
+    logger.error e
   end
   
+  def convert_post_back(job, result, error='')
+    return if job.postback_url.blank?
+    message = {\
+      'result'  =>  result,
+      'error'   =>  error,
+      'type'    => 'Convert',
+      'Job'     =>  job.id
+    }
+    if result   == 'success'
+      convert_file = job.convert_file
+      message['convert_video_id'] = convert_file.id
+      message['s3_name'] = convert_file.s3_name
+    end
+
+    message = message.to_json
+    private_key = job.user.private_key
+
+    encoded_message = Base64.\
+      encode64(HMAC::SHA1::digest(private_key,message)).strip
+    curl_cmd = %Q{ \\
+      curl -H "Content-type: application/x-www-form-urlencoded" \\
+      #{job.postback_url} -d \\
+      "message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}"
+    }
+    logger.info curl_cmd
+    f = IO.popen(curl_cmd + " 2>&1")
+    result = f.read
+    f.close
+  rescue Exception => e
+    logger.error e
+  end
 
 end
