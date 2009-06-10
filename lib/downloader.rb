@@ -37,18 +37,18 @@ class Downloader
     IO.popen(_command) do |pipe|
       pipe.each("\n") do |line|
 
-	if line =~ /^\[[\d ]+%\]/ && line =~ /(\d+)/
-	  p = $1.to_i 
-	  p = 100 if p > 100
-	  # limit the update rate to prevent too many progress update requests
-	  # flushing our mongrels
-	  if progress_need_refresh?(progress, p)
-	    progress = p
-	    # @logger.debug "progress = #{progress}, duration = #{duration}"
-	    block_given? ? yield(progress) : stdout_progress(progress)
-	    $defout.flush
-	  end
-	end
+        if line =~ /^\[[\d ]+%\]/ && line =~ /(\d+)/
+          p = $1.to_i 
+          p = 100 if p > 100
+          # limit the update rate to prevent too many progress update requests
+          # flushing our mongrels
+          if progress_need_refresh?(progress, p)
+            progress = p
+            # @logger.debug "progress = #{progress}, duration = #{duration}"
+            block_given? ? yield(progress) : stdout_progress(progress)
+            $defout.flush
+          end
+        end
       end
     end
     # TODO: Need to catch different types of errors
@@ -95,35 +95,36 @@ class Downloader
           options[:username] = 'user'
           options[:password] = 'password'
         end
-	%Q(curl -L -# -u "#{escape_quote options[:username]}:)+
-	%Q(#{escape_quote options[:password]}" )+
-	%Q(-A "#{USER_AGENT}" "#{URI.parse(url)}")+
-	%Q( -o "#{File.join(TEMP_FOLDER,local_filename)}" 2>&1)
+        %Q(curl -L -# -u "#{escape_quote options[:username]}:)+
+        %Q(#{escape_quote options[:password]}" )+
+        %Q(-A "#{USER_AGENT}" "#{escape_quote URI.parse(url)}")+
+        %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
       else
-	%Q(axel -o "#{File.join(TEMP_FOLDER,local_filename)}" )+
-	  %Q(-U "#{USER_AGENT}" "#{URI.parse(url)}"  2>&1)
+        %Q(axel -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" )+
+          %Q(-U "#{USER_AGENT}" "#{escape_quote URI.parse(url)}"  2>&1)
       end
     when 'sftp'
       match = /sftp:\/\/(\w+@)?([^\/]+)(\/.*)/.match url
       raise DownloadError.new('invalid sftp url') unless \
-	match && match.length == 4
+        match && match.length == 4
       userAt = match[1]
       host = match[2]
       path = match[3]
       %Q(scp -B -o PreferredAuthentications=publickey ) +
-        %Q("#{userAt ? userAt : ''}#{host}:#{path}") +
-      %Q( "#{File.join(TEMP_FOLDER,local_filename)}")
+        %Q("#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:)+
+        %Q(#{escape_quote path}") +
+      %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}")
     when 's3'
       match = /s3:\/\/([^\/]+)\/(.+)/.match url
       raise DownloadError.new('invalid s3 url') unless\
-	match && match.length == 3
+        match && match.length == 3
       bucket = match[1]
       file = match[2]
       S3Curl.get_curl_command(%Q(#{S3Curl::S3CURL} #{S3Curl.access_param} -- \\
-				 "http://s3.amazonaws.com/#{bucket}/#{file}" )\
-			     ) + \
-			       %Q( -o "#{File.join(TEMP_FOLDER,local_filename)}" \\
-				  -# 2>&1)
+            "http://s3.amazonaws.com/#{bucket}/#{file}" )\
+             ) + \
+             %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" \\
+             -# 2>&1)
 
     else
       raise DownloadError.new('protocol not supported')
@@ -141,23 +142,23 @@ class Downloader
     p = progress = nil; # to force 0% update
     IO.popen(_command) do |pipe|
       separator = case application
-		  when 'axel' then "\n"
-		  when 'curl' then "\r"
-		  else "\n"
-		  end
+                  when 'axel' then "\n"
+                  when 'curl' then "\r"
+                  else "\n"
+                  end
       pipe.each(separator) do |line|
         logger.debug line
         p = case application
             when 'axel'
               line =~ /^\[ *(\d+)%\]/ ? $1.to_i : p
-	    when 'curl'
-	      line =~ /(\d+\.\d+)%/ ? $1.to_f.round : p
+            when 'curl'
+              line =~ /(\d+\.\d+)%/ ? $1.to_f.round : p
             else
               p
             end
         if progress != p && progress_need_refresh?(progress, p)
-	  p = 0 if p < 0
-	  p = 100 if p > 100
+          p = 0 if p < 0
+          p = 100 if p > 100
           progress = p
           block_given? ? yield(progress) : stdout_progress(progress)
           $defout.flush
