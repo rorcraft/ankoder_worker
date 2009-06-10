@@ -36,7 +36,7 @@ namespace 'config' do
   end
 
   namespace 'environment' do
-    def copy state
+    def copy_env state
       file = "config/template/#{state}.rb"
       PATHS.each do |path|
         `cp #{file} #{path}/environments/production.rb`
@@ -45,12 +45,12 @@ namespace 'config' do
 
     desc 'set environments/production.rb for ec2'
     task :production do |t| 
-      copy 'production'
+      copy_env 'production'
     end 
 
     desc 'set environments/production.rb for local deployment'
     task :localproduction do |t| 
-      copy 'localproduction'
+      copy_env 'localproduction'
     end 
 
   end

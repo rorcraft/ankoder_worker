@@ -31,8 +31,8 @@ AR_SITE = 'http://workflow:r0rcr4ft@ar.ankoder.com'
 FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
 MENCODER_PATH   = "/usr/local/bin/mencoder"
 CURL            = "/usr/bin/curl"  
-FILE_FOLDER   = "/var/www/api_ankoder/file_system"
-PUBLIC_FOLDER = "/var/www/api_ankoder/public"
+FILE_FOLDER   = "/var/www/api_ankoder/current/file_system"
+PUBLIC_FOLDER = "/var/www/api_ankoder/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
 
 S3_ON         = false
