@@ -101,6 +101,7 @@ class Uploader
       local_filename = make_temp_filename
       download s3_url, local_filename
     end
+    
     _command = command(upload_url, local_filename, options)
     logger.info _command
     error = ''
