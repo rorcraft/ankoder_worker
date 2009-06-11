@@ -80,9 +80,17 @@ class Downloader
 
   def self.command(url, local_filename, options={})
     url = "http://" + url unless (url_protocol url)
+
     # handles s3 as a special case
-    url.sub!(/^http:\/\/s3\.amazonaws\.com\//,'s3://') if \
-      url =~ /^http:\/\/s3\.amazonaws\.com\//
+    if url =~ /^http:\/\/s3\.amazonaws\.com\//
+      url.sub!(/^http:\/\/s3\.amazonaws\.com\//,'s3://')
+    elsif url =~ /s3\.amazonaws\.com/
+      array = url.split /\.s3\.amazonaws\.com\/?/
+      bucket = %r[^http://(.+)].match(array[0])[1]
+      file = array[1]
+      url = "s3://#{bucket}/#{file}"
+    end
+
     url = parse_video_url url if url_protocol(url)=='http'
     case (protocol = url_protocol url)
     when 'http','ftp'
