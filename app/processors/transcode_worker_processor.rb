@@ -3,9 +3,11 @@ require "transcoder/tools/ffmpeg"
 
 class TranscodeWorkerProcessor < ApplicationProcessor
 
+  publishes_to :uploader_worker
   subscribes_to :transcode_worker
 
   include Transcoder::InstanceMethods
+  include ActiveMessaging::MessageSender
   include PostbackHelper
   
   def on_message(message) 
@@ -19,10 +21,12 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     # postback? - job complete
     if(job.status == 'complete')
       convert_post_back job, 'success'
+      # also upload completed video
+      publish :uploader_worker, {'video_id' => job.convert_file_id}.to_json
     else
       convert_post_back job, 'fail'
     end
-        
+
   end
    
   #  {"type": "ASSIGN", "content": {"config": {"OriginalFile": "1", "ConvertJob": "1"}, "node_name": "Converter"}}

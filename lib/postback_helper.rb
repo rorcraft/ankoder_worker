@@ -14,7 +14,8 @@ module PostbackHelper
     result = f.read
     f.close
   rescue Exception => e
-    logger.error e
+    logger.debug result
+    raise e
   end
   
   def convert_post_back(job, result, error='')
@@ -46,7 +47,37 @@ module PostbackHelper
     result = f.read
     f.close
   rescue Exception => e
-    logger.error e
+    logger.debug result
+    raise e
+  end
+
+  def upload_post_back(video, result, error='')
+    postback_url = video.user.postback_upload
+    return if postback_url.blank?
+    message = {
+      'result'  => result,
+      'error'   => error,
+      'type'    => 'Upload',
+      'Video'   => video.id,
+      'url'     => video.user.upload_url,
+      'filename'=> video.filename
+    }.to_json
+    private_key = video.user.private_key
+
+    encoded_message = Base64.\
+      encode64(HMAC::SHA1::digest(private_key,message)).strip
+    curl_cmd = %Q{ \\
+      curl -H "Content-type: application/x-www-form-urlencoded" \\
+      #{postback_url} -d \\
+      "message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}"
+    }
+    logger.info curl_cmd
+    f = IO.popen(curl_cmd + " 2>&1")
+    result = f.read
+    f.close
+  rescue Exception => e
+    logger.debug result
+    raise e
   end
 
 end

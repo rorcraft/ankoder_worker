@@ -70,8 +70,7 @@ class Downloader
   end
 
   def self.escape_quote url
-    raise DownloadError.new('blank url') if url.blank?
-    url.sub(/"/,'\"')
+    url.to_s.sub(/"/,'\"')
   end
 
   def self.url_protocol url
@@ -80,7 +79,6 @@ class Downloader
   end
 
   def self.command(url, local_filename, options={})
-    url = escape_quote url
     url = "http://" + url unless (url_protocol url)
     # handles s3 as a special case
     url.sub!(/^http:\/\/s3\.amazonaws\.com\//,'s3://') if \

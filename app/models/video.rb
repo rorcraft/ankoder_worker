@@ -4,6 +4,8 @@ require 'hmac-sha1'
 class Video < ActiveResource::Base
 
   include PostbackHelper
+  include AwsHelper
+  include AWS::S3
 
   self.site = AR_SITE
   DEFAULT_SEC = 0
@@ -71,10 +73,12 @@ class Video < ActiveResource::Base
   end
     
   def s3_url(option = {})
+    s3_connect
     AWS::S3::S3Object.url_for(self.s3_name, S3_BUCKET, option)    
   end
   
   def s3_exist?
+    s3_connect
     S3Curl.exist?(self.s3_name) 
   end
   
@@ -143,7 +147,7 @@ class Video < ActiveResource::Base
   end
   
   def upload_to_s3
-    S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})    
+    S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename}) 
     if s3_exist?
       self.uploaded = true
       self.save
