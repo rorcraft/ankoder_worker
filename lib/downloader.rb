@@ -78,6 +78,10 @@ class Downloader
     match ? match[1] : nil
   end
 
+  def self.temp_path local_filename
+    File.join(TEMP_FOLDER,local_filename)
+  end
+
   def self.command(url, local_filename, options={})
     url = "http://" + url unless (url_protocol url)
 

@@ -5,17 +5,20 @@ class DownloaderProcessor < ApplicationProcessor
   def on_message(message)
     logger.debug "DownloaderProcessor received #{message.class}: " + message
     video  = get_video(message)
-    video.filename = video.make_hashed_name
+    local_filename = video.make_hashed_name
+    while File.exist?(Downloader.temp_path(local_filename))
+      local_filename = video.make_hashed_name
+    end
     temp_filepath  = Downloader.download(
-      :url => video.source_url, :local_filename => video.filename) do |progress|
+      :url => video.source_url, :local_filename => local_filename) do |progress|
          video.progress = progress
 	 video.save
     end
     
     # avoid collision
-    while (File.exist?(video.file_path))
-      video.filename = Digest::SHA1.hexdigest \
-        "--#{video.filename}--#{(rand*Time.now.to_i).to_i}--"
+    loop do
+      video.filename = video.make_hashed_name
+      break unless File.exist?(video.file_path)
     end
     # move file from tmp folder to usual file_path 
     FileUtils.mv temp_filepath , video.file_path if temp_filepath
