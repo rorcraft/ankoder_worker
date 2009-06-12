@@ -68,12 +68,12 @@ class Uploader
     case (protocol = url_protocol url)
     when 'ftp'
       if options[:username] && options[:password]
-        %Q[\\
+        return %Q[\\
           curl -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
           -u "#{escape_quote options[:username]}:] +
           %Q[#{escape_quote options[:password]}"]
       else
-        %Q[curl -T "#{escape_quote tmp_path}" "#{escape_quote url}"]
+        return %Q[curl -T "#{escape_quote tmp_path}" "#{escape_quote url}"]
       end
     when 'sftp'
       match = /sftp:\/\/(\w+@)?([^\/]+)(\/.*)/.match url
@@ -82,10 +82,28 @@ class Uploader
       userAt = match[1]
       host = match[2]
       remote_path = match[3]
-      %Q[scp -B -o PreferredAuthentications=publickey \\
+      return %Q[scp -B -o PreferredAuthentications=publickey \\
         "#{escape_quote tmp_path}" \\
         "#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:]+
         %Q[#{escape_quote remote_path}"]
+    when 'http'
+      #handles s3 as a special case
+      if url =~ /s3\.amazonaws\.com/
+        s3_file = nil
+        unless url =~ %r[http://s3\.amazonaws\.com/[^/]+(/(.+))?]
+          array = url.split /s3\.amazonaws\.com\/?/
+            s3_file = array[1]
+        else
+          s3_file = $2
+        end
+        if !s3_file && url[url.length-1] != '/'[0]
+          url = url + '/'
+        end
+        return S3Curl.get_curl_command(
+          %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
+            -- "#{url}#{s3_file ? '' : options[:s3_name]}"])
+      end 
+
     else
       raise UploadError.new('protocol unsupported')
     end

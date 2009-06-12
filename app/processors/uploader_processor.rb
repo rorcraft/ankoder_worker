@@ -8,24 +8,17 @@ class UploaderProcessor < ApplicationProcessor
     params = JSON.parse message
     video = Video.find params['video_id']
     s3_url = S3_ON ? video.s3_url : ''
+    s3_name = video.s3_name
     local_file_path = S3_ON ? nil : video.file_path
     user = video.user
     upload_url = user.upload_url
     username = user.upload_username
     password = user.upload_password
 
-    #handles s3 as a special case
-    if upload_url =~ %r[http://s3\.amazonaws\.com/([^/]+)(/(.+))?]
-      S3Curl.upload(\
-                    $3 ? $3 : video.s3_name,
-                    local_file_path, {:bucket => $1})
-      upload_post_back(video,'success')
-      return
-    end
-
     Uploader.upload \
       :upload_url      => upload_url,
       :s3_url          => s3_url,
+      :s3_name         => s3_name,
       :local_file_path => local_file_path,
       :username        => username,
       :password        => password
