@@ -29,11 +29,11 @@ else
   FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
   CURL            = "/usr/bin/curl"  
-  FILE_FOLDER   = "/home/rorcraft/workflow/rorcraft_ankoder/api/file_system"
-  PUBLIC_FOLDER = "/home/rorcraft/workflow/rorcraft_ankoder/api/public"
+  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
+  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
   THUMBNAIL_FOLDER = "/thumbnail"
 end
 
 
 S3_ON         = true
-S3BUCKET = "devbucket2.ankoder.com"
+S3BUCKET = "download2.ankoder.com"
