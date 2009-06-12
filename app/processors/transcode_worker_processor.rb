@@ -19,7 +19,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     job.save
     
     # postback? - job complete
-    if(job.status == 'complete')
+    if(job.status == 'completed')
       convert_post_back job, 'success'
       # also upload completed video
       publish :uploader_worker, {'video_id' => job.convert_file_id}.to_json
