@@ -23,6 +23,7 @@ module Transcoder
     
       def self.command(path)
         cmd = "MP4Box -hint #{path}"
+        Transcoder.logger.debug cmd
       end
     
     end
