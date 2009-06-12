@@ -197,7 +197,7 @@ class Video < ActiveResource::Base
   def make_hashed_name
     original_filename = "" unless respond_to? "original_filename"
     extract_filename_from_url  if (original_filename.blank?) and (respond_to?("source_url") and !source_url.blank?)
-    Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{original_filename}--")
+    Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{original_filename}--#{(rand*Time.now.to_i).to_i}--")
   end
 
   def extract_file_information(_file_path = file_path)

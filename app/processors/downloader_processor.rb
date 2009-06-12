@@ -6,16 +6,16 @@ class DownloaderProcessor < ApplicationProcessor
     logger.debug "DownloaderProcessor received #{message.class}: " + message
     video  = get_video(message)
     video.filename = video.make_hashed_name
-    temp_filepath  = Downloader.download(
-      :url => video.source_url, :local_filename => video.filename) do |progress|
+    
+    # make sure filename doesn't exist in tmp_folder
+    temp_filepath  = Downloader.download(:url => video.source_url, :local_filename => video.filename) do |progress|
          video.progress = progress
-	 video.save
+      	 video.save
     end
     
-    # avoid collision
+    # make sure filename doesn't exists in file_path
     while (File.exist?(video.file_path))
-      video.filename = Digest::SHA1.hexdigest \
-        "--#{video.filename}--#{(rand*Time.now.to_i).to_i}--"
+      video.filename = video.make_hashed_name
     end
     # move file from tmp folder to usual file_path 
     FileUtils.mv temp_filepath , video.file_path if temp_filepath
