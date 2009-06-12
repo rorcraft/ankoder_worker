@@ -61,19 +61,20 @@ class Uploader
 
   def self.command(url, local_filename, options={})
     tmp_path = path(local_filename)
-    if options[:remote_filename]
+    protocol = url_protocol url
+    if url =~ /s3\.amazonaws\.com/ || options[:remote_filename] && protocol!='http'
       url = url + '/' if url[url.length-1] != '/'[0]
       url = url + options[:remote_filename]
     end
-    case (protocol = url_protocol url)
+    case protocol
     when 'ftp'
       if options[:username] && options[:password]
-        %Q[\\
+        return %Q[\\
           curl -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
           -u "#{escape_quote options[:username]}:] +
-          %Q[#{escape_quote options[:password]}"]
+          %Q[#{escape_quote options[:password]}" 2>&1]
       else
-        %Q[curl -T "#{escape_quote tmp_path}" "#{escape_quote url}"]
+        return %Q[curl -T "#{escape_quote tmp_path}" "#{escape_quote url}"]
       end
     when 'sftp'
       match = /sftp:\/\/(\w+@)?([^\/]+)(\/.*)/.match url
@@ -82,25 +83,47 @@ class Uploader
       userAt = match[1]
       host = match[2]
       remote_path = match[3]
-      %Q[scp -B -o PreferredAuthentications=publickey \\
+      return %Q[scp -B -o PreferredAuthentications=publickey \\
         "#{escape_quote tmp_path}" \\
         "#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:]+
-        %Q[#{escape_quote remote_path}"]
+        %Q[#{escape_quote remote_path}" 2>&1]
+    when 'http'
+      #handles s3 as a special case
+      if url =~ /s3\.amazonaws\.com/
+        s3_file = nil
+        unless url =~ %r[http://s3\.amazonaws\.com/[^/]+(/(.+))?]
+          array = url.split /s3\.amazonaws\.com\/?/
+            s3_file = array[1]
+        else
+          s3_file = $2
+        end
+        if !s3_file && url[url.length-1] != '/'[0]
+          url = url + '/'
+        end
+        return S3Curl.get_curl_command(
+          %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
+            -- "#{url}#{s3_file ? '' : options[:s3_name]}" 2>&1])
+      else
+        # http multipart
+        return %Q[\\
+          curl -F "file=@#{escape_quote tmp_path}" \\
+          -F "video_id=#{escape_quote options[:video_id]}" \\
+          -F "thumbnail_url=#{escape_quote options[:thumbnail_url]}" \\
+          "#{url}" 2>&1]
+      end 
+
     else
       raise UploadError.new('protocol unsupported')
     end
   end
 
   def self.upload *args
-    default_options = {:upload_url => '', :s3_url => ''}
+    default_options ={}
     options = default_options.merge(args.extract_options!)
     upload_url = options[:upload_url]
+    local_filename=options[:local_file_path]
     raise UploadError.new('upload url cannot be blank') if upload_url.blank?
-    unless local_filename=options[:local_file_path]
-      s3_url = options[:s3_url]
-      local_filename = make_temp_filename
-      download s3_url, local_filename
-    end
+    raise UploadError.new('local filename cannot be blank')if local_filename.blank?
     
     _command = command(upload_url, local_filename, options)
     logger.info _command

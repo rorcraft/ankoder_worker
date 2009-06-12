@@ -42,8 +42,7 @@ class Video < ActiveResource::Base
       extension = f.container.split(",").first
       self.filename = "#{filename}.#{extension}" 
       while File.exist?(self.file_path)
-        self.filename = Digest::SHA1.hexdigest \
-          "--#{self.filename}--#{(rand*Time.now.to_i)}--"
+        self.filename = self.make_hashed_name
         self.filename = "#{self.filename}.#{extension}"
       end
       FileUtils.mv old_file_path, file_path
@@ -170,6 +169,23 @@ class Video < ActiveResource::Base
     filename + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
   end
 
+  def thumbnail_url(options = {})
+    case options
+    when Hash
+      time = options.delete(:time)
+      size = options.delete(:size)
+
+      if S3_ON
+        "http://#{::S3_SERVER}/#{thumbnail_name(time,size)}"
+      else  
+        "#{API_URL}#{thumbnail_path(time,size)}"
+      end   
+    else  
+      "/"  
+    end      
+
+  end
+
   def default_thumb_size(size)                                              
     Video::SIZES.has_key?(size) ? size : "small"
   end
@@ -197,7 +213,7 @@ class Video < ActiveResource::Base
   def make_hashed_name
     original_filename = "" unless respond_to? "original_filename"
     extract_filename_from_url  if (original_filename.blank?) and (respond_to?("source_url") and !source_url.blank?)
-    Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{original_filename}--")
+    Digest::SHA1.hexdigest("--#{rand}--#{Time.now.to_i}--#{original_filename}--")
   end
 
   def extract_file_information(_file_path = file_path)
