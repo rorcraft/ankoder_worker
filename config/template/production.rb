@@ -35,5 +35,9 @@ FILE_FOLDER   = "/var/www/api_ankoder/current/file_system"
 PUBLIC_FOLDER = "/var/www/api_ankoder/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
 
-S3_ON         = false
-S3BUCKET = "devbucket.ankoder.com"
+S3_ON         = true
+S3BUCKET = "download2.ankoder.com"
+
+ACCESS_KEY_ID     = "04WAVZJW4HAZZQTWKCR2"
+SECRET_ACCESS_KEY = "/iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI"
+
