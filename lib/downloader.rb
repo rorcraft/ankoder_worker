@@ -41,6 +41,9 @@ class Downloader
   end
 
   def self.url_protocol url
+    if url =~ /^http:\/\/s3\.amazonaws\.com\// ||  url =~ /s3\.amazonaws\.com/
+      return 's3'
+    end
     match=/^(\w+):\/\//.match(url)
     match ? match[1] : nil
   end
@@ -72,7 +75,7 @@ class Downloader
           options[:username] = 'user'
           options[:password] = 'password'
         end
-        %Q(curl -L -# -u "#{escape_quote options[:username]}:)+
+        %Q(curl -v -L -# -u "#{escape_quote options[:username]}:)+
         %Q(#{escape_quote options[:password]}" )+
         %Q(-A "#{USER_AGENT}" "#{escape_quote URI.parse(url)}")+
         %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
@@ -100,7 +103,7 @@ class Downloader
       S3Curl.get_curl_command(%Q(#{S3Curl::S3CURL} #{S3Curl.access_param} -- \\
             "http://s3.amazonaws.com/#{bucket}/#{file}" )\
              ) + \
-             %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" \\
+             %Q( -v -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" \\
              -# 2>&1)
 
     else
@@ -123,8 +126,16 @@ class Downloader
                   when 'curl' then "\r"
                   else "\n"
                   end
+      error_detector = ErrorDetector.new(
+        application, url_protocol(url),File.join(TEMP_FOLDER,local_filename)
+      )
+      timeout_detector = TimeoutDetector.new(
+        File.join(TEMP_FOLDER,local_filename)
+      )
       pipe.each(separator) do |line|
         logger.debug line
+        error_detector.check_for_error line
+
         p = case application
             when 'axel'
               line =~ /^\[ *(\d+)%\]/ ? $1.to_i : p
@@ -141,6 +152,8 @@ class Downloader
           $defout.flush
         end
       end
+
+      timeout_detector.exit
     end
     raise DownloadError.new('unknown error') if $?.exitstatus != 0
     file_path = File.join(TEMP_FOLDER,local_filename)
