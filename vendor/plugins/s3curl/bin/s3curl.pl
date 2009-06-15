@@ -196,7 +196,7 @@ if (defined $createBucket) {
 push @args, @ARGV;
 
 #print STDERR "$CURL $args_line $url_path\n"; # . join (" ", @args));
-print STDERR "$CURL $args_line --retry 3 $url_path\n"; # . join (" ", @args));
+print STDERR "$CURL $args_line --retry 3 \"$url_path\"\n"; # . join (" ", @args));
 if ($execute) {
 	exec($CURL, @args)  or die "can't exec program: $!";
 }

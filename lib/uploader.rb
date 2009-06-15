@@ -41,24 +41,6 @@ class Uploader
     return filename
   end
 
-  def self.download s3_url, filename
-    raise UploadError.new('s3_url cannot be blank') if s3_url.blank?
-    tmp_path = path(filename)
-    command = %Q{\\
-      curl -L -# -A "#{USER_AGENT}" "#{escape_quote URI.parse(s3_url)}" \\
-      -o #{escape_quote tmp_path} 2>&1}
-    logger.debug command
-    error = ''
-    IO.popen(command) {|pipe|
-      pipe.each("\n") do |line|
-        error = error + line
-      end
-    }
-    (logger.debug error; raise UploadError.new('download from e3 failed') )if\
-      $? != 0 || !File.exist?(tmp_path)
-    return tmp_path
-  end
-
   def self.command(url, local_filename, options={})
     tmp_path = path(local_filename)
     protocol = url_protocol url

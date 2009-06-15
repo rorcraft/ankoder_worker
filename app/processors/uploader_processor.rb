@@ -14,8 +14,11 @@ class UploaderProcessor < ApplicationProcessor
     password = user.upload_password
 
     if S3_ON
-      s3_url = video.s3_url
-      local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
+      #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
+      local_file_path = Downloader.download(
+        :url => video.s3_url,
+        :local_filename => Uploader.make_temp_filename
+      )
     else
       local_file_path = video.file_path
     end
@@ -24,7 +27,6 @@ class UploaderProcessor < ApplicationProcessor
       :video_id        => video.id,
       :thumbnail_url   => video.thumbnail_url,
       :upload_url      => upload_url,
-      :s3_url          => s3_url,
       :s3_name         => s3_name,
       :local_file_path => local_file_path,
       :remote_filename => video.filename,

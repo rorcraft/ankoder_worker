@@ -28,39 +28,6 @@ class Downloader
 
   class DownloadError < RuntimeError; end
 
-  def self.original_download_and_todo_list(url, local_filename)
-    progress = nil
-
-
-    _command = "cd #{TEMP_FOLDER} && #{command(url,local_filename)}"
-    logger.info _command
-    IO.popen(_command) do |pipe|
-      pipe.each("\n") do |line|
-
-        if line =~ /^\[[\d ]+%\]/ && line =~ /(\d+)/
-          p = $1.to_i 
-          p = 100 if p > 100
-          # limit the update rate to prevent too many progress update requests
-          # flushing our mongrels
-          if progress_need_refresh?(progress, p)
-            progress = p
-            # @logger.debug "progress = #{progress}, duration = #{duration}"
-            block_given? ? yield(progress) : stdout_progress(progress)
-            $defout.flush
-          end
-        end
-      end
-    end
-    # TODO: Need to catch different types of errors
-    # HTTP/1.1 403 Forbidden
-    # 404
-    # Timeout (if nothing received in 20mins? check 'axel' interface)
-    # failed to login FTP
-    raise DownloadError.new('unknown error')if $?.exitstatus != 0
-    file_path = File.join(TEMP_FOLDER,local_filename)
-    return File.exists?(file_path) ? file_path : false
-  end
-
   def self.logger
     @@logger = RAILS_DEFAULT_LOGGER if !defined?(@@logger) &&
       (defined?(RAILS_DEFAULT_LOGGER) && !RAILS_DEFAULT_LOGGER.nil?)
