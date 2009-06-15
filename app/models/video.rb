@@ -207,7 +207,7 @@ class Video < ActiveResource::Base
 
   def extract_filename_from_url    
     self.original_filename = URI.parse(self.source_url).path[%r{[^/]+\z}]
-    self.original_filename = make_hashed_name if original_filename.blank?
+    self.original_filename = rand.to_s if original_filename.blank?
   end
 
   def make_hashed_name

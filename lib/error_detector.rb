@@ -43,7 +43,7 @@ class ErrorDetector
     case @protocol
     when 'http', 's3'
       if line =~ %r[HTTP/\d\.\d\s+(\d+)]
-        raise $1
+        raise $1 unless $1[0] == '3'[0]
       end
     end
 

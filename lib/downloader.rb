@@ -93,7 +93,7 @@ class Downloader
       %Q(scp -B -o PreferredAuthentications=publickey ) +
         %Q("#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:)+
         %Q(#{escape_quote path}") +
-      %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}")
+      %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
     when 's3'
       match = /s3:\/\/([^\/]+)\/(.+)/.match url
       raise DownloadError.new('invalid s3 url') unless\
