@@ -1,3 +1,5 @@
+require 'errors'
+
 class ApplicationProcessor < ActiveMessaging::Processor
   
   # Default on_error implementation - logs standard errors but keeps processing. Other exceptions are raised.

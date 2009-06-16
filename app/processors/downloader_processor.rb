@@ -4,10 +4,9 @@ class DownloaderProcessor < ApplicationProcessor
 
   def on_message(message)
     temp_filepath = ''
-    video = nil
+    logger.debug "DownloaderProcessor received #{message.class}: " + message
+    video  = get_video(message) # we're doomed anyway if anything happens here
     begin
-      logger.debug "DownloaderProcessor received #{message.class}: " + message
-      video  = get_video(message)
       local_filename = video.make_hashed_name
       while File.exist?(Downloader.temp_path(local_filename))
         local_filename = video.make_hashed_name
@@ -44,9 +43,27 @@ class DownloaderProcessor < ApplicationProcessor
       video.download_post_back(video,'success')
     rescue Exception => e
       File.delete(temp_filepath) if File.exist?(temp_filepath)
+      video.progress = -1
       logger.error e.to_yaml
       logger.error e.backtrace.to_yaml
-      video.download_post_back(video,'fail',e.message)
+      error_message = case e
+                      when HttpError
+                        "HTTP status #{e.message}"
+                      when BadVideoError
+                        'The downloaded file is not a supported video'
+                      when HostNotFoundError
+                        'Download URL unreachable'
+                      when AccessDeniedError
+                        'Password is not provided or is not correct'
+                      when DownloadTimeoutError
+                        'Download connection timed out'
+                      else
+                        'Ankoder internal error'
+                        logger.debug(" >>>> const: #{DownloadTimeoutError}" +
+                                     "class: #{e.class}")
+                      end
+      video.download_post_back(video,'fail',error_message)
+      video.save
     end
   end
 
@@ -59,5 +76,5 @@ class DownloaderProcessor < ApplicationProcessor
     msg = JSON.parse message
     msg["content"]["config"]["OriginalFile"]
   end
-  
+
 end
