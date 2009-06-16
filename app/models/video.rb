@@ -1,5 +1,6 @@
 require 'hmac'
 require 'hmac-sha1'
+require 'errors'
 
 class Video < ActiveResource::Base
 
@@ -34,10 +35,11 @@ class Video < ActiveResource::Base
     return unless file_exist?
     f = inspector
     %w(width height duration video? audio? audio_codec video_codec fps bitrate).each do |attr|
-      eval("self.#{attr.delete('?')} = f.send(attr)")   rescue false 
+      eval("self.#{attr.delete('?')} = f.send(attr)") rescue false 
     end   
     self.readable = f.valid?     
-    unless filename_has_container?         
+    unless filename_has_container?
+      raise BadVideoError.new unless f.container
       old_file_path = file_path
       extension = f.container.split(",").first
       self.filename = "#{filename}.#{extension}" 

@@ -25,11 +25,10 @@ class TimeoutDetector
           (current_time - last_update)*SECONDS_IN_A_DAY
         if(time_since_file_size_changed  > DETECTOR_TIMEOUT_SEC)
           # we have timed-out.
-          main_thread.raise RuntimeError.new(
+          main_thread.raise DownloadTimeoutError.new(
             "Timeout: the file #{local_file_path} has stayed unmodified " +
             "for #{DETECTOR_TIMEOUT_SEC} seconds."
           )
-          Thread.exit(1)
         end
         sleep DETECTOR_POLL_INTERVAL_SEC
       end

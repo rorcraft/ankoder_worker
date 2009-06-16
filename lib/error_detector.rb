@@ -1,8 +1,5 @@
 class ErrorDetector
 
-  HOST_NOT_FOUND = 'host not found'
-  ACCESS_DENIED = 'access denied'
-
   @app
   @protocol
   @local_file_path
@@ -20,30 +17,30 @@ class ErrorDetector
     when 'curl'
       case line
       when /curl: \(6\) Couldn't resolve host/
-        raise HOST_NOT_FOUND
+        raise HostNotFoundError.new
       when /curl: \(67\) Access denied: 530/
-        raise ACCESS_DENIED
+        raise AccessDeniedError.new
       end
     when 'axel'
       case line
       when /Unable to connect to server/
-        raise HOST_NOT_FOUND
+        raise HostNotFoundError.new
       when /^530/
-        raise ACCESS_DENIED
+        raise AccessDeniedError.new
       end
     when 'scp'
       case line
       when /ssh: Could not resolve hostname/
-        raise HOST_NOT_FOUND
+        raise HostNotFoundError.new
       when /Permission denied/
-        raise ACCESS_DENIED
+        raise AccessDeniedError.new
       end
     end
 
     case @protocol
     when 'http', 's3'
       if line =~ %r[HTTP/\d\.\d\s+(\d+)]
-        raise $1 unless $1[0] == '3'[0]
+        raise HttpError.new($1) unless $1[0] == '3'[0] || $1[0] == '2'[0]
       end
     end
 
