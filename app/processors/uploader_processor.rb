@@ -12,14 +12,15 @@ class UploaderProcessor < ApplicationProcessor
     upload_url = user.upload_url
     username = user.upload_username
     password = user.upload_password
+    uploader_temp_file = nil
 
     begin
 
       if S3_ON
         #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
-        local_file_path = Downloader.download(
+        local_file_path = uploader_temp_file = Downloader.download(
           :url => video.s3_url,
-          :local_filename => Uploader.make_temp_filename
+          :local_filename => Uploader.make_temp_filename 
         )
       else
         local_file_path = video.file_path
@@ -53,6 +54,10 @@ class UploaderProcessor < ApplicationProcessor
                         'Ankoder internal error'
                       end
       upload_post_back(video,'fail', error_message)
+    ensure
+       if S3_ON && File.exist?(uploader_temp_file)
+         File.delete(uploader_temp_file)
+       end
     end
   end
 end
