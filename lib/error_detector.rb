@@ -1,14 +1,17 @@
 class ErrorDetector
 
+  SAFE_HTTP_CODES = %w[
+    100 101 102 200 201 202 203 204 205 206
+    207 226 300 301 302 303 304 305 306 307
+  ]
+
   @app
   @protocol
-  @local_file_path
 
-  def initialize app, protocol, local_file_path=nil
+  def initialize app, protocol
     @app = app
     @protocol = protocol
     @xml_received = false
-    @local_file_path = local_file_path
   end
 
   def check_for_error line
@@ -40,7 +43,7 @@ class ErrorDetector
     case @protocol
     when 'http', 's3'
       if line =~ %r[HTTP/\d\.\d\s+(\d+)]
-        raise HttpError.new($1) unless $1[0] == '3'[0] || $1[0] == '2'[0]
+        raise HttpError.new($1) unless SAFE_HTTP_CODES.include? $1
       end
     end
 

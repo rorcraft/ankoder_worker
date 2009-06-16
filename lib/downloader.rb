@@ -124,11 +124,9 @@ class Downloader
       error_detector = timeout_detector = nil
       begin
         error_detector = ErrorDetector.new(
-          application, url_protocol(url),File.join(TEMP_FOLDER,local_filename)
-        )
+          application, url_protocol(url))
         timeout_detector = TimeoutDetector.new(
-          File.join(TEMP_FOLDER,local_filename)
-        )
+          File.join(TEMP_FOLDER,local_filename))
         separator = case application
                     when 'axel' then "\n"
                     when 'curl' then "\r"

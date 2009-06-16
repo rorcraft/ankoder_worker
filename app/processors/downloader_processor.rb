@@ -57,6 +57,8 @@ class DownloaderProcessor < ApplicationProcessor
                         'Password is not provided or is not correct'
                       when DownloadTimeoutError
                         'Download connection timed out'
+                      when Downloader::DownloadError
+                        e.message
                       else
                         'Ankoder internal error'
                         logger.debug(" >>>> const: #{DownloadTimeoutError}" +

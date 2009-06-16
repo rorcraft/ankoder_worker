@@ -28,7 +28,6 @@ class Uploader
   end
 
   def self.escape_quote url
-    raise UploadError.new('blank url') if url.blank?
     url.to_s.sub(/"/,'\"')
   end
 
@@ -51,12 +50,12 @@ class Uploader
     case protocol
     when 'ftp'
       if options[:username] && options[:password]
-        return %Q[\\
-          curl -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
+        return %Q[curl \\
+          -v -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
           -u "#{escape_quote options[:username]}:] +
           %Q[#{escape_quote options[:password]}" 2>&1]
       else
-        return %Q[curl -T "#{escape_quote tmp_path}" "#{escape_quote url}"]
+        return %Q[curl -v -T "#{escape_quote tmp_path}" "#{escape_quote url}" 2>&1]
       end
     when 'sftp'
       match = /sftp:\/\/(\w+@)?([^\/]+)(\/.*)/.match url
@@ -84,11 +83,11 @@ class Uploader
         end
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
-            -- "#{url}#{s3_file ? '' : options[:s3_name]}" 2>&1])
+            -- "#{url}#{s3_file ? '' : options[:s3_name]}"]) + ' -L -v 2>&1'
       else
         # http multipart
-        return %Q[\\
-          curl -F "file=@#{escape_quote tmp_path}" \\
+        return %Q[curl \\
+          -L -v -F "file=@#{escape_quote tmp_path}" \\
           -F "video_id=#{escape_quote options[:video_id]}" \\
           -F "thumbnail_url=#{escape_quote options[:thumbnail_url]}" \\
           "#{url}" 2>&1]
@@ -97,6 +96,10 @@ class Uploader
     else
       raise UploadError.new('protocol unsupported')
     end
+  end
+
+  def self.url_protocol url
+    Downloader.url_protocol url
   end
 
   def self.upload *args
@@ -108,11 +111,21 @@ class Uploader
     raise UploadError.new('local filename cannot be blank')if local_filename.blank?
     
     _command = command(upload_url, local_filename, options)
+    application = _command.slice /\S+/
     logger.info _command
-    error = ''
     IO.popen(_command) do |pipe|
-      pipe.each("\n") do |line|
-        error = error + line
+      error_detector = ErrorDetector.new(
+        application, url_protocol(upload_url)
+      )
+      begin
+        pipe.each("\n") do |line|
+          error_detector.check_for_error line
+        end
+      rescue Exception => e # to catch non-standard errors too
+        # kill the uploader process, else it may hang forever
+        `kill -9 #{pipe.pid}`
+        # rethrow exception
+        raise e
       end
     end
     raise UploadError.new('unknown error') if $?.exitstatus != 0
