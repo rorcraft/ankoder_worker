@@ -13,30 +13,46 @@ class UploaderProcessor < ApplicationProcessor
     username = user.upload_username
     password = user.upload_password
 
-    if S3_ON
-      #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
-      local_file_path = Downloader.download(
-        :url => video.s3_url,
-        :local_filename => Uploader.make_temp_filename
-      )
-    else
-      local_file_path = video.file_path
-    end
+    begin
 
-    Uploader.upload(
-      :video_id        => video.id,
-      :thumbnail_url   => video.thumbnail_url,
-      :upload_url      => upload_url,
-      :s3_name         => s3_name,
-      :local_file_path => local_file_path,
-      :remote_filename => video.filename,
-      :username        => username,
-      :password        => password
-    )
-    # postback
-    upload_post_back(video,'success')
-  rescue Exception => e
-    upload_post_back(video,'fail')
-    raise e
+      if S3_ON
+        #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
+        local_file_path = Downloader.download(
+          :url => video.s3_url,
+          :local_filename => Uploader.make_temp_filename
+        )
+      else
+        local_file_path = video.file_path
+      end
+
+      Uploader.upload(
+        :video_id        => video.id,
+        :thumbnail_url   => video.thumbnail_url,
+        :upload_url      => upload_url,
+        :s3_name         => s3_name,
+        :local_file_path => local_file_path,
+        :remote_filename => video.filename,
+        :username        => username,
+        :password        => password
+      )
+      # postback
+      upload_post_back(video,'success')
+    rescue Exception => e
+      error_message = case e
+                      when HttpError
+                        "HTTP status #{e.message}"
+                      when HostNotFoundError
+                        'Upload URL unreachable'
+                      when AccessDeniedError
+                        'Authentication failed'
+                      when Uploader::UploadError
+                        e.message
+                      else
+                        logger.error e.to_yaml
+                        logger.error e.backtrace.to_yaml
+                        'Ankoder internal error'
+                      end
+      upload_post_back(video,'fail', error_message)
+    end
   end
 end

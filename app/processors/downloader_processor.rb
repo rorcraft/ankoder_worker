@@ -44,8 +44,6 @@ class DownloaderProcessor < ApplicationProcessor
     rescue Exception => e
       File.delete(temp_filepath) if File.exist?(temp_filepath)
       video.progress = -1
-      logger.error e.to_yaml
-      logger.error e.backtrace.to_yaml
       error_message = case e
                       when HttpError
                         "HTTP status #{e.message}"
@@ -54,15 +52,15 @@ class DownloaderProcessor < ApplicationProcessor
                       when HostNotFoundError
                         'Download URL unreachable'
                       when AccessDeniedError
-                        'Password is not provided or is not correct'
+                        'Authentication failed'
                       when DownloadTimeoutError
                         'Download connection timed out'
                       when Downloader::DownloadError
                         e.message
                       else
+                        logger.error e.to_yaml
+                        logger.error e.backtrace.to_yaml
                         'Ankoder internal error'
-                        logger.debug(" >>>> const: #{DownloadTimeoutError}" +
-                                     "class: #{e.class}")
                       end
       video.download_post_back(video,'fail',error_message)
       video.save
