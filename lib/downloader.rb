@@ -95,7 +95,7 @@ class Downloader
         %Q(#{escape_quote path}") +
         %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
     when 's3'
-      match = /s3:\/\/([^\/]+)\/(.+)/.match url
+      match = /s3:\/\/([^\/]+)\/([^\?]+)/.match url
       raise DownloadError.new('invalid s3 url') unless\
         match && match.length == 3
       bucket = match[1]
