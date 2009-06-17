@@ -1,4 +1,8 @@
 <user>
   <id>1</id>
   <private_key>12345</private_key>
+  <upload_url>ftp://ftp.filekeeper.org</upload_url>
+  <postback_upload>http://localhost:5555</postback_upload>
+  <postback_convert>http://localhost:5555</postback_convert>
+  <postback_download>http://localhost:5555</postback_download>
 </user>

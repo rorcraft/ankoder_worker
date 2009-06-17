@@ -35,7 +35,10 @@ require 'ruby-debug'
 AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
 S3_ON         = false
-THUMBNAIL_FOLDER = File.join RAILS_ROOT, "public", "thumbnails"
+CURL            = "/usr/bin/curl"  
+FILE_FOLDER   = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/file_system"
+PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/public"
+THUMBNAIL_FOLDER = "/thumbnail"
 
 if `hostname`.strip.match 'rexchung'
   FFMPEG_PATH     = "/opt/local/bin/ffmpeg"

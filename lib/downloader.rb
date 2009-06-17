@@ -65,7 +65,7 @@ class Downloader
       url = "s3://#{bucket}/#{file}"
     end
 
-    url = parse_video_url url if url_protocol(url)=='http'
+    url = parse_video_url url if url_protocol(url)=='http' rescue url
     case (protocol = url_protocol url)
     when 'http','ftp'
       if (options[:username] && options[:password] || \
@@ -133,7 +133,7 @@ class Downloader
                     else "\n"
                     end
         pipe.each(separator) do |line|
-          logger.debug line
+          # logger.debug line
           error_detector.check_for_error line
 
           p = case application
