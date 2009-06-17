@@ -1,5 +1,6 @@
 <video>
   <id type="integer">404</id>
+  <user-id type="integer">404</user-id>
   <source-url>http://www.youtube.com/this.frigging.url.does.not.exist</source-url>
   <audio nil="true"></audio>
   <content-type nil="true"></content-type>
@@ -15,7 +16,6 @@
   <postback-url>http://localhost:5555</postback-url>
   <progress type="integer">0</progress>
   <uploaded type="boolean">false</uploaded>
-  <user-id type="integer">1</user-id>
   <finished-at nil="true"></finished-at>
   <bitrate nil="true"></bitrate>
   <audio-codec nil="true"></audio-codec>

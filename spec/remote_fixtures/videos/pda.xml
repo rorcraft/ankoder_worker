@@ -15,7 +15,7 @@
   <postback-url>http://localhost:5555</postback-url>
   <progress type="integer">0</progress>
   <uploaded type="boolean">false</uploaded>
-  <user-id type="integer">1</user-id>
+  <user-id type="integer">530</user-id>
   <finished-at nil="true"></finished-at>
   <bitrate nil="true"></bitrate>
   <audio-codec nil="true"></audio-codec>

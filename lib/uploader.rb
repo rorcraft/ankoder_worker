@@ -68,7 +68,7 @@ class Uploader
         "#{escape_quote tmp_path}" \\
         "#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:]+
         %Q[#{escape_quote remote_path}" 2>&1]
-    when 'http'
+    when 'http','s3'
       #handles s3 as a special case
       if url =~ /s3\.amazonaws\.com/
         s3_file = nil
@@ -84,6 +84,17 @@ class Uploader
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
             -- "#{url}#{s3_file ? '' : options[:s3_name]}"]) + ' -L -v 2>&1'
+      elsif url =~ %r[^s3://]
+        # alternative s3 url
+        match = /s3:\/\/([^\/]+)\/?([^\?]*)/.match url
+        raise UploadError.new('invalid s3 url') unless\
+          match && match.length >= 2
+        bucket = match[1] + '/'
+        file = match[2]
+        return S3Curl.get_curl_command(
+          %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
+            -- "http://s3.amazonaws.com/#{url}#{file.blank? ? \
+            options[:s3_name] : file}"]) + ' -L -v 2>&1'
       else
         # http multipart
         return %Q[curl \\

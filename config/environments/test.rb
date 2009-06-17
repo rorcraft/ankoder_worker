@@ -39,6 +39,7 @@ CURL            = "/usr/bin/curl"
 FILE_FOLDER   = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/file_system"
 PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/public"
 THUMBNAIL_FOLDER = "/thumbnail"
+API_URL = "http://workflow:r0rcr4ft@api.localankoder.com"
 
 if `hostname`.strip.match 'rexchung'
   FFMPEG_PATH     = "/opt/local/bin/ffmpeg"
