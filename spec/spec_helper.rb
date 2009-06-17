@@ -110,6 +110,13 @@ end
   ActiveResource::HttpMock.respond_to do |mock|
     mock.get "/videos/1.xml", {}, video(:kites)
     mock.get "/videos/2.xml", {}, video(:downloaded)
+    mock.get "/videos/1997.xml",{}, video(:processor_test_video)
+    mock.get "/videos/404.xml", {}, video(:p404)
+    mock.get "/videos/139.xml", {}, video(:pbad_video)
+    mock.get "/videos/640.xml", {}, video(:phnf)
+    mock.get "/videos/530.xml", {}, video(:pda)
+    mock.get "/videos/774.xml", {}, video(:pto)
+    mock.get "/videos/975.xml", {}, video(:prn)
     mock.get "/jobs/1.xml", {}, job(:kites_to_flv)    
     mock.get "/jobs/2.xml", {}, job(:kites_to_wmv)    
     mock.get "/jobs/3.xml", {}, job(:kites_to_divx)    
@@ -122,7 +129,11 @@ end
     mock.get "/profiles/4.xml", {}, profile(:mov)
     mock.get "/profiles/5.xml", {}, profile(:rm)
     mock.get "/profiles/6.xml", {}, profile(:flv320x240)
-    mock.get "/users/1.xml", {}, user(:edwin)
+    mock.get "/users/1.xml",  {},user(:edwin)
+    mock.get "/users/404.xml",{},user(:u404)
+    mock.get "/users/139.xml",{},user(:u139)
+    mock.get "/users/530.xml",{},user(:u530)
+    mock.get "/users/975.xml",{},user(:u975)
 #     mock.get "/profiles/2.xml", {}, profile(:flv320x240)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404

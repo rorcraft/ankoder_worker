@@ -1,6 +1,6 @@
 module PostbackHelper
 
-  def upload_post_back( video , result, error="")
+  def download_post_back( video , result, error="")
     return if video.postback_url.blank?
     message = {"result" => result, "error" => error, "type" => "Download" , 
       "video_id"=> video.id, "video_name" => video.name }.to_json
@@ -15,7 +15,8 @@ module PostbackHelper
     f.close
   rescue Exception => e
     logger.debug result
-    raise e
+    logger.error e.to_yaml
+    logger.error e.backtrace.to_yaml
   end
   
   def convert_post_back(job, result, error='')
@@ -48,7 +49,8 @@ module PostbackHelper
     f.close
   rescue Exception => e
     logger.debug result
-    raise e
+    logger.error e.to_yaml
+    logger.error e.backtrace.to_yaml
   end
 
   def upload_post_back(video, result, error='')
@@ -77,7 +79,8 @@ module PostbackHelper
     f.close
   rescue Exception => e
     logger.debug result
-    raise e
+    logger.error e.to_yaml
+    logger.error e.backtrace.to_yaml
   end
 
 end

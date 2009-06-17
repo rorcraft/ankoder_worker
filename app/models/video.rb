@@ -1,5 +1,6 @@
 require 'hmac'
 require 'hmac-sha1'
+require 'errors'
 
 class Video < ActiveResource::Base
 
@@ -34,16 +35,16 @@ class Video < ActiveResource::Base
     return unless file_exist?
     f = inspector
     %w(width height duration video? audio? audio_codec video_codec fps bitrate).each do |attr|
-      eval("self.#{attr.delete('?')} = f.send(attr)")   rescue false 
+      eval("self.#{attr.delete('?')} = f.send(attr)") rescue false 
     end   
     self.readable = f.valid?     
-    unless filename_has_container?         
+    unless filename_has_container?
+      raise BadVideoError.new unless f.container
       old_file_path = file_path
       extension = f.container.split(",").first
       self.filename = "#{filename}.#{extension}" 
       while File.exist?(self.file_path)
-        self.filename = Digest::SHA1.hexdigest \
-          "--#{self.filename}--#{(rand*Time.now.to_i)}--"
+        self.filename = self.make_hashed_name
         self.filename = "#{self.filename}.#{extension}"
       end
       FileUtils.mv old_file_path, file_path
@@ -170,6 +171,23 @@ class Video < ActiveResource::Base
     filename + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
   end
 
+  def thumbnail_url(options = {})
+    case options
+    when Hash
+      time = options.delete(:time)
+      size = options.delete(:size)
+
+      if S3_ON
+        "http://#{::S3_SERVER}/#{thumbnail_name(time,size)}"
+      else  
+        "#{API_URL}#{thumbnail_path(time,size)}"
+      end   
+    else  
+      "/"  
+    end      
+
+  end
+
   def default_thumb_size(size)                                              
     Video::SIZES.has_key?(size) ? size : "small"
   end
@@ -191,7 +209,7 @@ class Video < ActiveResource::Base
 
   def extract_filename_from_url    
     self.original_filename = URI.parse(self.source_url).path[%r{[^/]+\z}]
-    self.original_filename = make_hashed_name if original_filename.blank?
+    self.original_filename = rand.to_s if original_filename.blank?
   end
 
   def make_hashed_name

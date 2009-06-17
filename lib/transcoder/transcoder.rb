@@ -93,7 +93,7 @@ module Transcoder
       # remove local original file
       # remove local convert file
       
-      job.set_status("complete")
+      job.set_status("completed")
       
     rescue TranscoderError
       job.set_status("failed")

@@ -1,0 +1,31 @@
+<video>
+  <id type="integer">975</id>
+  <source-url>abEACa351bklas92://3851hggxzclGFDDdjawa</source-url>
+  <audio nil="true"></audio>
+  <content-type nil="true"></content-type>
+  <name>b</name>
+  <created-at type="datetime">2009-06-16T05:30:57+08:00</created-at>
+  <video-codec nil="true"></video-codec>
+  <size nil="true"></size>
+  <thumbnail-uploaded type="boolean">false</thumbnail-uploaded>
+  <thumbnail nil="true"></thumbnail>
+  <s3-created-at nil="true"></s3-created-at>
+  <deleted-at nil="true"></deleted-at>
+  <original-filename>watch</original-filename>
+  <postback-url>http://localhost:5555</postback-url>
+  <progress type="integer">0</progress>
+  <uploaded type="boolean">false</uploaded>
+  <user-id type="integer">975</user-id>
+  <finished-at nil="true"></finished-at>
+  <bitrate nil="true"></bitrate>
+  <audio-codec nil="true"></audio-codec>
+  <height nil="true"></height>
+  <filename>b</filename>
+  <is-public nil="true"></is-public>
+  <video nil="true"></video>
+  <duration nil="true"></duration>
+  <fps nil="true"></fps>
+  <readable nil="true"></readable>
+  <width nil="true"></width>
+</video>
+

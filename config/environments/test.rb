@@ -35,7 +35,11 @@ require 'ruby-debug'
 AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
 S3_ON         = false
-THUMBNAIL_FOLDER = File.join RAILS_ROOT, "public", "thumbnails"
+CURL            = "/usr/bin/curl"  
+FILE_FOLDER   = "/Users/rexchung/workspace/ankoder_worker/file_system"
+PUBLIC_FOLDER = "/Users/rexchung/workspace/ankoder_worker/public"
+THUMBNAIL_FOLDER = "/thumbnail"
+API_URL = "http://workflow:r0rcr4ft@api.localankoder.com"
 
 if `hostname`.strip.match 'rexchung'
   FFMPEG_PATH     = "/opt/local/bin/ffmpeg"

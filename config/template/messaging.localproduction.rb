@@ -7,17 +7,14 @@ ActiveMessaging::Gateway.define do |s|
   #s.filter :some_filter, :only=>:orders
   s.processor_group :transcoder, :transcode_worker
   s.processor_group :downloader, :downloader_worker
+  s.processor_group :uploader,   :uploader_worker 
     
   # NB:
   # reliable_msg "/queue/dev/Converter"
   # sqs "_queue_dev_Converter"
   
-  if ENV['RAILS_ENV'] != "production"
-    s.destination :transcode_worker, '_queue_dev_Converter_qsbwee'
-    s.destination :downloader_worker, '_queue_dev_Downloader_qsbwee'
-  else
-    s.destination :transcode_worker, '_queue_asqs_local_Converter'
-    s.destination :downloader_worker, '_queue_asqs_local_Downloader'  
-  end
+  s.destination :transcode_worker, '_queue_asqs_local_Converter'
+  s.destination :downloader_worker, '_queue_asqs_local_Downloader'  
+  s.destination :uploader_worker, '_queue_asqs_local_Uploader'
 
 end

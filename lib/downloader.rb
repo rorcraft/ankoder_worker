@@ -28,39 +28,6 @@ class Downloader
 
   class DownloadError < RuntimeError; end
 
-  def self.original_download_and_todo_list(url, local_filename)
-    progress = nil
-
-
-    _command = "cd #{TEMP_FOLDER} && #{command(url,local_filename)}"
-    logger.info _command
-    IO.popen(_command) do |pipe|
-      pipe.each("\n") do |line|
-
-        if line =~ /^\[[\d ]+%\]/ && line =~ /(\d+)/
-          p = $1.to_i 
-          p = 100 if p > 100
-          # limit the update rate to prevent too many progress update requests
-          # flushing our mongrels
-          if progress_need_refresh?(progress, p)
-            progress = p
-            # @logger.debug "progress = #{progress}, duration = #{duration}"
-            block_given? ? yield(progress) : stdout_progress(progress)
-            $defout.flush
-          end
-        end
-      end
-    end
-    # TODO: Need to catch different types of errors
-    # HTTP/1.1 403 Forbidden
-    # 404
-    # Timeout (if nothing received in 20mins? check 'axel' interface)
-    # failed to login FTP
-    raise DownloadError.new('unknown error')if $?.exitstatus != 0
-    file_path = File.join(TEMP_FOLDER,local_filename)
-    return File.exists?(file_path) ? file_path : false
-  end
-
   def self.logger
     @@logger = RAILS_DEFAULT_LOGGER if !defined?(@@logger) &&
       (defined?(RAILS_DEFAULT_LOGGER) && !RAILS_DEFAULT_LOGGER.nil?)
@@ -74,16 +41,31 @@ class Downloader
   end
 
   def self.url_protocol url
+    if url =~ /^http:\/\/s3\.amazonaws\.com\// ||  url =~ /s3\.amazonaws\.com/
+      return 's3'
+    end
     match=/^(\w+):\/\//.match(url)
     match ? match[1] : nil
   end
 
+  def self.temp_path local_filename
+    File.join(TEMP_FOLDER,local_filename)
+  end
+
   def self.command(url, local_filename, options={})
     url = "http://" + url unless (url_protocol url)
+
     # handles s3 as a special case
-    url.sub!(/^http:\/\/s3\.amazonaws\.com\//,'s3://') if \
-      url =~ /^http:\/\/s3\.amazonaws\.com\//
-    url = parse_video_url url if url_protocol(url)=='http'
+    if url =~ /^http:\/\/s3\.amazonaws\.com\//
+      url.sub!(/^http:\/\/s3\.amazonaws\.com\//,'s3://')
+    elsif url =~ /s3\.amazonaws\.com/
+      array = url.split /\.s3\.amazonaws\.com\/?/
+      bucket = %r[^http://(.+)].match(array[0])[1]
+      file = array[1]
+      url = "s3://#{bucket}/#{file}"
+    end
+
+    url = parse_video_url url if url_protocol(url)=='http' rescue url
     case (protocol = url_protocol url)
     when 'http','ftp'
       if (options[:username] && options[:password] || \
@@ -93,10 +75,10 @@ class Downloader
           options[:username] = 'user'
           options[:password] = 'password'
         end
-        %Q(curl -L -# -u "#{escape_quote options[:username]}:)+
+        %Q(curl -v -L -# -u "#{escape_quote options[:username]}:)+
         %Q(#{escape_quote options[:password]}" )+
-        %Q(-A "#{USER_AGENT}" "#{escape_quote URI.parse(url)}")+
-        %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
+          %Q(-A "#{USER_AGENT}" "#{escape_quote URI.parse(url)}")+
+          %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
       else
         %Q(axel -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" )+
           %Q(-U "#{USER_AGENT}" "#{escape_quote URI.parse(url)}"  2>&1)
@@ -111,17 +93,17 @@ class Downloader
       %Q(scp -B -o PreferredAuthentications=publickey ) +
         %Q("#{userAt ? escape_quote(userAt) : ''}#{escape_quote host}:)+
         %Q(#{escape_quote path}") +
-      %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}")
+        %Q( "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
     when 's3'
-      match = /s3:\/\/([^\/]+)\/(.+)/.match url
+      match = /s3:\/\/([^\/]+)\/([^\?]+)/.match url
       raise DownloadError.new('invalid s3 url') unless\
         match && match.length == 3
       bucket = match[1]
       file = match[2]
       S3Curl.get_curl_command(%Q(#{S3Curl::S3CURL} #{S3Curl.access_param} -- \\
             "http://s3.amazonaws.com/#{bucket}/#{file}" )\
-             ) + \
-             %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" \\
+                             ) + \
+                               %Q( -v -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" \\
              -# 2>&1)
 
     else
@@ -136,31 +118,49 @@ class Downloader
     local_filename = options[:local_filename]
     _command = command(url, local_filename, options)
     application = _command.slice /\S+/
-    logger.info _command
+      logger.info _command
     p = progress = nil; # to force 0% update
     IO.popen(_command) do |pipe|
-      separator = case application
-                  when 'axel' then "\n"
-                  when 'curl' then "\r"
-                  else "\n"
-                  end
-      pipe.each(separator) do |line|
-        logger.debug line
-        p = case application
-            when 'axel'
-              line =~ /^\[ *(\d+)%\]/ ? $1.to_i : p
-            when 'curl'
-              line =~ /(\d+\.\d+)%/ ? $1.to_f.round : p
-            else
-              p
-            end
-        if progress != p && progress_need_refresh?(progress, p)
-          p = 0 if p < 0
-          p = 100 if p > 100
-          progress = p
-          block_given? ? yield(progress) : stdout_progress(progress)
-          $defout.flush
+      error_detector = timeout_detector = nil
+      begin
+        error_detector = ErrorDetector.new(
+          application, url_protocol(url))
+        timeout_detector = TimeoutDetector.new(
+          File.join(TEMP_FOLDER,local_filename))
+        separator = case application
+                    when 'axel' then "\n"
+                    when 'curl' then "\r"
+                    else "\n"
+                    end
+        pipe.each(separator) do |line|
+          # logger.debug line
+          error_detector.check_for_error line
+
+          p = case application
+              when 'axel'
+                line =~ /^\[ *(\d+)%\]/ ? $1.to_i : p
+              when 'curl'
+                line =~ /(\d+\.\d+)%/ ? $1.to_f.round : p
+              else
+                p
+              end
+          if progress != p && progress_need_refresh?(progress, p)
+            p = 0 if p < 0
+            p = 100 if p > 100
+            progress = p
+            block_given? ? yield(progress) : stdout_progress(progress)
+            $defout.flush
+          end
         end
+      rescue Exception => e # else a miserable non-standard error
+                            # raised herein will bypass it here.
+                            # It would even bypass the ensure block.
+        # kill the downloader process
+        `kill -9 #{pipe.pid}`
+        # rethrow exception
+        raise e
+      ensure
+        timeout_detector.exit
       end
     end
     raise DownloadError.new('unknown error') if $?.exitstatus != 0
