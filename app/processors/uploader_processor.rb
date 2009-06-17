@@ -48,6 +48,8 @@ class UploaderProcessor < ApplicationProcessor
                         'Authentication failed'
                       when Uploader::UploadError
                         e.message
+                      when DownloadTimeoutError
+                        'Upload connection timed out'
                       else
                         logger.error e.to_yaml
                         logger.error e.backtrace.to_yaml

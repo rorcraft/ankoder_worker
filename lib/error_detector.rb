@@ -23,6 +23,8 @@ class ErrorDetector
         raise HostNotFoundError.new
       when /curl: \(67\) Access denied: 530/
         raise AccessDeniedError.new
+      when /curl: \(28\)/
+        raise DownloadTimeoutError.new("Timeout")
       end
     when 'axel'
       case line

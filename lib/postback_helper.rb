@@ -1,5 +1,12 @@
 module PostbackHelper
 
+  CURL_FLAGS =
+    %Q[ \\
+      -v -L -Y 100 \\
+      --connect-timeout #{TimeoutDetector::DETECTOR_TIMEOUT_SEC} \\
+      -y #{TimeoutDetector::DETECTOR_TIMEOUT_SEC} \\
+    ]
+
   def download_post_back( video , result, error="")
     return if video.postback_url.blank?
     message = {"result" => result, "error" => error, "type" => "Download" , 
@@ -8,7 +15,7 @@ module PostbackHelper
     
     encoded_message = Base64.encode64(HMAC::SHA1::digest(private_key, message)).strip
 
-    curl_cmd = "curl -H \"Content-type: application/x-www-form-urlencoded\" #{video.postback_url} -d \"message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}\""
+    curl_cmd = "curl #{CURL_FLAGS} -H \"Content-type: application/x-www-form-urlencoded\" #{video.postback_url} -d \"message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}\""
     logger.info curl_cmd
     f = IO.popen(curl_cmd +" 2>&1")
     result = f.read
@@ -39,7 +46,7 @@ module PostbackHelper
     encoded_message = Base64.\
       encode64(HMAC::SHA1::digest(private_key,message)).strip
     curl_cmd = %Q{ \\
-      curl -H "Content-type: application/x-www-form-urlencoded" \\
+      curl #{CURL_FLAGS} -H "Content-type: application/x-www-form-urlencoded" \\
       #{job.postback_url} -d \\
       "message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}"
     }
@@ -69,7 +76,7 @@ module PostbackHelper
     encoded_message = Base64.\
       encode64(HMAC::SHA1::digest(private_key,message)).strip
     curl_cmd = %Q{ \\
-      curl -H "Content-type: application/x-www-form-urlencoded" \\
+      curl #{CURL_FLAGS} -H "Content-type: application/x-www-form-urlencoded" \\
       #{postback_url} -d \\
       "message=#{CGI.escape(message)}&signature=#{CGI.escape(encoded_message)}"
     }

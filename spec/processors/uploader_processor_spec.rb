@@ -14,7 +14,7 @@ class Video
   end
 end
 
-describe Uploader do
+describe UploaderProcessor do
   remote_fixtures
 
   `touch #{FILE_FOLDER}/b`
@@ -64,6 +64,27 @@ describe Uploader do
     return $1
   end
 
+  it 'should timeout' do
+    poll_interval = TimeoutDetector::DETECTOR_POLL_INTERVAL_SEC
+    timeout = TimeoutDetector::DETECTOR_TIMEOUT_SEC
+    TimeoutDetector.const_set 'DETECTOR_POLL_INTERVAL_SEC', 1
+    TimeoutDetector.const_set 'DETECTOR_TIMEOUT_SEC', 1
+    p = get_processor
+    Thread.start do
+      p.on_message(message(774))
+    end
+    s = @@socket.accept[0]
+    sleep 4
+    s.close
+    params = read_socket
+    assert(params['message'] =~ /"result":"([^"]*)"/)
+    assert_equal 'fail', $1
+    assert(params['message'] =~ /"error":"([^"]*)"/)
+    assert_equal 'Upload connection timed out', $1
+    TimeoutDetector.const_set 'DETECTOR_POLL_INTERVAL_SEC', poll_interval
+    TimeoutDetector.const_set 'DETECTOR_TIMEOUT_SEC', timeout
+  end
+
   it 'should work' do # costs 30 sec
     check(1997,'success')
   end
@@ -79,8 +100,6 @@ describe Uploader do
   it 'should report denied access' do
     check(530,'fail','Authentication failed')
   end
-
-  it 'should timeout'
 
   it 'should react to random url' do
     error = check(975,'fail',nil,true)

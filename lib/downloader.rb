@@ -163,7 +163,7 @@ class Downloader
         timeout_detector.exit
       end
     end
-    raise DownloadError.new('unknown error') if $?.exitstatus != 0
+    raise RuntimeError.new('unknown error') if $?.exitstatus != 0
     file_path = File.join(TEMP_FOLDER,local_filename)
     return File.exists?(file_path) ? file_path : false
   end

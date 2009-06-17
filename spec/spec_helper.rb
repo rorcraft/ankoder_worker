@@ -134,6 +134,7 @@ end
     mock.get "/users/139.xml",{},user(:u139)
     mock.get "/users/530.xml",{},user(:u530)
     mock.get "/users/975.xml",{},user(:u975)
+    mock.get "/users/774.xml",{},user(:u774)
 #     mock.get "/profiles/2.xml", {}, profile(:flv320x240)
     # mock.get "/tools/1/users/0.xml", {}, nil, 404
     # mock.get "/tools/1/users/.xml", {}, nil, 404

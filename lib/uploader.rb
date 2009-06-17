@@ -4,6 +4,14 @@ class Uploader
   USER_AGENT  = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.11)"+
     "Gecko/20071231 Firefox/2.0.0.11 Flock/1.0.5" unless defined? USER_AGENT
 
+  def self.curl_flags
+    %Q[ \\
+      -v -L -Y 100 \\
+      --connect-timeout #{TimeoutDetector::DETECTOR_TIMEOUT_SEC} \\
+      -y #{TimeoutDetector::DETECTOR_TIMEOUT_SEC} \\
+    ]
+  end
+
   class UploadError < RuntimeError; end
 
   def self.logger
@@ -50,12 +58,13 @@ class Uploader
     case protocol
     when 'ftp'
       if options[:username] && options[:password]
-        return %Q[curl \\
-          -v -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
+        return %Q[curl #{curl_flags}\\
+          -T "#{escape_quote tmp_path}" "#{escape_quote url}" \\
           -u "#{escape_quote options[:username]}:] +
           %Q[#{escape_quote options[:password]}" 2>&1]
       else
-        return %Q[curl -v -T "#{escape_quote tmp_path}" "#{escape_quote url}" 2>&1]
+        return %Q[curl #{curl_flags}\\
+          -T "#{escape_quote tmp_path}" "#{escape_quote url}" 2>&1]
       end
     when 'sftp'
       match = /sftp:\/\/(\w+@)?([^\/]+)(\/.*)/.match url
@@ -83,7 +92,8 @@ class Uploader
         end
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
-            -- "#{url}#{s3_file ? '' : options[:s3_name]}"]) + ' -L -v 2>&1'
+            -- "#{url}#{s3_file ? '' : options[:s3_name]}"]) +
+            " #{curl_flags} -L -v 2>&1"
       elsif url =~ %r[^s3://]
         # alternative s3 url
         match = /s3:\/\/([^\/]+)\/?([^\?]*)/.match url
@@ -94,11 +104,11 @@ class Uploader
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
             -- "http://s3.amazonaws.com/#{url}#{file.blank? ? \
-            options[:s3_name] : file}"]) + ' -L -v 2>&1'
+            options[:s3_name] : file}"]) + " #{curl_flags} 2>&1"
       else
         # http multipart
-        return %Q[curl \\
-          -L -v -F "file=@#{escape_quote tmp_path}" \\
+        return %Q[curl #{curl_flags}\\
+          -F "file=@#{escape_quote tmp_path}" \\
           -F "video_id=#{escape_quote options[:video_id]}" \\
           -F "thumbnail_url=#{escape_quote options[:thumbnail_url]}" \\
           "#{url}" 2>&1]
@@ -124,12 +134,14 @@ class Uploader
     _command = command(upload_url, local_filename, options)
     application = _command.slice /\S+/
     logger.info _command
+    output = ''
     IO.popen(_command) do |pipe|
       error_detector = ErrorDetector.new(
         application, url_protocol(upload_url)
       )
       begin
         pipe.each("\n") do |line|
+          output = output + line
           error_detector.check_for_error line
         end
       rescue Exception => e # to catch non-standard errors too
@@ -139,7 +151,10 @@ class Uploader
         raise e
       end
     end
-    raise UploadError.new('unknown error') if $?.exitstatus != 0
+    if $?.exitstatus != 0
+      logger.debug output
+      raise RuntimeError.new('unknown error') 
+    end
     File.delete(path(local_filename)) unless options[:local_file_path] 
     return true
   end
