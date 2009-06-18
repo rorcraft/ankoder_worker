@@ -92,7 +92,7 @@ class Uploader
         end
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
-            -- "#{url}#{s3_file ? '' : options[:s3_name]}"]) +
+            -- "#{url}#{s3_file ? '' : options[:remote_filename]}"]) +
             " #{curl_flags} -L -v 2>&1"
       elsif url =~ %r[^s3://]
         # alternative s3 url
@@ -103,8 +103,8 @@ class Uploader
         file = match[2]
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\\
-            -- "http://s3.amazonaws.com/#{url}#{file.blank? ? \
-            options[:s3_name] : file}"]) + " #{curl_flags} 2>&1"
+            -- "http://s3.amazonaws.com/#{bucket}#{file.blank? ? \
+            options[:remote_filename] : file}"]) + " #{curl_flags} 2>&1"
       else
         # http multipart
         return %Q[curl #{curl_flags}\\
