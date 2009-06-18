@@ -63,4 +63,12 @@ class Job < ActiveResource::Base
     self.status = _status
   end
 
+  def get_upload_url
+    upload_url ? upload_url : user.upload_url
+  end
+
+  def get_thumbnail_sizes
+    @thumbnail_sizes ||= JSON.parse thumbnail_sizes
+  end
+
 end

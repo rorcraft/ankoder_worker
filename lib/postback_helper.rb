@@ -60,7 +60,7 @@ module PostbackHelper
     logger.error e.backtrace.to_yaml
   end
 
-  def upload_post_back(video, result, error='')
+  def upload_post_back(video, job, result, error='')
     postback_url = video.user.postback_upload
     return if postback_url.blank?
     message = {
@@ -68,7 +68,7 @@ module PostbackHelper
       'error'   => error,
       'type'    => 'Upload',
       'Video'   => video.id,
-      'url'     => video.user.upload_url,
+      'url'     => job.get_upload_url,
       'filename'=> video.filename
     }.to_json
     private_key = video.user.private_key

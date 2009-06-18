@@ -23,7 +23,12 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       convert_post_back job, 'success'
       # also upload completed video if upload_url is not null.
       if job.user.upload_url
-        publish :uploader_worker,{'video_id'=>job.convert_file_id}.to_json
+        publish(
+          :uploader_worker,
+          {'video_id'=> job.convert_file_id,
+           'job_id'  => job.id 
+          }.to_json
+        )
       end
     else
       convert_post_back job, 'fail'
