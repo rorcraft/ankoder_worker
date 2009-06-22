@@ -61,6 +61,9 @@ class Job < ActiveResource::Base
   def set_status(_status)
     put(:set_status, :status => _status)
     self.status = _status
+    if _status == 'complete'
+      self.finish
+    end
   end
 
   def get_upload_url
