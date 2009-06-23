@@ -24,7 +24,6 @@ module Transcoder
         tmp_file = "#{path}.tmp"
         cmd = "MP4Box -out #{tmp_file} -hint #{path} 2>&1;"
         cmd += " mv #{tmp_file} #{path}"
-        cmd = "MP4Box -hint #{path}"
       end
     
     end
