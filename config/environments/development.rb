@@ -16,6 +16,15 @@ config.action_controller.perform_caching             = false
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
 
+S3_ON = false
+
+S3_BUCKET = S3BUCKET = "devbucket2.ankoder.com"
+ACCESS_KEY_ID     = "04WAVZJW4HAZZQTWKCR2"
+SECRET_ACCESS_KEY = "/iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI"
+S3_SERVER         = "s3.amazonaws.com"
+
+API_URL = "http://workflow:r0rcr4ft@api.localankoder.com"
+
 if `hostname`.strip.match 'rexchung'
   AR_SITE          = 'http://mancjew:pianoman@ar.localankoder.com'
   FFMPEG_PATH      = "/opt/local/bin/ffmpeg"
@@ -28,12 +37,9 @@ else
   AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
   FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
   MENCODER_PATH   = "/usr/local/bin/mencoder"
+  MP4BOX_PATH     = "/usr/local/bin/MP4Box"
   CURL            = "/usr/bin/curl"  
-  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
-  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
+  FILE_FOLDER   = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/file_system"
+  PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/rorcraft_ankoder/api/public"
   THUMBNAIL_FOLDER = "/thumbnail"
 end
-
-
-S3_ON         = true
-S3BUCKET = "download2.ankoder.com"

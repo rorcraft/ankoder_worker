@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn
+END
+LICENSE
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/LICENSE
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/.gitignore
+END
+init.rb
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/init.rb
+END
+CHANGELOG
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/CHANGELOG
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/README
+END

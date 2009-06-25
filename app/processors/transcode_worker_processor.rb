@@ -39,7 +39,10 @@ class TranscodeWorkerProcessor < ApplicationProcessor
   #  {"type": "ASSIGN", "content": {"config": {"OriginalFile": "1", "ConvertJob": "1"}, "node_name": "Converter"}}
   def get_job_id message
     msg = JSON.parse message
-    msg["content"]["config"]["ConvertJob"]
+
+    # the former is proposed scaler message.
+    # the latter is legacy API message.
+    msg["job_id"] || msg["content"]["config"]["ConvertJob"]
   end
   
   

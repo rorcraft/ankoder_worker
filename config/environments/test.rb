@@ -36,8 +36,15 @@ AR_SITE       = "http://localhost"
 FILE_FOLDER   = File.join RAILS_ROOT, "file_system"
 S3_ON         = false
 CURL            = "/usr/bin/curl"  
-FILE_FOLDER   = "/Users/rexchung/workspace/ankoder_worker/file_system"
-PUBLIC_FOLDER = "/Users/rexchung/workspace/ankoder_worker/public"
+
+if `hostname` =~ /yfcai8s/
+  FILE_FOLDER   = "/mnt/file_system"
+  PUBLIC_FOLDER = "/Users/yfcai8/code/rorcraft/ankoderworker/public"
+else
+  FILE_FOLDER = "your file folder"
+  PUBLIC_FOLDER="your public folder"
+end
+
 THUMBNAIL_FOLDER = "/thumbnail"
 API_URL = "http://workflow:r0rcr4ft@api.localankoder.com"
 

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/lib
+END
+patches.rb
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/lib/patches.rb
+END
+spawn.rb
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/rorcraft_ankoder/!svn/ver/249/api/vendor/plugins/spawn/lib/spawn.rb
+END

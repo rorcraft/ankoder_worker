@@ -3,8 +3,7 @@
 
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  #protect_from_forgery # only scaler can see workers
 
-  # Scrub sensitive parameters from your log
-  # filter_parameter_logging :password
+  include Spawn
 end
