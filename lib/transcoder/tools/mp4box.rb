@@ -26,7 +26,6 @@ module Transcoder
         tmp_file = "#{path}.tmp"
         cmd = "#{MP4B0X_PATH} -out #{tmp_file} -hint #{path} 2>&1;"
         cmd += " mv #{tmp_file} #{path}"
-        cmd = "#{MP4BOX_PATH} -hint #{path}"
       end
     
     end
