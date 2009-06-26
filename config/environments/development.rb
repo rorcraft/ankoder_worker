@@ -16,24 +16,14 @@ config.action_controller.perform_caching             = false
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
 
-if `hostname`.strip.match 'rexchung'
-  AR_SITE          = 'http://mancjew:pianoman@ar.localankoder.com'
-  FFMPEG_PATH      = "/opt/local/bin/ffmpeg"
-  MENCODER_PATH    = "/opt/local/bin/mencoder"
-  CURL             = "/usr/bin/curl"
-  FILE_FOLDER      = "/Users/rexchung/workspace/ankoder/api/file_system"
-  PUBLIC_FOLDER    = "/Users/rexchung/workspace/ankoder/api/public"
-  THUMBNAIL_FOLDER = "/thumbnail"
-else
-  AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
-  FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
-  MENCODER_PATH   = "/usr/local/bin/mencoder"
-  CURL            = "/usr/bin/curl"  
-  FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
-  PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
-  THUMBNAIL_FOLDER = "/thumbnail"
-end
+AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
+FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
+MENCODER_PATH   = "/usr/local/bin/mencoder"
+CURL            = "/usr/bin/curl"  
+FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
+PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
+THUMBNAIL_FOLDER = "/thumbnail"
 
-
-S3_ON         = true
+S3_ON         = false
 S3BUCKET = "download2.ankoder.com"
+API_URL  = "http://api.localankoder.com"

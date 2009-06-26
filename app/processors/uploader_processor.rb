@@ -1,7 +1,7 @@
 class UploaderProcessor < ApplicationProcessor
   subscribes_to :uploader_worker
 
-  include PostbackHelper
+#  include PostbackHelper
 
   def on_message(message)
     logger.debug "UploaderProcessor received #{message}"
@@ -14,7 +14,8 @@ class UploaderProcessor < ApplicationProcessor
     password = user.upload_password
     uploader_temp_file = nil
     thumbnail_destination = job.thumbnail_destination
-    thumbnail_sizes = job.get_thumbnail_sizes
+    thumbnail_sizes = job.thumbnail_sizes
+    destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
 
     begin
 
@@ -35,23 +36,25 @@ class UploaderProcessor < ApplicationProcessor
           Uploader.upload(
             :upload_url      => thumbnail_destination,
             :local_file_path => video.thumbnail_full_path(nil,size),
-            :remote_filename => video.thumbnail_name(nil,size)
+            :remote_filename => video.thumbnail_name(nil,size),
+            :destination_s3_public => destination_s3_public
           )
         end
       end
 
       # upload the video
       Uploader.upload(
-        :video_id        => video.id,
-        :thumbnail_url   => video.thumbnail_url,
-        :upload_url      => upload_url,
-        :local_file_path => local_file_path,
-        :remote_filename => video.filename,
-        :username        => username,
-        :password        => password
+        :video_id              => video.id,
+        :thumbnail_url         => video.thumbnail_url,
+        :upload_url            => upload_url,
+        :local_file_path       => local_file_path,
+        :remote_filename       => "#{video.id}_#{video.filename}",
+        :username              => username,
+        :password              => password,
+        :destination_s3_public => destination_s3_public
       )
       # postback
-      upload_post_back(video,job,'success')
+      Postback.post_back('upload', job, 'success')
     rescue Exception => e
       error_message = case e
                       when HttpError
@@ -69,7 +72,7 @@ class UploaderProcessor < ApplicationProcessor
                         logger.error e.backtrace.to_yaml
                         'Ankoder internal error'
                       end
-      upload_post_back(video,job,'fail', error_message)
+      Postback.post_back('upload', job, 'fail', error_message)
     ensure
       if S3_ON && File.exist?(uploader_temp_file)
         File.delete(uploader_temp_file)

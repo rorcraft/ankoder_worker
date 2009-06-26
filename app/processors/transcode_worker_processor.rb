@@ -8,39 +8,38 @@ class TranscodeWorkerProcessor < ApplicationProcessor
 
   include Transcoder::InstanceMethods
   include ActiveMessaging::MessageSender
-  include PostbackHelper
-  
+
   def on_message(message) 
     logger.debug "TranscodeWorkerProcessor received: " + message
     puts "TranscodeWorkerProcessor received: " + message
-    
+
     job = Job.find(get_job_id(message))
     transcode(job)
-    job.save
-    
+
+    job = Job.find(get_job_id(message))
     # postback? - job complete
     if(job.status == 'completed')
-      convert_post_back job, 'success'
+      Postback.post_back 'convert', job, 'success'
       # also upload completed video if upload_url is not null.
-      if job.user.upload_url
+      if job.upload_url
         publish(
-          :uploader_worker,
-          {'video_id'=> job.convert_file_id,
-           'job_id'  => job.id 
+          :uploader_worker, {
+            'video_id'=> job.convert_file.id,
+            'job_id'  => job.id 
           }.to_json
         )
       end
     else
-      convert_post_back job, 'fail'
+      Postback.post_back 'convert', job, 'fail'
     end
 
   end
-   
+
   #  {"type": "ASSIGN", "content": {"config": {"OriginalFile": "1", "ConvertJob": "1"}, "node_name": "Converter"}}
   def get_job_id message
     msg = JSON.parse message
     msg["content"]["config"]["ConvertJob"]
   end
-  
-  
+
+
 end                          
