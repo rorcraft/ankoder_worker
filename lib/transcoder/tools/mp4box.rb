@@ -13,7 +13,9 @@ module Transcoder
       end
       
       def self.run_command(command)
-        io = IO.popen(command + " 2>&1") 
+        _command = command + " 2>&1"
+        Transcoder.logger.debug _command
+        io = IO.popen(_command) 
         error = io.read
         io.close
       raise TranscoderError::MP4BoxHintingException.new(error) if $?.exitstatus != 0
@@ -22,7 +24,7 @@ module Transcoder
     
       def self.command(path)
         tmp_file = "#{path}.tmp"
-        cmd = "MP4Box -out #{tmp_file} -hint #{path} 2>&1;"
+        cmd = "#{MP4BOX_PATH} -out #{tmp_file} -hint #{path} 2>&1;"
         cmd += " mv #{tmp_file} #{path}"
       end
     

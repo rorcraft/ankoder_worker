@@ -77,7 +77,10 @@ class DownloaderProcessor < ApplicationProcessor
 
   def get_video_id message
     msg = JSON.parse message
-    msg["content"]["config"]["OriginalFile"]
+
+    # the former is proposed scaler message
+    # the latter is legacy API message
+    msg["video_id"] || msg["content"]["config"]["OriginalFile"]
   end
 
 end

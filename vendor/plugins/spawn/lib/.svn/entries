@@ -1,0 +1,52 @@
+8
+
+dir
+324
+https://rorcraft.unfuddle.com/svn/rorcraft_ankoder/api/vendor/plugins/spawn/lib
+https://rorcraft.unfuddle.com/svn/rorcraft_ankoder
+
+
+
+2009-04-17T07:10:22.464647Z
+249
+rorcraft_mancjew
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+fbd691eb-4c16-4b1b-ac14-7b8bfea83dfc
+
+patches.rb
+file
+
+
+
+
+2009-06-01T02:19:59.000000Z
+2d8f36dacd210f088609bc6d61548d26
+2009-04-17T07:10:22.464647Z
+249
+rorcraft_mancjew
+
+spawn.rb
+file
+
+
+
+
+2009-06-01T02:19:59.000000Z
+96223cb632979c91095eab56acbb1fdf
+2009-04-17T07:10:22.464647Z
+249
+rorcraft_mancjew
+

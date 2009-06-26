@@ -27,3 +27,11 @@ THUMBNAIL_FOLDER = "/thumbnail"
 S3_ON         = false
 S3BUCKET = "download2.ankoder.com"
 API_URL  = "http://api.localankoder.com"
+S3_ON = false
+
+S3_BUCKET = S3BUCKET = "devbucket2.ankoder.com"
+ACCESS_KEY_ID     = "04WAVZJW4HAZZQTWKCR2"
+SECRET_ACCESS_KEY = "/iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI"
+S3_SERVER         = "s3.amazonaws.com"
+
+API_URL = "http://workflow:r0rcr4ft@api.localankoder.com"

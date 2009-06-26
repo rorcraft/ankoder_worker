@@ -98,7 +98,7 @@ module Transcoder
     rescue TranscoderError
       job.set_status("failed")
       Transcoder.logger.error "#{$!.class}: #{$!.message}"
-      
+      Transcoder.logger.debug $!.backtrace.to_yaml
     end
     
     def create_convert_file(job)
