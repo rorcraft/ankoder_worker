@@ -24,7 +24,7 @@ module Transcoder
     
       def self.command(path)
         tmp_file = "#{path}.tmp"
-        cmd = "#{MP4B0X_PATH} -out #{tmp_file} -hint #{path} 2>&1;"
+        cmd = "#{MP4BOX_PATH} -out #{tmp_file} -hint #{path} 2>&1;"
         cmd += " mv #{tmp_file} #{path}"
       end
     
