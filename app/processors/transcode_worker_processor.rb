@@ -34,10 +34,12 @@ class TranscodeWorkerProcessor < ApplicationProcessor
         Postback.post_back 'convert', job, 'fail'
       end
     ensure
-#      # tell scaler of my own death.
-#      me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
-#      me.state = WorkerProcess::DEAD
-#      me.save
+      # tell scaler of my own death.
+      if (JSON.parse(message)["worker_process_id"])
+        me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
+        me.state = WorkerProcess::DEAD
+        me.save
+      end
     end
   end
 
