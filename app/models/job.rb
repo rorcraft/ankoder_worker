@@ -68,6 +68,10 @@ class Job < ActiveResource::Base
     end
   end
 
+  def send_to_queue
+    post(:send_to_queue)
+  end
+
   def get_upload_url
     upload_url ? upload_url : user.upload_url
   end

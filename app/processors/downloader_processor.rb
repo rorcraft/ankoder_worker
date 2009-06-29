@@ -40,6 +40,14 @@ class DownloaderProcessor < ApplicationProcessor
         video.upload_to_s3
       end
 
+      profile = find_custom_profile video.custom_profile
+
+      # create job and send it to queue.
+      if profile # silently ignores invalid custom_profile
+        job = Job.create :user_id => video.user.id, :original_file_id => video.id, :profile_id => profile.id
+        job.send_to_queue
+      end    
+
       # postback? - file downloaded
       Postback.post_back('download', video, 'success')
 
@@ -81,6 +89,10 @@ class DownloaderProcessor < ApplicationProcessor
     # the former is proposed scaler message
     # the latter is legacy API message
     msg["video_id"] || msg["content"]["config"]["OriginalFile"]
+  end
+
+  def find_custom_profile(profile_id)
+    Profile.find profile_id rescue nil                                               
   end
 
 end

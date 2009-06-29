@@ -24,7 +24,7 @@ module Transcoder
             parse_line(line)
             duration = parse_duration(line) if duration.nil?          
             p = parse_progress(line,duration)
-            if p >= progress 
+            if p >= progress && progress_need_refresh?(progress, p)
               progress = p 
               block_given? ? yield(p) : stdout_progress(p)
               $defout.flush
