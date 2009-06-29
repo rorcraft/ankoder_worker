@@ -36,9 +36,11 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       end
     ensure
       # tell scaler of my own death.
-      me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
-      me.state = WorkerProcess::DEAD
-      me.save
+      if (JSON.parse(message)["worker_process_id"])
+        me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
+        me.state = WorkerProcess::DEAD
+        me.save
+      end
     end
   end
    
