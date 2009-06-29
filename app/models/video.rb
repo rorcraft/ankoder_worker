@@ -4,7 +4,6 @@ require 'errors'
 
 class Video < ActiveResource::Base
 
-  include PostbackHelper
   include AwsHelper
   include AWS::S3
 
@@ -97,7 +96,7 @@ class Video < ActiveResource::Base
   end
 
   def duration_in_secs                                                      
-     duration.nil? ? 0 : (duration / 1000).to_i
+     duration.nil? ? 0 : (duration.to_i / 1000).to_i
   end
  
   def ffmpeg_thumbnail(time= nil)
@@ -168,7 +167,7 @@ class Video < ActiveResource::Base
     time = default_sec time
     size = default_thumb_size size
   
-    filename + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
+    "#{filename}" + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
   end
 
   def thumbnail_url(options = {})

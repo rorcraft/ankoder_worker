@@ -41,7 +41,8 @@ class DownloaderProcessor < ApplicationProcessor
       end
 
       # postback? - file downloaded
-      video.download_post_back(video,'success')
+      Postback.post_back('download', video, 'success')
+
     rescue Exception => e
       File.delete(temp_filepath) if File.exist?(temp_filepath)
       video.progress = -1
@@ -63,7 +64,7 @@ class DownloaderProcessor < ApplicationProcessor
                         logger.error e.backtrace.to_yaml
                         'Ankoder internal error'
                       end
-      video.download_post_back(video,'fail',error_message)
+      Postback.post_back('download', video,'fail',error_message)
       video.save
 
     end

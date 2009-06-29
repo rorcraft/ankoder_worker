@@ -10,17 +10,21 @@ module Transcoder
       end
     
       def self.run(job)
-        run_command command(job)
+        run_command command(job) do |progress|
+          job.convert_progress = progress
+          job.save
+        end 
       end
       
       def self.run_command(command)
         progress = 0      
         IO.popen(command) do |pipe|
+          duration = nil
           pipe.each("\r") do |line|          
             parse_line(line)
             duration = parse_duration(line) if duration.nil?          
             p = parse_progress(line,duration)
-            if progress_need_refresh? progress, p
+            if p >= progress 
               progress = p 
               block_given? ? yield(p) : stdout_progress(p)
               $defout.flush
@@ -29,7 +33,15 @@ module Transcoder
         end
         progress_finalise
 
-        raise TranscoderError::MediaFormatException if $?.exitstatus != 0
+        if $?.exitstatus != 0
+          Transcoder.logger.error command
+          raise TranscoderError::MediaFormatException
+        else
+          # to ensure the convert is 100 is the conversion is success
+          progress = 100 
+          block_given? ? yield(progress) : stdout_progress(progress)
+        end
+
         
         # Fixme: When doing 2-pass the output is not the job.generate_convert_filename
         # not supporting 2-pass for now.
@@ -47,7 +59,7 @@ module Transcoder
         cmd += " -acodec #{job.profile.audio_codec}"
         cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
         cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
-        cmd +=" -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
+        cmd += " -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
 
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
 
@@ -64,9 +76,10 @@ module Transcoder
           cmd += "-s #{job.profile.width}x#{job.profile.height}"
         end          
                 
-        cmd += " #{job.profile.extra_param}"
-                                # can use S3 link directly here? if the file is public
-        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, job.generate_convert_filename)} 2>&1"
+        cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
+        temp_file_path = "#{Time.now.to_i}#{job.generate_convert_filename}"
+        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        cmd += ";mv #{File.join(FILE_FOLDER, temp_file_path)} #{File.join(FILE_FOLDER, job.generate_convert_filename)}"
         Transcoder.logger.debug cmd
         cmd
       end
@@ -123,10 +136,10 @@ module Transcoder
           if duration.nil? or duration == 0
             p = 0
           else
-            p = ($1.to_i * 10 + $2.to_i) * 100 / duration
+            p = ($1.to_i * 1000 + $2.to_i.to_f) * 100 / duration
           end
           p = 100 if p > 100
-          p
+          p.to_i
         else 
           0
         end
@@ -144,8 +157,8 @@ module Transcoder
 
     
       def self.parse_duration(line)
-        if line =~ /Duration: (\d{2}):(\d{2}):(\d{2}).(\d{1})/m
-          (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 10 + $4.to_i
+        if line =~ /Duration: (\d{2}):(\d{2}):(\d{2}).(\d{2})/m
+          (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 1000 + $4.to_i
         else
           nil
         end

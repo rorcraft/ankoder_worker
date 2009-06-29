@@ -3,6 +3,7 @@ class Job < ActiveResource::Base
   
   STATUS = %w{ submitting queuing processing complete }
   
+=begin
   def profile
     @profile ||= Profile.find(profile_id) if profile_id
     @profile
@@ -23,6 +24,7 @@ class Job < ActiveResource::Base
   rescue
     nil
   end
+=end
   
   def user
     @user ||= User.find(user_id) if user_id
@@ -39,7 +41,7 @@ class Job < ActiveResource::Base
 
   # TODO: add job_id to filename otherwise multiple jobs with same suffix can overwrite each other
   def generate_convert_filename
-    if convert_file.nil? or convert_file.filename.nil?
+    if !respond_to?('convert_file') || convert_file.nil? || convert_file.filename.nil?
       "#{original_file.filename.split(".")[0]}.#{profile.suffix}" 
     else
       convert_file.filename
@@ -47,10 +49,10 @@ class Job < ActiveResource::Base
   end
 
   def generate_convert_file_original_filename
-    if convert_file.nil? or convert_file.original_filename.nil?
-      "#{original_file.original_filename.split(".")[0]}.#{profile.suffix}"
+    if !respond_to?('convert_file') || convert_file.nil? || convert_file.name.nil?
+      "#{original_file.name.split(".")[0]}.#{profile.suffix}"
     else
-      convert_file.original_filename
+      convert_file.name
     end  
   end
 
@@ -68,10 +70,6 @@ class Job < ActiveResource::Base
 
   def get_upload_url
     upload_url ? upload_url : user.upload_url
-  end
-
-  def get_thumbnail_sizes
-    @thumbnail_sizes ||= JSON.parse thumbnail_sizes
   end
 
 end
