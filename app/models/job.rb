@@ -2,30 +2,13 @@ class Job < ActiveResource::Base
   self.site = AR_SITE
   
   STATUS = %w{ submitting queuing processing complete }
-  
-=begin
-  def profile
-    @profile ||= Profile.find(profile_id) if profile_id
-    @profile
-  rescue
-    nil
-  end
-  
-  def original_file
-    @original_file ||= Video.find(original_file_id) if original_file_id
-    @original_file
-  rescue
-    nil
-  end
-  
-  def convert_file
-    @convert_file ||= Video.find(convert_file_id) if convert_file_id
-    @convert_file
-  rescue
-    nil
-  end
-=end
-  
+  EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
+    
+  def encode_with_default_options
+    encode_without_default_options(:except => EXCLUDE_WHEN_SAVING)
+  end    
+  alias_method_chain :encode, :encode_with_default_options
+    
   def user
     @user ||= User.find(user_id) if user_id
     @user

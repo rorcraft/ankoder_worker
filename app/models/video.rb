@@ -18,20 +18,10 @@ class Video < ActiveResource::Base
     File.join(FILE_FOLDER,filename) unless filename.nil?
   end
 
-  def encode(options={})
-    save_attributes = self.attributes.except(EXCLUDE_WHEN_SAVING)
-    case self.class.format
-      when ActiveResource::Formats[:xml]
-        self.class.format.encode(save_attributes, {:root => self.class.element_name}.merge(options))
-      else
-        self.class.format.encode(save_attributes, options)
-    end
-  end
-  
   def encode_with_default_options
     encode_without_default_options(:except => EXCLUDE_WHEN_SAVING)
-  end
-    
+  end    
+  alias_method_chain :encode, :encode_with_default_options
   
   def set_filename
     return unless original_filename.nil?
