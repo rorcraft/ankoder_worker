@@ -4,10 +4,18 @@ class Job < ActiveResource::Base
   STATUS = %w{ submitting queuing processing complete }
   EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
     
-  def encode_with_default_options
-    encode_without_default_options(:except => EXCLUDE_WHEN_SAVING)
-  end    
-  alias_method_chain :encode, :encode_with_default_options
+
+  def encode(options={})
+    save_attributes = self.attributes.except(*EXCLUDE_WHEN_SAVING)
+    case self.class.format
+    when ActiveResource::Formats[:xml]
+      self.class.format.encode(
+        save_attributes,
+        {:root => self.class.element_name}.merge(options))
+    else
+      self.class.format.encode(save_attributes, options)
+    end
+  end
     
   def user
     @user ||= User.find(user_id) if user_id

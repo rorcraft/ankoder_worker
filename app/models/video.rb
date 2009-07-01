@@ -18,11 +18,6 @@ class Video < ActiveResource::Base
     File.join(FILE_FOLDER,filename) unless filename.nil?
   end
 
-  def encode_with_default_options
-    encode_without_default_options(:except => EXCLUDE_WHEN_SAVING)
-  end    
-  alias_method_chain :encode, :encode_with_default_options
-  
   def set_filename
     return unless original_filename.nil?
     if !name.nil?
@@ -59,19 +54,6 @@ class Video < ActiveResource::Base
   def filename_has_container?
     !File.extname(self.filename).blank?
   end
-
-  # def uploaded_data=(file_data)
-  #   return nil if file_data.nil? || file_data.size == 0
-  #   self.content_type = file_data.content_type.strip
-  #   self.original_filename = file_data.original_filename.strip if original_filename.blank?
-  #   ext = self.original_filename.split('.').last 
-  #   hashed_name = Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{self.original_filename}--")
-  #   self.filename = "#{hashed_name}.#{ext}"
-  #   self.size = file_data.length
-  # 
-  #   FileUtils.cp file_data.path, file_path(filename)
-  #   FileUtils.chmod 0666, file_path(filename)
-  # end
 
   def inspector
     return unless file_exist?
@@ -243,6 +225,18 @@ class Video < ActiveResource::Base
     @logger = ActiveRecord::Base.logger unless defined?(@logger)
     @logger = Logger.new(STDOUT) unless defined?(@logger)
     @logger
+  end
+
+  def encode(options={})
+    save_attributes = self.attributes.except(*EXCLUDE_WHEN_SAVING)
+    case self.class.format
+    when ActiveResource::Formats[:xml]
+      self.class.format.encode(
+        save_attributes,
+        {:root => self.class.element_name}.merge(options))
+    else
+      self.class.format.encode(save_attributes, options)
+    end
   end
 
 end
