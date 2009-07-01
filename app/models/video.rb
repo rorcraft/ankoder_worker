@@ -10,7 +10,7 @@ class Video < ActiveResource::Base
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
-  EXCLUDE_WHEN_SAVING = {"thumb" => true}
+  EXCLUDE_WHEN_SAVING = [:thumb]
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(_filename = nil)
@@ -18,16 +18,20 @@ class Video < ActiveResource::Base
     File.join(FILE_FOLDER,filename) unless filename.nil?
   end
 
-  def save
-    backup = attributes
-    self.attributes = {}
-    backup.each do |key, value|
-      attributes[key] = value unless EXCLUDE_WHEN_SAVING[key]
+  def encode(options={})
+    save_attributes = self.attributes.except(EXCLUDE_WHEN_SAVING)
+    case self.class.format
+      when ActiveResource::Formats[:xml]
+        self.class.format.encode(save_attributes, {:root => self.class.element_name}.merge(options))
+      else
+        self.class.format.encode(save_attributes, options)
     end
-    logger.info attributes.inspect
-    super
-    self.attributes = backup
   end
+  
+  def encode_with_default_options
+    encode_without_default_options(:except => EXCLUDE_WHEN_SAVING)
+  end
+    
   
   def set_filename
     return unless original_filename.nil?
