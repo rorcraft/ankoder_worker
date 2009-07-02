@@ -2,6 +2,7 @@
 module Transcoder
   module Tools
     class Mp4box
+      MP4BOX_PATH = "MP4Box" unless defined? MP4BOX_PATH
       include Transcoder
       
       class << self 
