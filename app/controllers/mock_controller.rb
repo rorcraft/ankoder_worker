@@ -29,7 +29,7 @@ class MockController < ApplicationController
         ).ceil
         (1 + one_third_sleeping_time).times do |i|
           sleep 3
-          job.convert_progress = i/one_third_sleeping_time
+          job.convert_progress = i*100/one_third_sleeping_time
           job.save
         end
         job.status = Job::COMPLETED
