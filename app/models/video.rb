@@ -10,7 +10,7 @@ class Video < ActiveResource::Base
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
-  EXCLUDE_WHEN_SAVING = {"thumb" => true}
+  EXCLUDE_WHEN_SAVING = [:thumb]
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(_filename = nil)
@@ -18,17 +18,6 @@ class Video < ActiveResource::Base
     File.join(FILE_FOLDER,filename) unless filename.nil?
   end
 
-  def save
-    backup = attributes
-    self.attributes = {}
-    backup.each do |key, value|
-      attributes[key] = value unless EXCLUDE_WHEN_SAVING[key]
-    end
-    logger.info attributes.inspect
-    super
-    self.attributes = backup
-  end
-  
   def set_filename
     return unless original_filename.nil?
     if !name.nil?
@@ -65,19 +54,6 @@ class Video < ActiveResource::Base
   def filename_has_container?
     !File.extname(self.filename).blank?
   end
-
-  # def uploaded_data=(file_data)
-  #   return nil if file_data.nil? || file_data.size == 0
-  #   self.content_type = file_data.content_type.strip
-  #   self.original_filename = file_data.original_filename.strip if original_filename.blank?
-  #   ext = self.original_filename.split('.').last 
-  #   hashed_name = Digest::SHA1.hexdigest("--#{Time.now.to_i.to_s}--#{self.original_filename}--")
-  #   self.filename = "#{hashed_name}.#{ext}"
-  #   self.size = file_data.length
-  # 
-  #   FileUtils.cp file_data.path, file_path(filename)
-  #   FileUtils.chmod 0666, file_path(filename)
-  # end
 
   def inspector
     return unless file_exist?
@@ -249,6 +225,18 @@ class Video < ActiveResource::Base
     @logger = ActiveRecord::Base.logger unless defined?(@logger)
     @logger = Logger.new(STDOUT) unless defined?(@logger)
     @logger
+  end
+
+  def encode(options={})
+    save_attributes = self.attributes.except(*EXCLUDE_WHEN_SAVING)
+    case self.class.format
+    when ActiveResource::Formats[:xml]
+      self.class.format.encode(
+        save_attributes,
+        {:root => self.class.element_name}.merge(options))
+    else
+      self.class.format.encode(save_attributes, options)
+    end
   end
 
 end

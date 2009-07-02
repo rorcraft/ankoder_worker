@@ -1,31 +1,27 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
+
+  SUBMITTING = "submitting"
+  QUEUEING = "queuing"
+  PROCESSING = "processing"
+  COMPLETED = "completed"
   
   STATUS = %w{ submitting queuing processing complete }
-  
-=begin
-  def profile
-    @profile ||= Profile.find(profile_id) if profile_id
-    @profile
-  rescue
-    nil
+  EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
+    
+
+  def encode(options={})
+    save_attributes = self.attributes.except(*EXCLUDE_WHEN_SAVING)
+    case self.class.format
+    when ActiveResource::Formats[:xml]
+      self.class.format.encode(
+        save_attributes,
+        {:root => self.class.element_name}.merge(options))
+    else
+      self.class.format.encode(save_attributes, options)
+    end
   end
-  
-  def original_file
-    @original_file ||= Video.find(original_file_id) if original_file_id
-    @original_file
-  rescue
-    nil
-  end
-  
-  def convert_file
-    @convert_file ||= Video.find(convert_file_id) if convert_file_id
-    @convert_file
-  rescue
-    nil
-  end
-=end
-  
+    
   def user
     @user ||= User.find(user_id) if user_id
     @user
