@@ -10,7 +10,10 @@ class WorkerController < ApplicationController
   end
 
   def kill
-    `kill -9 #{params["pid"]}`
+    me = (WorkerProcess.find params["worker_process_id"] rescue nil)
+    if me && me.pid.to_s == params["pid"].to_s
+      Process.kill(9, params["pid"].to_i)
+    end
     render :text => "OK"
   end
 

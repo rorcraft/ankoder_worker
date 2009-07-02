@@ -1,5 +1,10 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
+
+  SUBMITTING = "submitting"
+  QUEUEING = "queuing"
+  PROCESSING = "processing"
+  COMPLETED = "completed"
   
   STATUS = %w{ submitting queuing processing complete }
   EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
