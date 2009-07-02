@@ -5,9 +5,9 @@
 # http://code.google.com/p/activemessaging/wiki/Configuration
 ActiveMessaging::Gateway.define do |s|
   #s.filter :some_filter, :only=>:orders
-  s.processor_group :transcoder, :transcode_worker
-  s.processor_group :downloader, :downloader_worker
-  s.processor_group :uploader,   :uploader_worker
+  s.processor_group :transcoder, :transcode_worker_processor
+  s.processor_group :downloader, :downloader_processor
+  s.processor_group :uploader,   :uploader_processor
     
   # NB:
   # reliable_msg "/queue/dev/Converter"
