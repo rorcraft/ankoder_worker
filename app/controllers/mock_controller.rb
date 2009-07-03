@@ -1,4 +1,4 @@
-require "JSON"
+require "json"
 
 class MockController < ApplicationController
   include Spawn
@@ -21,8 +21,7 @@ class MockController < ApplicationController
     spawn do
       begin
         job = Job.find @msg["job_id"]
-        job.status = Job::PROCESSING
-        job.save
+        job.set_status(Job::PROCESSING)
         one_third_sleeping_time = (
           job.original_file.size.to_i/\
           1024.0/1024.0/700.0*3600.0*rand
