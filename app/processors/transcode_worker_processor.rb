@@ -12,7 +12,6 @@ class TranscodeWorkerProcessor < ApplicationProcessor
   def on_message(message) 
     begin
       logger.debug "TranscodeWorkerProcessor received: " + message
-      puts "TranscodeWorkerProcessor received: " + message
 
       job = Job.find(get_job_id(message))
       transcode(job)
