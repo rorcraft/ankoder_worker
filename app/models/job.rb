@@ -38,7 +38,7 @@ class Job < ActiveResource::Base
   # TODO: add job_id to filename otherwise multiple jobs with same suffix can overwrite each other
   def generate_convert_filename
     if !respond_to?('convert_file') || convert_file.nil? || convert_file.filename.nil?
-      "#{original_file.filename.split(".")[0]}.#{profile.suffix}" 
+      "#{original_file.filename.split(".")[0]}_#{id}.#{profile.suffix}" 
     else
       convert_file.filename
     end
