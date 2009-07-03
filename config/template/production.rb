@@ -31,13 +31,14 @@ AR_SITE = 'http://workflow:r0rcr4ft@ar.ankoder.com'
 FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
 MENCODER_PATH   = "/usr/local/bin/mencoder"
 CURL            = "/usr/bin/curl"  
-FILE_FOLDER   = "/var/www/api_ankoder/current/file_system"
-PUBLIC_FOLDER = "/var/www/api_ankoder/current/public"
+FILE_FOLDER   = "/var/www/ankoderworker/current/file_system"
+PUBLIC_FOLDER = "/var/www/ankoderworker/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
 
 S3_ON         = true
-S3BUCKET = "download2.ankoder.com"
+S3BUCKET = S3_BUCKET = "download2.ankoder.com"
 
 ACCESS_KEY_ID     = "04WAVZJW4HAZZQTWKCR2"
 SECRET_ACCESS_KEY = "/iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI"
 
+S3_SERVER         = "s3.amazonaws.com"

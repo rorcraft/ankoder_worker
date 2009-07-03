@@ -36,4 +36,6 @@ PUBLIC_FOLDER = "/var/www/api_ankoder/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
 
 S3_ON         = false
-S3BUCKET = "devbucket.ankoder.com"
+S3BUCKET = S3_BUCKET = "devbucket.ankoder.com"
+
+S3_SERVER         = "s3.amazonaws.com"

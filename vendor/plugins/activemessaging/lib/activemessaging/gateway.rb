@@ -225,6 +225,7 @@ module ActiveMessaging
                 :direction => :incoming
               }
               begin
+                acknowledge_message subscription, message 
                 execute_filter_chain(:incoming, message, routing) do |m|
                   result = subscription.processor_class.new.process!(m)
                 end
@@ -233,7 +234,7 @@ module ActiveMessaging
                 abort = true
                 return
               ensure
-                acknowledge_message subscription, message unless abort
+               # acknowledge_message subscription, message unless abort
               end
             end
           end
