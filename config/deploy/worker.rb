@@ -27,6 +27,6 @@ set :user, 'railsdeploy'
 set :password, 'railsonruby'
 set :deploy_via, :remote_cache
 
-role :app, "174.129.117.128"
-role :web, "174.129.117.128"
-role :db,  "174.129.117.128", :primary => true
+role :app, "server1.ankoder.com"
+role :web, "server1.ankoder.com"
+role :db,  "server1.ankoder.com", :primary => true
