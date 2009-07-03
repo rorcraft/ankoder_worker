@@ -1,6 +1,25 @@
 #!/usr/bin/env ruby
 require File.dirname(__FILE__) + '/../config/environment'
 
+APACHE_VIRTUAL_HOST = %Q[
+<VirtualHost *:80>
+RailsEnv production
+ServerName #{`hostname`.strip}
+PassengerHighPerformance on
+DocumentRoot /var/www/ankoderworker/current/public
+<Directory "/var/www/ankoderworker/current/public">    
+Options FollowSymLinks
+AllowOverride None
+Order allow,deny
+Allow from all 
+</Directory>
+</VirtualHost>
+]
+
+`echo "#{APACHE_VIRTUAL_HOST}" > /etc/apache2/sites-available/worker`
+`ln -s /etc/apache2/sites-available/worker /etc/apache2/sites-enabled/worker`
+`/etc/init.d/apache2 start`
+
 escaped_hostname = Ec2Instance.escape_primary_key(`hostname`.strip)
 me = Ec2Instance.find escaped_hostname
 me.aws_state = Ec2Instance::RUNNING
