@@ -47,9 +47,6 @@ module Transcoder
         # not supporting 2-pass for now.
 #        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       
-      rescue TranscoderError => e
-        Transcoder.logger.error e.message
-        Transcoder.logger.error e.backtrace.join("\n")
       end
     
       def self.command(job)

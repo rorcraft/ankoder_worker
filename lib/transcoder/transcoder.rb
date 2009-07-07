@@ -80,25 +80,8 @@ module Transcoder
         convert_file.upload_to_s3
       end
       
-      # FTP the file. 
-      # send to ftp queue and ftp worker to ftp? from another machine
-      # FTP the thumbnail as well      
-      
-      # Upload to Client's S3 ?
-      
-      # Post back to client's server
-
-      # remove local watermark
-      # remove local thumbnail
-      # remove local original file
-      # remove local convert file
-      
       job.set_status("completed")
       
-    rescue TranscoderError
-      job.set_status("failed")
-      Transcoder.logger.error "#{$!.class}: #{$!.message}"
-      Transcoder.logger.debug $!.backtrace.to_yaml
     end
     
     def create_convert_file(job)
