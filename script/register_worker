@@ -18,7 +18,7 @@ Allow from all
 
 `echo "#{APACHE_VIRTUAL_HOST}" > /etc/apache2/sites-available/worker`
 `a2ensite worker`
-`/etc/init.d/apache2 start`
+`/etc/init.d/apache2 restart`
 
 escaped_hostname = Ec2Instance.escape_primary_key(`hostname`.strip)
 me = Ec2Instance.find escaped_hostname
