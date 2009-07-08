@@ -3,4 +3,5 @@ require File.dirname(__FILE__) + '/../config/environment'
 
 me = Ec2Instance.find ARGV[0].to_i
 me.aws_state = Ec2Instance::RUNNING
+me.finished_booting_at = Time.now
 me.save

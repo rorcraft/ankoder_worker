@@ -23,8 +23,8 @@ set :scm_verbose, true
 #set :ssh_options, { :forward_agent => true , :keys => ["/home/workflow/.ssh/id_rsa"] }
 ssh_options[:forward_agent] = true
 
-set :user, 'workflow'
-set :password, 'rubyonrails'
+set :user, 'railsdeploy'
+set :password, 'railsonruby'
 set :deploy_via, :remote_cache
 
 
