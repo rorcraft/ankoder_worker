@@ -40,7 +40,7 @@ class DownloaderProcessor < ApplicationProcessor
         video.upload_to_s3
       end
 
-      profile = find_custom_profile video.custom_profile
+      profile = find_custom_profile video.custom_profile unless video.custom_profile.nil?
 
       # create job and send it to queue.
       if profile # silently ignores invalid custom_profile
