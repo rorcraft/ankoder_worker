@@ -1,5 +1,5 @@
 set :default_stage, "ec2-server2"
-set :stages, %w(staging production ec2-server2 localec2 ec2_cluster local ec2-server1)
+set :stages, %w(staging production ec2-server2 localec2 ec2_cluster local ec2-server1 ec2-new-worker)
 require 'capistrano/ext/multistage'
 
 set :repository_cache, "svn_trunk"

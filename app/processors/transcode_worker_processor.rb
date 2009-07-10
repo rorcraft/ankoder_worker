@@ -33,13 +33,15 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     rescue
       job.set_status Job::FAILED
       Postback.post_back 'convert', job, 'fail'
-      logger.error $!
+      logger.error " ------------- !!!!!!!!!!!!!! -------------"
+      logger.error $!.class
+      logger.error $!.message
+      logger.error $!.backtrace[0,20].to_yaml
     ensure
       # tell scaler of my own death.
       if (JSON.parse(message)["worker_process_id"])
         me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
-        me.state = WorkerProcess::DEAD
-        me.save
+        me.destroy
       end
     end
   end
