@@ -5,8 +5,10 @@ class Job < ActiveResource::Base
   QUEUEING = "queuing"
   PROCESSING = "processing"
   COMPLETED = "completed"
+  FAILED = "failed"
   
-  STATUS = %w{ submitting queuing processing complete }
+  STATUS = [SUBMITTING, QUEUEING, PROCESSING, COMPLETED, FAILED]
+
   EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
     
 
@@ -29,11 +31,13 @@ class Job < ActiveResource::Base
     nil
   end
 
+=begin
   def finish(success=true)
     self.finished_at = Time.now
     success or user.unuse_one_token
     save
   end
+=end
 
   # TODO: add job_id to filename otherwise multiple jobs with same suffix can overwrite each other
   def generate_convert_filename
@@ -59,9 +63,8 @@ class Job < ActiveResource::Base
   def set_status(_status)
     put(:set_status, :status => _status)
     self.status = _status
-    if _status == 'complete'
-      self.finish
-    end
+    # conflicts with current architecture
+    # self.finish if _status == COMPLETED
   end
 
   def send_to_queue

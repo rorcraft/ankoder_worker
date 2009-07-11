@@ -27,7 +27,6 @@ set :user, 'railsdeploy'
 set :password, 'railsonruby'
 set :deploy_via, :remote_cache
 
-
-role :app, "ec2.localankoder.com"
-role :web, "ec2.localankoder.com"
-role :db,  "ec2.localankoder.com", :primary => true
+role :app, "ec2-75-101-176-85.compute-1.amazonaws.com"
+role :web, "ec2-75-101-176-85.compute-1.amazonaws.com"
+role :db,  "ec2-75-101-176-85.compute-1.amazonaws.com", :primary => true

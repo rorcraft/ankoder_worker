@@ -10,34 +10,38 @@ class TranscodeWorkerProcessor < ApplicationProcessor
   include ActiveMessaging::MessageSender
 
   def on_message(message) 
-    begin
       logger.debug "TranscodeWorkerProcessor received: " + message
-
       job = Job.find(get_job_id(message))
+
+    begin
       transcode(job)
 
       job = Job.find(get_job_id(message))
+      raise "Unfinished job" unless (job.status == 'completed')
+
       # postback? - job complete
-      if(job.status == 'completed')
-        Postback.post_back 'convert', job, 'success'
-        # also upload completed video if upload_url is not null.
-        if job.upload_url
-          publish(
-            :uploader_worker, {
-            'video_id'=> job.convert_file.id,
-            'job_id'  => job.id 
-          }.to_json
-          )
-        end
-      else
-        Postback.post_back 'convert', job, 'fail'
+      Postback.post_back 'convert', job, 'success'
+      # also upload completed video if upload_url is not null.
+      if job.upload_url
+        publish(
+          :uploader_worker, {
+          'video_id'=> job.convert_file.id,
+          'job_id'  => job.id 
+        }.to_json
+        )
       end
+    rescue
+      job.set_status Job::FAILED
+      Postback.post_back 'convert', job, 'fail'
+      logger.error " ------------- !!!!!!!!!!!!!! -------------"
+      logger.error $!.class
+      logger.error $!.message
+      logger.error $!.backtrace[0,20].to_yaml
     ensure
       # tell scaler of my own death.
       if (JSON.parse(message)["worker_process_id"])
         me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
-        me.state = WorkerProcess::DEAD
-        me.save
+        me.destroy
       end
     end
   end

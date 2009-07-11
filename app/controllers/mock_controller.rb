@@ -31,16 +31,13 @@ class MockController < ApplicationController
           job.convert_progress = i*100/one_third_sleeping_time
           job.save
         end
-        job.status = Job::COMPLETED
-        job.finished_at = Time.now
-        job.save
+        job.set_status(Job::COMPLETED)
       rescue
         logger.debug $!.to_yaml
         logger.debug $!.backtrace.to_yaml
       ensure
         me = WorkerProcess.find(@msg["worker_process_id"])
-        me.state = WorkerProcess::DEAD
-        me.save
+        me.destroy
       end
     end
   end
