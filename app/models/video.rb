@@ -238,5 +238,12 @@ class Video < ActiveResource::Base
       self.class.format.encode(save_attributes, options)
     end
   end
+  
+  def set_status(_status)
+
+    put(:set_status, :status => _status)
+    self.status = _status
+
+  end
 
 end
