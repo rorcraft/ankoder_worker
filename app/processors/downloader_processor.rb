@@ -12,7 +12,9 @@ class DownloaderProcessor < ApplicationProcessor
       while File.exist?(Downloader.temp_path(local_filename))
         local_filename = video.make_hashed_name
       end
+
       video.set_status Video::DOWNLOADING
+
       temp_filepath  = Downloader.download(
         :url => video.source_url, :local_filename => local_filename) do |progress|
         video.progress = progress
@@ -55,7 +57,9 @@ class DownloaderProcessor < ApplicationProcessor
 
     rescue Exception => e
       File.delete(temp_filepath) if File.exist?(temp_filepath)
+
       video.set_status Video::FAILED
+      
       error_message = case e
                       when HttpError
                         "HTTP status #{e.message}"
