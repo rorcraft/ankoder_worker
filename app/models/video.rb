@@ -3,6 +3,13 @@ require 'hmac-sha1'
 require 'errors'
 
 class Video < ActiveResource::Base
+  
+  SUBMITTING = "submitting"
+  QUEUEING = "queueing" 
+  DOWNLOADING = "downloading"
+  DOWNLOADED = "downloaded"
+  FAILED    = "failed"
+  STATUS = [SUBMITTING, QUEUEING, DOWNLOADING, DOWNLOADED, FAILED]  
 
   include AwsHelper
   include AWS::S3
@@ -237,6 +244,11 @@ class Video < ActiveResource::Base
     else
       self.class.format.encode(save_attributes, options)
     end
+  end
+
+  def set_status(_status)
+    put(:set_status, :status => _status)
+    self.status = _status
   end
 
 end

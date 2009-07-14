@@ -12,6 +12,7 @@ class DownloaderProcessor < ApplicationProcessor
       while File.exist?(Downloader.temp_path(local_filename))
         local_filename = video.make_hashed_name
       end
+      video.set_status Video::DOWNLOADING
       temp_filepath  = Downloader.download(
         :url => video.source_url, :local_filename => local_filename) do |progress|
         video.progress = progress
@@ -27,7 +28,6 @@ class DownloaderProcessor < ApplicationProcessor
       FileUtils.mv temp_filepath , video.file_path if temp_filepath
 
       ### return , log error if temp_filepath is false   
-      video.progress = 100 
       video.read_metadata
       video.extract_file_information
       logger.debug "Thumbnail generation: #{video.generate_thumbnails}"
@@ -39,6 +39,8 @@ class DownloaderProcessor < ApplicationProcessor
         Downloader.logger.debug "upload converted file back to S3"
         video.upload_to_s3
       end
+
+      video.set_status Video::DOWNLOADED
 
       profile = find_custom_profile video.custom_profile unless video.custom_profile.nil?
 
@@ -53,7 +55,7 @@ class DownloaderProcessor < ApplicationProcessor
 
     rescue Exception => e
       File.delete(temp_filepath) if File.exist?(temp_filepath)
-      video.progress = -1
+      video.set_status Video::FAILED
       error_message = case e
                       when HttpError
                         "HTTP status #{e.message}"
@@ -73,8 +75,6 @@ class DownloaderProcessor < ApplicationProcessor
                         'Ankoder internal error'
                       end
       Postback.post_back('download', video,'fail',error_message)
-      video.save
-
     end
   end
 
