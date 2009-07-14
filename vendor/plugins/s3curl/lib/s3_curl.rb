@@ -40,9 +40,13 @@
            curl_command  = get_curl_command("#{S3CURL} #{access_param} #{addition_option} --put=#{local_filename} -- http://s3.amazonaws.com/#{bucket}/#{s3_filename}")
            
            logger.debug curl_command 
+
+           curl_output = ""
+           full_command = "#{curl_command}  2>&1"
         
-           IO.popen("#{curl_command}  2>&1") do |pipe|
+           IO.popen(full_command) do |pipe|
              pipe.each("\r") do |line|
+               curl_output += line + "\n"
                case line
                when /NoSuchBucket/
                  raise S3NoSuchBucket
@@ -60,7 +64,7 @@
              end
            end
            block_given? ? yield(100) : stdout_progress(100)
-           raise S3UploadError if $?.exitstatus != 0
+           raise S3UploadError.new("\n#{full_command}\n\n#{curl_output}") if $?.exitstatus != 0
          end
     
          def self.download(filename , local_file, options = {} )
