@@ -75,7 +75,7 @@ module Transcoder
       
       if S3_ON
         Transcoder.logger.debug "upload thumbnail to S3"
-        convert_file.upload_thumbnails_to_s3      
+        convert_file.upload_thumbnails_to_s3 rescue nil
         Transcoder.logger.debug "upload converted file back to S3"
         convert_file.upload_to_s3
       end
