@@ -53,10 +53,17 @@ module Transcoder
       end
       # download watermark
       
-      # if Theora
-        # FFmpeg2Theora.run(job)
-      # else Transcode the video
-      Tools::FFmpeg.run(job)
+      case job.original_file.video_codec
+      when /iv.0/i # iv30 iv40 iv50
+        Tools::Mencoder.preprocess(job)        
+      end
+      
+      case job.profile.video_codec
+      when /theora/i
+        FFmpeg2Theora.run(job)
+      else
+        Tools::FFmpeg.run(job)        
+      end
           
       Transcoder.logger.debug "create the converted file"
       convert_file = create_convert_file(job)
