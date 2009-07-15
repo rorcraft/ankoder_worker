@@ -18,10 +18,12 @@ module Transcoder
         cmd += "vcodec=ffvhuff:vstrict=-1:vhq:psnr -of avi"
         cmd += " && mv #{job.original_file.file_path}.preprocess #{job.original_file.file_path}"
         cmd
-              end
+      end
       
       def self.preprocess(job)
-        IO.popen(preprocess_command(job))         
+        IO.popen(preprocess_command(job)) do |pipe|
+          pipe.read
+        end
       end
 
     end
