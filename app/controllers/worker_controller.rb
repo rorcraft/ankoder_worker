@@ -6,7 +6,7 @@ class WorkerController < ApplicationController
   }
 
   def art_thou_there
-    render :text => CGI.escape({"private_dns_name" => `hostname`, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
+    render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
   end
 
   def transcode
