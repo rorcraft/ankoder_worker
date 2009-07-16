@@ -122,7 +122,11 @@ class Uploader
   end
 
   def self.url_protocol url
-    Downloader.url_protocol url
+    if url =~ /^http:\/\/s3\.amazonaws\.com\// ||  url =~ /s3\.amazonaws\.com/
+      return 's3'
+    end
+    match=/^(\w+):\/\//.match(url)
+    match ? match[1] : nil
   end
 
   def self.upload *args
