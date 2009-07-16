@@ -5,6 +5,10 @@ class WorkerController < ApplicationController
     "upload"    => UploaderProcessor
   }
 
+  def art_thou_there
+    render :text => CGI.escape({"private_dns_name" => `hostname`, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
+  end
+
   def transcode
     send_to("transcode", params["message"])
   end

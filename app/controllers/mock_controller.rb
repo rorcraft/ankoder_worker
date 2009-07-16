@@ -4,6 +4,10 @@ class MockController < ApplicationController
   include Spawn
   before_filter :parse_params
 
+  def art_thou_there
+    render :text => CGI.escape({"private_dns_name" => `hostname`, "pids" => %x[ps ax | grep Rails].
+  end
+
   def parse_params
     @msg = (JSON.parse(params["message"]) rescue "gotcha")
   end
