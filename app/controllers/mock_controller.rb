@@ -5,7 +5,7 @@ class MockController < ApplicationController
   before_filter :parse_params
 
   def art_thou_there
-    render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps ax | grep Rails].
+    render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
   end
 
   def parse_params

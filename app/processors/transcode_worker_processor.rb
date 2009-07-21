@@ -22,7 +22,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       # postback? - job complete
       Postback.post_back 'convert', job, 'success'
       # also upload completed video if upload_url is not null.
-      if job.upload_url
+      if job.get_upload_url
         publish(
           :uploader_worker, {
           'video_id'=> job.convert_file.id,
