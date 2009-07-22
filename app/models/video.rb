@@ -133,7 +133,7 @@ class Video < ActiveResource::Base
         S3Curl.upload(thumbnail_name(time, key), thumbnail_full_path(time, key), "public" => true)    
       rescue
         count += 1
-        retry if count < 3
+        retry if count < MAX_S3_UPLOAD_TRIES
         raise
       end
     }
@@ -142,7 +142,7 @@ class Video < ActiveResource::Base
   end
   
   def upload_to_s3
-    S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename}) 
+    TryAFewTimes.do(MAX_S3_UPLOAD_TRIES){S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})}
     if s3_exist?
       self.uploaded = true
       self.save
