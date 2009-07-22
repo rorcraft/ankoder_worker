@@ -74,7 +74,7 @@ class UploaderProcessor < ApplicationProcessor
                       end
       Postback.post_back('upload', job, 'fail', error_message)
     ensure
-      if S3_ON && File.exist?(uploader_temp_file)
+      if S3_ON && uploader_temp_file && File.exist?(uploader_temp_file)
         File.delete(uploader_temp_file)
       end
     end

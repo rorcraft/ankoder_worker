@@ -47,11 +47,11 @@ module Transcoder
           # pad top and bottom 
           if ratio_height * video_width / ratio_width > video_height 
             result_height = even_size profile_width / video_ratio
-            result["padtop"], result["padbottom"] = split_padding(profile_height - result_height)
+            result["padtop"], result["padbottom"] = split_padding(-profile_height + result_height)
           # pad left and right
           elsif ratio_width * video_height / ratio_height> video_width 
             result_width = even_size profile_height * video_ratio
-            result["padleft"], result["padright"] = split_padding(profile_width - result_width) 
+            result["padleft"], result["padright"] = split_padding(-profile_width + result_width) 
           end                                    
       end
       
