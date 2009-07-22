@@ -60,9 +60,9 @@ module Transcoder
       
       case job.profile.video_codec
       when /theora/i
-        FFmpeg2Theora.run(job)
+        Tools::FFmpeg2theora.run(job)
       else
-        Tools::FFmpeg.run(job)        
+        Tools::FFmpeg.run(job)
       end
           
       Transcoder.logger.debug "create the converted file"
