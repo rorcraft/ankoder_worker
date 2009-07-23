@@ -82,7 +82,6 @@ module Transcoder
         if @use_ffmpeg_to_generate_audio
           Transcoder.logger.debug "processing audio in ffmpeg"
           cmd += ";#{FFMPEG_PATH} -i #{File.join(FILE_FOLDER, temp_file_path_as_ogv)}"
-
           cmd += " -vcodec copy" # done by copying the video from the ogv file
 
           cmd += " -i #{job.original_file.file_path}"
@@ -116,23 +115,23 @@ module Transcoder
       private
 
       def self.parse_progress(line,duration)
-        if duration.nil? or duration == 0
-          p = 0
-        else
+        p = 0
+        unless duration.nil? or duration == 0
           if @use_ffmpeg_to_generate_audio
             p = parse_theora_time(line)
-            p = p * 50 / duration if p
+            p = p * 60 / duration if p
             if line =~ /time=\s*(\d+).(\d+)/
-              p = ($1.to_i * 1000 + $2.to_i.to_f) * 100 / duration / 2 + 50
+              p = ($1.to_i * 1000 + $2.to_i.to_f) * 40 / duration / 2 + 60
             end
-            p = 100 if p > 100
-            p.to_i
           else
             p = parse_theora_time(line)
             p = p * 100 / duration if p
           end
+          p ||= 0
+          p = 100 if p > 100
+          p.to_i
         end
-        return p || 0
+        return p
       end
 
       def self.progress_finalise
@@ -156,7 +155,7 @@ module Transcoder
       end
 
       def self.parse_theora_time(line)
-        if line =~ /(\d{2}):(\d{2}):(\d{2}).(\d{2}) audio/m
+        if line =~ /(\d{1}):(\d{2}):(\d{2}).(\d{2}) audio/m
           (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 1000 + $4.to_i
         else
           nil
