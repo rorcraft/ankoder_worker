@@ -98,7 +98,7 @@ module Transcoder
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
 
         # trimming
-        cmd += trimming_command
+        cmd += trimming_command(job.profile, job.original_file)
 
         # bitrate
         if job.profile.keep_quality?
