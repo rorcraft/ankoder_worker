@@ -1,9 +1,9 @@
 class TryAFewTimes
   def self.do(how_many)
     success = false
-    how_many.times do
+    how_many.times do |i|
       begin
-        yield
+        yield(i)
         success = true
         break
       rescue

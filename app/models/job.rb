@@ -67,6 +67,11 @@ class Job < ActiveResource::Base
     # self.finish if _status == COMPLETED
   end
 
+  def set_error(error)
+    self.error = error
+    self.save
+  end
+
   def send_to_queue
     post(:send_to_queue)
   end
@@ -78,6 +83,7 @@ class Job < ActiveResource::Base
   def add_trimming?
     !((profile.trim_begin.blank? || profile.trim_begin == "0") && (profile.trim_end.blank? || profile.trim_end.to_i == "0"))
   end
+
   def preprocess?
      add_trimming? || (profile.add_padding.blank? || profile.add_padding == "false") # false is "false"?
   end
