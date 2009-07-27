@@ -2,13 +2,15 @@ module Transcoder
 
   module Padding
     
+    # split padding into symmetric halves
     def split_padding length
       pad1 = pad2 = even_size(length)/2
       return even_size(pad1), even_size(pad2) #padding must be even number themselves.
     end 
 
+    # turns odd numbers into even & even ones into themselves
     def even_size(size)
-      size = size.to_i 
+      size = (size.to_i rescue 240)
       size += 1 if size.odd?
       size 
     end
@@ -43,16 +45,16 @@ module Transcoder
 
       if profile_height == 0 #auto get height
         result_height = profile_width * video_height / video_width.to_i
-      else  
-          # pad top and bottom 
-          if ratio_height * video_width / ratio_width > video_height 
-            result_height = even_size profile_width / video_ratio
-            result["padtop"], result["padbottom"] = split_padding(-profile_height + result_height)
-          # pad left and right
-          elsif ratio_width * video_height / ratio_height> video_width 
-            result_width = even_size profile_height * video_ratio
-            result["padleft"], result["padright"] = split_padding(-profile_width + result_width) 
-          end                                    
+      else
+        # pad top and bottom; profile too high
+        if profile_width*video_height < profile_height*video_width
+          result_height = even_size profile_width*video_height/video_width
+          result["padtop"], result["padbottom"] = split_padding(profile_height - result_height)
+        # pad left and right; profile too wide
+        elsif profile_width*video_height > profile_height*video_width
+          result_width = even_size profile_height*video_width/video_height
+          result["padleft"], result["padright"] = split_padding(profile_width  - result_width) 
+        end                                    
       end
       
       result["result_width"], result["result_height"] = even_size(result_width), even_size(result_height)
