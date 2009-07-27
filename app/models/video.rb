@@ -142,7 +142,10 @@ class Video < ActiveResource::Base
   end
   
   def upload_to_s3
-    TryAFewTimes.do(MAX_S3_UPLOAD_TRIES){S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})}
+    TryAFewTimes.do(MAX_S3_UPLOAD_TRIES) do |i|
+      increment_s3_upload_trials
+      S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})
+    end
     if s3_exist?
       self.uploaded = true
       self.save
@@ -249,6 +252,11 @@ class Video < ActiveResource::Base
   def set_status(_status)
     put(:set_status, :status => _status)
     self.status = _status
+  end
+
+  def increment_s3_upload_trials
+    self.s3_upload_trials = self.s3_upload_trials.to_i + 1
+    self.save
   end
 
 end
