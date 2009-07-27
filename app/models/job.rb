@@ -75,4 +75,11 @@ class Job < ActiveResource::Base
     upload_url ? upload_url : user.upload_url
   end
 
+  def add_trimming?
+    !((profile.trim_begin.blank? || profile.trim_begin == "0") && (profile.trim_end.blank? || profile.trim_end.to_i == "0")
+  end
+  def preprocess?
+     && (profile.add_padding.blank? || profile.add_padding == "false")) # false is "false"?
+  end
+
 end
