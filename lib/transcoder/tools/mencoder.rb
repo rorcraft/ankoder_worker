@@ -21,9 +21,7 @@ module Transcoder
       end
       
       def self.preprocess(job)
-        IO.popen(preprocess_command(job)) do |pipe|
-          pipe.read
-        end
+        `#{preprocess_command(job)}`
       end
 
     end

@@ -46,6 +46,7 @@ module Transcoder
         Transcoder.logger.error e.backtrace.join("\n")
       end
 
+
       def self.command(job)
         cmd = ''
 
@@ -66,14 +67,10 @@ module Transcoder
           cmd += " --noaudio" # we don't need the noise
         end
 
-        #if job.profile.add_padding?
-        #  cmd += padding_command(job.profile, job.original_file)
-        #elsif job.profile.width.to_i > 0
         if job.profile.width.to_i > 0
           cmd += " -x #{job.profile.width} -y #{job.profile.height}"
         end
 
-        cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
         temp_file_path = "#{Time.now.to_i}#{job.generate_convert_filename}"
         temp_file_path_as_ogv = "#{Time.now.to_i}#{job.generate_convert_filename}.ogv"
         cmd = "#{FFMPEG2THEORA_PATH} #{job.original_file.file_path} #{cmd} -o #{File.join(FILE_FOLDER, temp_file_path_as_ogv)} 2>&1"

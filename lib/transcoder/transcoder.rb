@@ -60,6 +60,7 @@ module Transcoder
       
       case job.profile.video_codec
       when /theora/i
+        Tools::FFmpeg.preprocess(job) if job.preprocess?
         Tools::FFmpeg2theora.run(job)
       else
         Tools::FFmpeg.run(job)
