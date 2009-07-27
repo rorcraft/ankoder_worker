@@ -76,7 +76,7 @@ class Job < ActiveResource::Base
   end
 
   def add_trimming?
-    !((profile.trim_begin.blank? || profile.trim_begin == "0") && (profile.trim_end.blank? || profile.trim_end.to_i == "0")
+    !((profile.trim_begin.blank? || profile.trim_begin == "0") && (profile.trim_end.blank? || profile.trim_end.to_i == "0"))
   end
   def preprocess?
      add_trimming? || (profile.add_padding.blank? || profile.add_padding == "false") # false is "false"?
