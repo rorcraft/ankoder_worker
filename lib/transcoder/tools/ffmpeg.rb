@@ -67,7 +67,7 @@ module Transcoder
         cmd += " -acodec pcm_s16le"
 
         # trimming
-        cmd += trimming_command
+        cmd += trimming_command(job.profile, job.original_file)
 
         if job.profile.add_padding == "true"
           cmd += padding_command(job.profile, job.original_file) 
