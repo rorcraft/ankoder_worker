@@ -1,5 +1,6 @@
 require "transcoder/transcoder"
 require "transcoder/tools/ffmpeg"
+require "transcoder/tools/ffmpeg2theora"
 
 class TranscodeWorkerProcessor < ApplicationProcessor
 

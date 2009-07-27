@@ -29,6 +29,7 @@ config.action_view.cache_template_loading            = true
 #
 AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
 FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
+FFMPEG2THEORA_PATH     = "/usr/local/bin/ffmpeg2theora"
 MENCODER_PATH   = "/usr/local/bin/mencoder"
 CURL            = "/usr/bin/curl"  
 FILE_FOLDER   = "/var/www/api_ankoder/current/file_system"
