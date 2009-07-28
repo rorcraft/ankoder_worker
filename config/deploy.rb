@@ -7,7 +7,7 @@ set :deploy_via, :remote_cache
 set :use_sudo, false
 
 # Make symlink for for app
-after "deploy:symlink", "app:symlink"
+after "deploy:symlink", "app:symlink", "app:rake_and_update_crontab", "deploy:restart"
 namespace :app do
   task :symlink do
     sudo "mkdir -p /mnt/file_system"
@@ -16,23 +16,25 @@ namespace :app do
     #run "cd #{deploy_to}/current/config && rm -f mongrel_cluster.yml && ln -s #{shared_path}/svn_trunk/config/mongrel_cluster.yml"
     run "cd #{deploy_to}/current/config && rm -f database.yml && ln -s #{shared_path}/svn_trunk/config/database.yml"
   end
+
+  desc "Rake & Update crontabe"
+  task :rake_and_update_crontab, :roles => :db do
+    # order dependency
+    run "cd #{current_path} && rake config:messaging:#{rails_env}"
+    run "cd #{current_path} && rake config:environment:#{rails_env}"
+    run "cd #{current_path} && sudo rake gems:install"
+    run "cd #{current_path} && whenever --update-crontab #{application}"
+  end
 end         
 
 namespace :deploy do
   desc "Restarting mod_rails with restart.txt"
   task :restart, :roles => :app, :except => { :no_release => true } do
-    run "apache2ctl restart" #"touch #{current_path}/tmp/restart.txt"
+    run "sudo apache2ctl restart" #"touch #{current_path}/tmp/restart.txt"
   end 
               
   [:start, :stop].each do |t| 
     desc "#{t} task is a no-op with mod_rails"
     task t, :roles => :app do ; end 
   end 
-
-  desc "Update the crontabe file"
-  task :update_crontab, :roles => :db do
-    run "cd #{current_path} rake config:messaging:#{rails_env}"
-    run "cd #{current_path} rake config:environment:#{rails_env}"
-    run "cd #{current_path} && whenever --update-crontab #{application}"
-  end
 end 
