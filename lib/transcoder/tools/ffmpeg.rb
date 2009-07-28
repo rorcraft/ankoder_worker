@@ -122,21 +122,21 @@ module Transcoder
       end
 
       def self.trimming_command(profile,video)
-        trim_begin = profile.trim_begin.blank? || (profile.trim_begin.to_i < 0) ? 0 : rofile.trim_begin.to_i
-        trim_end = profile.trim_end.blank? || (profile.trim_end.to_i < 0) ? 0 : rofile.trim_end.to_i
+        trim_begin = profile.trim_begin.blank? || (profile.trim_begin.to_i < 0) ? 0 : profile.trim_begin.to_i
+        trim_end = profile.trim_end.blank? || (profile.trim_end.to_i < 0) ? 0 : profile.trim_end.to_i
 
         return '' unless (trim_begin > 0 || trim_end > 0)
         current_duration = video.duration.nil? ? 0 : (video.duration.to_i / 1000)
 
         # there is no more time, so give zero length video
-        return ' -t 0' if current_duration < (trim_begin + trim_end)
+        return ' -t 0' if (trim_begin > trim_end) || (current_duration < trim_begin)
 
         cmd = ''
 
-        cmd += " -ss #{trim_begin}" if trim_begin > 0
+        cmd += " -ss #{trim_begin}"
 
-        if trim_end > 0
-          new_duration = current_duration - trim_end - trim_begin
+        if current_duration > trim_end
+          new_duration = trim_end - trim_begin
           cmd += " -t #{new_duration}"
         end
 
