@@ -1,3 +1,4 @@
+set :rails_env,   "production"
 set :application, "ankoderworker"
 set :repository,  "git@rorcraft.unfuddle.com:rorcraft/ankoderworker.git"
 default_run_options[:pty] = true
