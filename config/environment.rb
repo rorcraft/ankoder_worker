@@ -11,6 +11,7 @@ Rails::Initializer.run do |config|
   config.gem "rvideo", :lib => "rvideo", :version => "1.0.0", :source => "git://github.com/jagthedrummer/rvideo.git"
   config.gem "image_science", :lib => "image_science"
   config.time_zone = 'UTC'
+  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
 
 end
 

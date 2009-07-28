@@ -42,7 +42,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       logger.error message
     ensure
       # tell scaler of my own death.
-      if (JSON.parse(message)["worker_process_id"])
+      if (JSON.parse(message)["worker_process_id"] rescue false)
         me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
         me.destroy
       end

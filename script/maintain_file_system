@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+require File.dirname(__FILE__) + "/../config/environment.rb"
+
+MAX_FS_STORAGE   = 53687091200 # 50 GB
+FS_KEEP_DURATION = 259200.0 # 3 days
+
+class FileData
+  attr_reader :size, :ctime, :name
+
+  def self.expand_dir(dir)
+    files = []
+    Dir.foreach(dir) do |file|
+      next if %w[.. .].include?(file)
+      file = File.join(dir,file)
+      if File.directory?(file)
+        files += expand_dir(file)
+      else
+        files << self.new(file)
+      end
+    end
+    return files
+  end
+
+  def to_i; size end
+  
+  def initialize filename
+    @ctime = File.ctime(filename)
+    @size  = File.size(filename)
+    @name  = filename
+  end
+
+  def <=> other
+    ctime <=> other.ctime
+  end
+end
+
+@now = Time.now
+@files = FileData.expand_dir(FILE_FOLDER).sort
+
+@temporal_length = @files.index(@files.find{|i|@now - i.ctime <= FS_KEEP_DURATION}) || @files.length
+
+(@files.length).times do |i|
+  if @files[@files.length-i-1,i+1].inject{|a,b|a.to_i+b.to_i}.to_i >= MAX_FS_STORAGE 
+    @spatial_length = @files.length - i
+    break
+  end
+end
+@spatial_length ||= 0
+
+@files.slice(0, [@temporal_length, @spatial_length].max).each {|i|puts "rm #{i.name}"; File.delete(i.name)}
