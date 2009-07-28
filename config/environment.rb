@@ -10,9 +10,10 @@ Rails::Initializer.run do |config|
   config.gem "json", :lib => "json"
   config.gem "rvideo", :lib => "rvideo", :version => "1.0.0", :source => "git://github.com/jagthedrummer/rvideo.git"
   config.gem "image_science", :lib => "image_science"
-  config.time_zone = 'UTC'
+  config.gem "cronic"
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
 
+  config.time_zone = 'UTC'
 end
 
 Rails.logger.auto_flushing = 1
