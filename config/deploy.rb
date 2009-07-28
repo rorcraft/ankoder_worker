@@ -5,15 +5,16 @@ require 'capistrano/ext/multistage'
 set :repository_cache, "svn_trunk"
 set :deploy_via, :remote_cache
 set :use_sudo, false
+set :whenever, "whenever"
 
 # Make symlink for for app
 after "deploy:symlink", "app:symlink", "app:rake_and_update_crontab", "deploy:restart"
+
 namespace :app do
   task :symlink do
     sudo "mkdir -p /mnt/file_system"
     sudo "chown #{user} /mnt/file_system"
     run "ln -s /mnt/file_system #{deploy_to}/current/file_system"
-    #run "cd #{deploy_to}/current/config && rm -f mongrel_cluster.yml && ln -s #{shared_path}/svn_trunk/config/mongrel_cluster.yml"
     run "cd #{deploy_to}/current/config && rm -f database.yml && ln -s #{shared_path}/svn_trunk/config/database.yml"
   end
 
@@ -23,7 +24,7 @@ namespace :app do
     run "cd #{current_path} && rake config:messaging:#{rails_env}"
     run "cd #{current_path} && rake config:environment:#{rails_env}"
     run "cd #{current_path} && sudo rake gems:install"
-    run "cd #{current_path} && whenever --update-crontab #{application}"
+    run "cd #{current_path} && #{whenever} --update-crontab #{application}"
   end
 end         
 

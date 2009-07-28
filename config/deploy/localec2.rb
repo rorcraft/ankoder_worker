@@ -15,6 +15,8 @@ set :branch, "master"
 set :git_enable_submodules, 1
 set :git_shallow_clone, 1
 
+set :whenever, "/usr/local/ruby-enterprise/lib/ruby/gems/1.8/gems/javan-whenever-0.3.6/bin/whenever"
+
 set :scm_username, "railsdeploy"
 set :scm_password, "r0rcr4ft"
 set :scm_passphrase, ""
