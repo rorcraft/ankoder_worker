@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 require File.dirname(__FILE__) + "/../config/environment.rb"
 
-MAX_FS_STORAGE   = 53687091200 # 50 GB
-FS_KEEP_DURATION = 259200.0 # 3 days
+MAX_FS_STORAGE   = 53687091200 unless defined?(MAX_FS_STORAGE) # 50 GB
+FS_KEEP_DURATION = 259200.0 unless defined?(FS_KEEP_DURATION)  # 3 days
 
 class FileData
   attr_reader :size, :ctime, :name
