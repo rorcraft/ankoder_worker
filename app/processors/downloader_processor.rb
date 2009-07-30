@@ -33,6 +33,20 @@ class DownloaderProcessor < ApplicationProcessor
       video.read_metadata
       video.extract_file_information
       logger.debug "Thumbnail generation: #{video.generate_thumbnails}"
+
+      # add metadata to original flv files
+      if video.filename.split(".").last == 'flv'
+        Downloader.logger.debug 'this is a flv file'
+        begin
+          require 'flvtools'
+          Flvtools::Flvtool.hint(video.file_path)
+          Flvtools::Flvtool.add_title(video.name, video.file_path)
+        rescue Exception => e
+          Downloader.logger.debug e
+          # just to ignore MediaInjectionError, so there is nothing to do
+        end
+      end
+
       video.save
 
       if S3_ON

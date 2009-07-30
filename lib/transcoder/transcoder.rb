@@ -69,13 +69,19 @@ module Transcoder
       Transcoder.logger.debug "create the converted file"
       convert_file = create_convert_file(job)
       
-      # if flv - add title
-      # Flvtool.add_title(job)
       
       # if MP4 for Flash
-      if convert_file.video_codec == "h264" 
-        Transcoder.logger.debug "hinting the converted file"
+      if convert_file.video_codec == "h264" && convert_file.video_format = "mp4"
+        Transcoder.logger.debug "hinting the converted filei (mp4)"
         Tools::Mp4box.run(job.convert_file_full_path)  
+      end
+
+      # if FLV for flash
+      if convert_file.video_format == "flv"
+        require 'flvtools'
+        Transcoder.logger.debug "hinting the converted file (flv)"
+        Flvtools::Flvtool.hint(job.convert_file_full_path)
+        Flvtools::Flvtool.add_title(job.original_file.name, job.convert_file_full_path)
       end
 
       Transcoder.logger.debug "generate thumbnail for converted file"

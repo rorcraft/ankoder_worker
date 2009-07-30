@@ -62,7 +62,7 @@ module Transcoder
         cmd = ''
         cmd += " -y "
 
-        cmd += " -f avi -vcodec rawvideo" # is it really raw?
+        cmd += " -f avi -vcodec huffyuv" # is it really raw?
         cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
         cmd += " -acodec pcm_s16le"
 
