@@ -71,13 +71,13 @@ module Transcoder
       
       
       # if MP4 for Flash
-      if convert_file.video_codec == "h264" && convert_file.video_format = "mp4"
+      if convert_file.video_codec == "h264" && job.profile.video_format = "mp4"
         Transcoder.logger.debug "hinting the converted filei (mp4)"
         Tools::Mp4box.run(job.convert_file_full_path)  
       end
 
       # if FLV for flash
-      if convert_file.video_format == "flv"
+      if job.profile.video_format == "flv"
         require 'flvtools'
         Transcoder.logger.debug "hinting the converted file (flv)"
         Flvtools::Flvtool.hint(job.convert_file_full_path)
