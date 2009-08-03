@@ -1,4 +1,4 @@
-require 'active_support'
+#require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + "/../spec_helper")
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/transcoder/helper")
 require File.expand_path(File.dirname(__FILE__) + "/../../lib/timeout_detector")
