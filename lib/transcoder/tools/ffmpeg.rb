@@ -62,7 +62,7 @@ module Transcoder
         cmd = ''
         cmd += " -y "
 
-        cmd += " -f avi -vcodec rawvideo" # is it really raw?
+        cmd += " -f avi -vcodec huffyuv" # is it really raw?
         cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
         cmd += " -acodec pcm_s16le"
 
@@ -208,6 +208,7 @@ module Transcoder
         raise_media_format_exception if line =~ /frame decoding failed: Array index out of range/
         raise_media_format_exception if line =~ /MV errors/
         raise_media_format_exception if line =~ /Could not write header for output file/
+        raise_media_format_exception if line =~ /maybe incorrect parameters such as bit_rate, rate, width or height/
       end
 
 
