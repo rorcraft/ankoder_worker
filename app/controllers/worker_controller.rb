@@ -9,6 +9,14 @@ class WorkerController < ApplicationController
     render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
   end
 
+  def upload
+    send_to("upload", params["message"])
+  end
+
+  def download
+    send_to("download", params["message"])
+  end
+
   def transcode
     send_to("transcode", params["message"])
   end

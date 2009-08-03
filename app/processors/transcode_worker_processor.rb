@@ -34,17 +34,19 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     rescue
       Postback.post_back 'convert', job, 'fail'
       logger.error " ------------- !!!!!!!!!!!!!! -------------"
-      message = $!.class.to_s
-      message += $!.message
-      message += $!.backtrace[0,20].to_yaml
-      job.set_error(message)
+      error_msg = $!.class.to_s
+      error_msg += $!.message
+      error_msg += $!.backtrace[0,20].to_yaml
+      job.set_error(error_msg)
       job.set_status Job::FAILED
-      logger.error message
+      logger.error error_msg
     ensure
       # tell scaler of my own death.
       if (JSON.parse(message)["worker_process_id"] rescue false)
         me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
         me.destroy
+      else
+        logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
       end
     end
   end

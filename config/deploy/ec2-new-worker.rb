@@ -1,3 +1,5 @@
+NEW_WORKER_HOSTNAME = "ec2-174-129-141-222.compute-1.amazonaws.com"
+
 set :rails_env,   "production"
 set :application, "ankoderworker"
 set :repository,  "git@rorcraft.unfuddle.com:rorcraft/ankoderworker.git"
@@ -15,6 +17,8 @@ set :branch, "master"
 set :git_enable_submodules, 1
 set :git_shallow_clone, 1
 
+set :whenever, "/usr/local/ruby-enterprise/lib/ruby/gems/1.8/gems/javan-whenever-0.3.6/bin/whenever"
+
 set :scm_username, "railsdeploy"
 set :scm_password, "r0rcr4ft"
 set :scm_passphrase, ""
@@ -28,6 +32,6 @@ set :user, 'railsdeploy'
 set :password, 'railsonruby'
 set :deploy_via, :remote_cache
 
-role :app, "ec2-75-101-176-85.compute-1.amazonaws.com"
-role :web, "ec2-75-101-176-85.compute-1.amazonaws.com"
-role :db,  "ec2-75-101-176-85.compute-1.amazonaws.com", :primary => true
+role :app, NEW_WORKER_HOSTNAME
+role :web, NEW_WORKER_HOSTNAME
+role :db,  NEW_WORKER_HOSTNAME, :primary => true
