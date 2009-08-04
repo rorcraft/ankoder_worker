@@ -3,7 +3,7 @@ require 'hmac-sha1'
 require 'errors'
 
 class Video < ActiveResource::Base
-  
+
   SUBMITTING = "submitting"
   QUEUEING = "queueing" 
   DOWNLOADING = "downloading"
@@ -17,7 +17,7 @@ class Video < ActiveResource::Base
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
-  EXCLUDE_WHEN_SAVING = [:thumb]
+  EXCLUDE_WHEN_SAVING = [:thumb, :thumbnail_name, :profile]
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(_filename = nil)
