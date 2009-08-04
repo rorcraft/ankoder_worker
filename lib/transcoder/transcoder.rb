@@ -100,6 +100,7 @@ module Transcoder
     
     def create_convert_file(job)
       converted_video = ConvertFile.new
+      converted_video.s3_upload_trials  = 0
       converted_video.filename          = job.generate_convert_filename
       converted_video.original_filename = job.generate_convert_file_original_filename
       converted_video.size              = File.size(job.convert_file_full_path)  
