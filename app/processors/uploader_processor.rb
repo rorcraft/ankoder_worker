@@ -6,14 +6,14 @@ class UploaderProcessor < ApplicationProcessor
   def on_message(message)
     logger.debug "UploaderProcessor received #{message}"
     params = JSON.parse message
-    video = Video.find params['video_id']
     job = Job.find params['job_id']
+    video = Video.find job.convert_file.id
     user = video.user
     upload_url = job.get_upload_url
     username = user.upload_username
     password = user.upload_password
     uploader_temp_file = nil
-    thumbnail_destination = job.thumbnail_destination
+    thumbnail_destination = job.get_thumbnail_upload_url
     thumbnail_sizes = job.thumbnail_sizes
     destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
 
@@ -27,19 +27,6 @@ class UploaderProcessor < ApplicationProcessor
         )
       else
         local_file_path = video.file_path
-      end
-
-      # upload thumbnails
-      if thumbnail_destination && thumbnail_sizes.length > 0
-        thumbnail_sizes.each do |size|
-          size = size.to_sym
-          Uploader.upload(
-            :upload_url      => thumbnail_destination,
-            :local_file_path => video.thumbnail_full_path(nil,size),
-            :remote_filename => video.thumbnail_name(nil,size),
-            :destination_s3_public => destination_s3_public
-          )
-        end
       end
 
       # upload the video

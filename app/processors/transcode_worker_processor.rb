@@ -17,8 +17,15 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     begin
       transcode(job)
 
-      job = Job.find(get_job_id(message))
-      raise "Unfinished job" unless (job.status == 'completed')
+      # upload thumbnails to external storage
+      job.thumbnails.each do |thumbnail|
+        Uploader.upload(
+          :upload_url            => job.get_thumbnail_upload_url,
+          :local_file_path       => thumbnail.file_path,
+          :remote_filename       => thumbnail.filename,
+          :destination_s3_public => job.profile.destination_s3_public
+        )
+      end if job.get_thumbnail_upload_url && job.thumbnails
 
       # postback? - job complete
       Postback.post_back 'convert', job, 'success'

@@ -91,55 +91,12 @@ class Video < ActiveResource::Base
   end
 
   def duration_in_secs                                                      
-     duration.nil? ? 0 : (duration.to_i / 1000).to_i
+     duration.nil? ? 0.0 : duration.to_i / 1000.0
   end
  
-  def ffmpeg_thumbnail(time= nil)
-    time = default_sec time
-    FileUtils.mkdir_p File.dirname(self.thumbnail_full_path(time))    
-    # sleep(1) # ?
-    command = "#{FFMPEG_PATH} -ss #{time} -i #{self.file_path} -y -f image2 -t 0.001 #{self.thumbnail_full_path(time)}"
-    # logger.info command
-    f = IO.popen(command)
-    f.close
-  end
-
   def partitioned_path(*args)
     ("%08d" % self.id).scan(/..../) + args
   end  
-  
-  def generate_thumbnails(time=nil)
-    return unless file_exist?
-    time = default_sec(time)    
-    
-    ffmpeg_thumbnail(time)
-    
-    Video::SIZES.each do |key,value|
-      image_resize(time, key, value)
-    end
-  end
-  
-  def upload_thumbnails_to_s3(time=nil) 
-    return unless file_exist?
-    time = default_sec(time)    
-        
-    #s3_connect
-    #AWS::S3::S3Object.store(thumbnail_name(time), open(self.thumbnail_full_path(time)), ::S3_BUCKET ,  :access => :public_read)
-    S3Curl.upload(thumbnail_name(time), thumbnail_full_path(time), "public" => true)    
-    Video::SIZES.each { |key,value|
-      count = 0
-      begin
-        #AWS::S3::S3Object.store(thumbnail_name(time,key), open(self.thumbnail_full_path(time,key)), ::S3_BUCKET ,  :access => :public_read)
-        S3Curl.upload(thumbnail_name(time, key), thumbnail_full_path(time, key), "public" => true)    
-      rescue
-        count += 1
-        retry if count < MAX_S3_UPLOAD_TRIES
-        raise
-      end
-    }
-    self.thumbnail_uploaded = true
-    self.save
-  end
   
   def upload_to_s3
     TryAFewTimes.do(MAX_S3_UPLOAD_TRIES) do |i|
@@ -149,58 +106,6 @@ class Video < ActiveResource::Base
     if s3_exist?
       self.uploaded = true
       self.save
-    end
-  end
-  
-  def thumbnail_path(time=nil, size = nil)
-    File.join  THUMBNAIL_FOLDER, *partitioned_path(thumbnail_name(time,size)) 
-  end
-
-  def thumbnail_full_path(time=nil, size = nil)    
-    File.join "#{PUBLIC_FOLDER}", "#{thumbnail_path(time,size)}"
-  end
-
-  # TODO: Need to create models for thumbnails.  
-  def thumbnail_name(time=nil,size = nil)
-    time = default_sec time
-    size = default_thumb_size size
-  
-    "#{filename}" + (size.nil? ? ".#{time}.jpg" : ".#{time}.#{size}.jpg")
-  end
-
-  def thumbnail_url(options = {})
-    case options
-    when Hash
-      time = options.delete(:time)
-      size = options.delete(:size)
-
-      if S3_ON
-        "http://#{::S3_SERVER}/#{thumbnail_name(time,size)}"
-      else  
-        "#{API_URL}#{thumbnail_path(time,size)}"
-      end   
-    else  
-      "/"  
-    end      
-
-  end
-
-  def default_thumb_size(size)                                              
-    Video::SIZES.has_key?(size) ? size : "small"
-  end
-
-  def image_resize(time, size, width)
-    # MiniMagick had problems with mod_rails
-    # image = MiniMagick::Image.new thumbnail_full_path(time)
-    # image.resize width
-    # image.write output
-    # logger.info "image_resize"
-    # logger.info "#{size}, #{width}"
-    #trying imagescience
-    ImageScience.with_image(thumbnail_full_path(time)) do |img|
-      img.thumbnail(width) do |thumb|
-        thumb.save thumbnail_full_path(time,size)
-      end
     end
   end
 
@@ -257,6 +162,9 @@ class Video < ActiveResource::Base
   def increment_s3_upload_trials
     self.s3_upload_trials = self.s3_upload_trials.to_i + 1
     self.save
+  end
+
+  def get_thumbnails
   end
 
 end
