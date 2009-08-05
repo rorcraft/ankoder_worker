@@ -83,13 +83,11 @@ module Transcoder
         Flvtools::Flvtool.hint(job.convert_file_full_path)
         Flvtools::Flvtool.add_title(job.original_file.name, job.convert_file_full_path)
       end
-
-      Transcoder.logger.debug "generate thumbnail for converted file"
-      convert_file.generate_thumbnails
       
+      Transcoder.logger.debug "generate thumbnail for converted file"
+      job.generate_thumbnails
+
       if S3_ON
-        Transcoder.logger.debug "upload thumbnail to S3"
-        convert_file.upload_thumbnails_to_s3 rescue nil
         Transcoder.logger.debug "upload converted file back to S3"
         convert_file.upload_to_s3
       end
@@ -105,11 +103,11 @@ module Transcoder
       converted_video.original_filename = job.generate_convert_file_original_filename
       converted_video.size              = File.size(job.convert_file_full_path)  
       converted_video.user_id           = job.user_id
-      # converted_video.video_codec       = 
       converted_video.read_metadata
       converted_video.save
       Transcoder.logger.debug converted_video.inspect     
       job.convert_file_id = converted_video.id
+      job.newly_converted = converted_video
       job.save
       
       return converted_video

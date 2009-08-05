@@ -1,5 +1,6 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
+  attr_accessor :newly_converted, :thumbnails
 
   SUBMITTING = "submitting"
   QUEUEING = "queuing"
@@ -31,15 +32,6 @@ class Job < ActiveResource::Base
     nil
   end
 
-=begin
-  def finish(success=true)
-    self.finished_at = Time.now
-    success or user.unuse_one_token
-    save
-  end
-=end
-
-  # TODO: add job_id to filename otherwise multiple jobs with same suffix can overwrite each other
   def generate_convert_filename
     if !respond_to?('convert_file') || convert_file.nil? || convert_file.filename.nil?
       "#{original_file.filename.split(".")[0]}_#{id}.#{profile.suffix}" 
@@ -77,7 +69,11 @@ class Job < ActiveResource::Base
   end
 
   def get_upload_url
-    upload_url ? upload_url : user.upload_url
+    upload_url || user.upload_url
+  end
+
+  def get_thumbnail_upload_url
+    thumbnail_upload_url || user.thumbnail_upload_url
   end
 
   def add_trimming?
@@ -86,6 +82,16 @@ class Job < ActiveResource::Base
 
   def preprocess?
      add_trimming? || (profile.add_padding.blank? || profile.add_padding == "false") # false is "false"?
+  end
+
+  # generate thumbnails for converted file
+  def generate_thumbnails
+    self.thumbnails = [
+      Thumbnail.generate(
+        newly_converted,
+        :width         => profile.thumbnail_width,
+        :height        => profile.thumbnail_height)
+    ]
   end
 
 end
