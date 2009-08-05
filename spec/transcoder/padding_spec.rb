@@ -40,6 +40,22 @@ describe Transcoder::Padding do
       result["result_width"].should == 320
     end
 
+    it "should not break on zeros" do
+      result = @p.padding(0,0,0,0)
+      #result["result_height"].should == 0
+      #result["result_width"].should == 0
+    end
+
+    it "should always return integer values" do
+      result = @p.padding(123,456,789,234)
+      result["result_height"].should.type == Fixnum
+      result["result_width"].should.type == Fixnum
+      result["padtop"].should.type == Fixnum
+      result["padbottom"].should.type == Fixnum
+      result["padleft"].should.type == Fixnum
+      result["padright"].should.type == Fixnum
+
+    end
     it "if video_height < 0 or video_width < 0, padding should return profile dimensions" do
       result = @p.padding(320,240,-1,-1)
       result["result_height"].should == 240
