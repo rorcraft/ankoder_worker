@@ -89,7 +89,7 @@ module Transcoder
         end
       end
 
-      result["result_width"], result["result_height"] = result_width, result_height
+      result["result_width"], result["result_height"] = result_width.to_i, result_height.to_i
 
       return result
     end
