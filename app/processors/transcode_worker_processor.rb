@@ -19,6 +19,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
 
       # upload thumbnails to external storage
       job.thumbnails.each do |thumbnail|
+        next unless File.exist?(thumbnail.file_path)
         Uploader.upload(
           :upload_url            => job.get_thumbnail_upload_url,
           :local_file_path       => thumbnail.file_path,

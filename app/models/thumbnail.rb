@@ -19,6 +19,7 @@ class Thumbnail < ActiveResource::Base
       :output => file_path,
       :size   => size,
       :time   => time
+    Transcoder.logger.debug cmd
     `#{cmd}`
     if File.exist?(file_path)
       self.save
