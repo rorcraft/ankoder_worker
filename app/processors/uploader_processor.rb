@@ -14,7 +14,6 @@ class UploaderProcessor < ApplicationProcessor
     password = user.upload_password
     uploader_temp_file = nil
     thumbnail_destination = job.get_thumbnail_upload_url
-    thumbnail_sizes = job.thumbnail_sizes
     destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
 
     begin
@@ -32,7 +31,6 @@ class UploaderProcessor < ApplicationProcessor
       # upload the video
       Uploader.upload(
         :video_id              => video.id,
-        :thumbnail_url         => video.thumbnail_url,
         :upload_url            => upload_url,
         :local_file_path       => local_file_path,
         :remote_filename       => "#{video.id}_#{video.filename}",

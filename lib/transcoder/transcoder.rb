@@ -107,9 +107,9 @@ module Transcoder
       converted_video.save
       Transcoder.logger.debug converted_video.inspect     
       job.convert_file_id = converted_video.id
+      job.convert_file = converted_video
       job.newly_converted = converted_video
       job.save
-      
       return converted_video
     end
     

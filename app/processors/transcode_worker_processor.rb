@@ -26,6 +26,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
           :remote_filename       => thumbnail.filename,
           :destination_s3_public => job.profile.destination_s3_public
         )
+        thumbnail.uploaded = true
       end if job.get_thumbnail_upload_url && job.thumbnails
 
       # postback? - job complete
@@ -34,7 +35,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       if job.get_upload_url
         publish(
           :uploader_worker, {
-          'video_id'=> job.convert_file.id,
+          'video_id'=> job.convert_file_id,
           'job_id'  => job.id 
         }.to_json
         )

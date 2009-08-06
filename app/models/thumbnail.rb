@@ -1,6 +1,6 @@
 class Thumbnail < ActiveResource::Base
   self.site = AR_SITE
-  attr_accessor :video
+  attr_accessor :video, :uploaded
 
   def file_path
     File.join FILE_FOLDER, filename

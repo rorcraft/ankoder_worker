@@ -32,12 +32,20 @@ class Postback
         'result'  =>  result,
         'error'   =>  error,
         'type'    => 'Convert',
-        'Job'     =>  model.id
+        'Job'     =>  model.id,
+        'original_video_id'     => model.original_file.id
     }
     if result   == 'success'
       message['convert_video_id'] = model.convert_file.id
       message['s3_name'] = model.convert_file.s3_name
       message['name'] = "#{model.convert_file.id}_#{model.convert_file.filename}"
+      tus = model.thumbnails.map &:uploaded # tus == thumbnail_upload_status
+      message['thumbnail_result'] = 
+        case [tus.inject{|i,j|i&&j}, tus.inject{|i,j|i||j}]
+        when [true, true ] then 'success'
+        when [false,false] then 'fail'
+        else 'partial_success'
+        end
     end
 
     when 'test'
@@ -55,7 +63,6 @@ class Postback
         'Video'   => model.convert_file.id,
         'url'     => model.get_upload_url,
         'filename'=> model.convert_file.filename,
-        'thumbnail_name'=> model.convert_file.thumbnail_name
     }
     end
 
