@@ -32,7 +32,6 @@ class DownloaderProcessor < ApplicationProcessor
       ### return , log error if temp_filepath is false   
       video.read_metadata
       video.extract_file_information
-      logger.debug "Thumbnail generation: #{video.generate_thumbnails}"
 
       # add metadata to original flv files
       if video.filename.split(".").last == 'flv'
@@ -50,8 +49,6 @@ class DownloaderProcessor < ApplicationProcessor
       video.save
 
       if S3_ON
-        Downloader.logger.debug "upload thumbnail to S3"
-        video.upload_thumbnails_to_s3      
         Downloader.logger.debug "upload converted file back to S3"
         video.upload_to_s3
       end
