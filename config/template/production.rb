@@ -37,7 +37,7 @@ PUBLIC_FOLDER = "/var/www/ankoderworker/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
 
 S3_ON         = true
-S3BUCKET = S3_BUCKET = "download2.ankoder.com"
+S3BUCKET = S3_BUCKET = "download.ankoder.com"
 
 ACCESS_KEY_ID     = "04WAVZJW4HAZZQTWKCR2"
 SECRET_ACCESS_KEY = "/iEjATrlFcU9k7pyPQSWjtfI8AnylH1CXs33TrvI"
