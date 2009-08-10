@@ -16,6 +16,7 @@ namespace :app do
     sudo "chown #{user} /mnt/file_system"
     run "ln -s /mnt/file_system #{deploy_to}/current/file_system"
     run "cd #{deploy_to}/current/config && rm -f database.yml && ln -s #{shared_path}/svn_trunk/config/database.yml"
+    run "cd #{deploy_to}/current/ && rm -f log && ln -s /mnt/log ."
   end
 
   desc "Rake & Update crontabe"
@@ -24,7 +25,7 @@ namespace :app do
     run "cd #{current_path} && rake config:messaging:#{rails_env}"
     run "cd #{current_path} && rake config:environment:#{rails_env}"
     run "cd #{current_path} && sudo rake gems:install"
-    run "cd #{current_path} && #{whenever} --update-crontab #{application}"
+    # run "cd #{current_path} && #{whenever} --update-crontab #{application}"
   end
 end         
 

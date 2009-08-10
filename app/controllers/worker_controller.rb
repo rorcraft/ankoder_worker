@@ -6,7 +6,8 @@ class WorkerController < ApplicationController
   }
 
   def art_thou_there
-    render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps ax | grep Rails].split($/).map{|i|i.scan(/^\d+/).first.to_i}}.to_json)
+    pids = params["pids"] || [0]
+    render :text => CGI.escape({"private_dns_name" => `hostname`.strip, "pids" => %x[ps #{pids.join(" ")}].split($/).map{|i|i.scan(/^\s*\d+/).first.to_i}.select{|i|i>0}}.to_json)
   end
 
   def upload
