@@ -63,6 +63,7 @@ class Postback
         'Video'   => model.convert_file.id,
         'url'     => model.get_upload_url,
         'filename'=> model.convert_file.filename,
+        "thumbnail_filenames" => model.convert_file.thumbnails.map(&:filename)
     }
     end
 

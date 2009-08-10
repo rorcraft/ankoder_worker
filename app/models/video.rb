@@ -8,8 +8,10 @@ class Video < ActiveResource::Base
   QUEUEING = "queueing" 
   DOWNLOADING = "downloading"
   DOWNLOADED = "downloaded"
+  UPLOADING     = "uploading"
+  UPLOADED      = "uploaded"
   FAILED    = "failed"
-  STATUS = [SUBMITTING, QUEUEING, DOWNLOADING, DOWNLOADED, FAILED]  
+  STATUS = [SUBMITTING, QUEUEING, DOWNLOADING, DOWNLOADED, UPLOADING, UPLOADED, FAILED]
 
   include AwsHelper
   include AWS::S3
@@ -155,8 +157,8 @@ class Video < ActiveResource::Base
   end
 
   def set_status(_status)
-    put(:set_status, :status => _status)
     self.status = _status
+    self.save
   end
 
   def increment_s3_upload_trials
