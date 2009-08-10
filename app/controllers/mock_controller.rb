@@ -21,6 +21,14 @@ class MockController < ApplicationController
     render :text => "OK"
   end
 
+  def download
+    render :text => "Yo!\n"
+  end
+
+  def upload
+    render :text => "Yo!\n"
+  end
+
   def transcode
     render :text => (rand*10000).ceil
     spawn do

@@ -18,6 +18,8 @@ class UploaderProcessor < ApplicationProcessor
 
     begin
 
+      video.set_status ConvertFile::UPLOADING
+
       if S3_ON
         #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
         local_file_path = uploader_temp_file = Downloader.download(
@@ -38,9 +40,11 @@ class UploaderProcessor < ApplicationProcessor
         :password              => password,
         :destination_s3_public => destination_s3_public
       )
+      video.set_status ConvertFile::UPLOADED
       # postback
       Postback.post_back('upload', job, 'success')
     rescue Exception => e
+      video.set_status ConvertFile::FAILED
       error_message = case e
                       when HttpError
                         "HTTP status #{e.message}"

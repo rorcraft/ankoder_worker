@@ -4,9 +4,6 @@ require "transcoder/tools/ffmpeg2theora"
 
 class TranscodeWorkerProcessor < ApplicationProcessor
 
-  publishes_to :uploader_worker
-  subscribes_to :transcode_worker
-
   include Transcoder::InstanceMethods
   include ActiveMessaging::MessageSender
 
@@ -33,12 +30,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       Postback.post_back 'convert', job, 'success'
       # also upload completed video if upload_url is not null.
       if job.get_upload_url
-        publish(
-          :uploader_worker, {
-          'video_id'=> job.convert_file_id,
-          'job_id'  => job.id 
-        }.to_json
-        )
+        job.convert_file.set_status ConvertFile::QUEUEING
       end
     rescue
       Postback.post_back 'convert', job, 'fail'
