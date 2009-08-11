@@ -10,7 +10,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
   def on_message(message) 
       logger.debug "TranscodeWorkerProcessor received: " + message
       job = Job.find(get_job_id(message))
-
+      destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
     begin
       transcode(job)
 
@@ -21,7 +21,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
           :upload_url            => job.get_thumbnail_upload_url,
           :local_file_path       => thumbnail.file_path,
           :remote_filename       => thumbnail.filename,
-          :destination_s3_public => job.profile.destination_s3_public
+          :destination_s3_public => destination_s3_public
         )
         thumbnail.uploaded = true
       end if job.get_thumbnail_upload_url && job.thumbnails
