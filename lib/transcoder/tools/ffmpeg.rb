@@ -21,14 +21,14 @@ module Transcoder
       end
 
       def self.run_command(command)
-        progress = 0      
+        progress = 0
         IO.popen(command) do |pipe|
           duration = nil
           @ffmpeg_output = ""
           pipe.each("\r") do |line|          
             @ffmpeg_output += line + "\n"
             parse_line(line)
-            duration = parse_duration(line) if duration.nil?          
+            duration = parse_duration(line) if duration.nil?
             p = parse_progress(line,duration)
             if p >= progress && progress_need_refresh?(progress, p)
               progress = p 

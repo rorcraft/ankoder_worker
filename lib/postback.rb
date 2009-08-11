@@ -19,21 +19,24 @@ class Postback
     return if (!model.respond_to?('profile') || model.profile.blank? || model.profile.postback_url.blank?) && (!model.respond_to?('user') || model.user.blank? || model.user.postback_url.blank?)
     case type
     when 'download'
+      # model = Video's instance
       message = {
         "result" => result,
         "error" => error,
         "type" => "Download",
         "video_id"=> model.id,
-        "video_name" => model.name
+        "video_name" => model.filename
     }
 
     when 'convert'
+      # model = instance of Job
       message = {
         'result'  =>  result,
         'error'   =>  error,
         'type'    => 'Convert',
         'Job'     =>  model.id,
-        'original_video_id'     => model.original_file.id
+        'original_video_id'     => model.original_file.id,
+        'is_trimmed' => ((model.profile.trim_begin || model.profile.trim_end) && (model.convert_file.duration == model.original_file.duration)),
     }
     if result   == 'success'
       message['convert_video_id'] = model.convert_file.id
@@ -55,6 +58,7 @@ class Postback
     }
 
     when 'upload'
+      # model = instance of Job
       message = {
         'Job'     => model.id,
         'result'  => result,

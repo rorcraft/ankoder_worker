@@ -18,8 +18,9 @@ config.action_mailer.raise_delivery_errors = false
 
 AR_SITE = 'http://workflow:r0rcr4ft@ar.localankoder.com'
 FFMPEG_PATH     = "/usr/local/bin/ffmpeg"
+FFMPEG2THEORA_PATH     = "/usr/local/bin/ffmpeg2theora"
 MENCODER_PATH   = "/usr/local/bin/mencoder"
-CURL            = "/usr/bin/curl"  
+CURL            = "/usr/bin/curl"
 FILE_FOLDER   = "/home/rorcraft/workspace/rorcraft_ankoder/api/file_system"
 PUBLIC_FOLDER = "/home/rorcraft/workspace/rorcraft_ankoder/api/public"
 THUMBNAIL_FOLDER = "/thumbnail"

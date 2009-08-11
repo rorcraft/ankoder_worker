@@ -15,11 +15,17 @@ module Transcoder
         end
       end
 
+      def self.raise_media_format_exception
+        raise TranscoderError::MediaFormatException.new(@ffmpeg_output)
+      end
+
       def self.run_command(command)
         progress = 0
         IO.popen(command) do |pipe|
           duration = nil
-          pipe.each("\r") do |line|
+          @ffmpeg_output = ""
+          pipe.each("\r") do |line|          
+            @ffmpeg_output += line + "\n"
             parse_line(line)
             duration = parse_duration(line) if duration.nil?
             p = parse_progress(line,duration)
@@ -34,16 +40,13 @@ module Transcoder
 
         if $?.exitstatus != 0
           Transcoder.logger.error command
-          raise TranscoderError::MediaFormatException
+          raise_media_format_exception
         else
           # to ensure the convert is 100 is the conversion is success
           progress = 100 
           block_given? ? yield(progress) : stdout_progress(progress)
         end
 
-      rescue TranscoderError => e
-        Transcoder.logger.error e.message
-        Transcoder.logger.error e.backtrace.join("\n")
       end
 
 
@@ -136,10 +139,10 @@ module Transcoder
       end
 
       def self.parse_line(line)
-        raise TranscoderError::MediaFormatException if line =~ /frame decoding failed: Array index out of range/
-        raise TranscoderError::MediaFormatException if line =~ /MV errors/
-        raise TranscoderError::MediaFormatException if line =~ /Could not write header for output file/
-        raise TranscoderError::MediaFormatException if line =~ /does not exist or has an unknown data format/
+        raise_media_format_exception if line =~ /frame decoding failed: Array index out of range/
+        raise_media_format_exception if line =~ /MV errors/
+        raise_media_format_exception if line =~ /Could not write header for output file/
+        raise_media_format_exception if line =~ /does not exist or has an unknown data format/
       end
 
 
