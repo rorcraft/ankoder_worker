@@ -1,7 +1,7 @@
 class UploaderProcessor < ApplicationProcessor
   subscribes_to :uploader_worker
 
-#  include PostbackHelper
+  #  include PostbackHelper
 
   def on_message(message)
     logger.debug "UploaderProcessor received #{message}"
@@ -65,6 +65,13 @@ class UploaderProcessor < ApplicationProcessor
     ensure
       if S3_ON && uploader_temp_file && File.exist?(uploader_temp_file)
         File.delete(uploader_temp_file)
+        # tell scaler of my own death.
+      end
+      if (JSON.parse(message)["worker_process_id"] rescue false)
+        me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
+        me.destroy
+      else
+        logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
       end
     end
   end

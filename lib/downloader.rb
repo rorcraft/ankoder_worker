@@ -20,6 +20,7 @@ class Downloader
 
   TEMP_FOLDER = "/tmp" unless defined? TEMP_FOLDER
   USER_AGENT  = "Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en-US; rv:1.8.1.11) Gecko/20071231 Firefox/2.0.0.11 Flock/1.0.5" unless defined? USER_AGENT
+  AXEL_PATH = "/usr/local/bin/axel" unless defined?(AXEL_PATH)
 
   class << self 
     include Transcoder::Helper
@@ -80,7 +81,7 @@ class Downloader
           %Q(-A "#{USER_AGENT}" "#{escape_quote URI.parse(url)}")+
           %Q( -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" 2>&1)
       else
-        %Q(axel -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" )+
+        %Q(#{AXEL_PATH} -o "#{escape_quote File.join(TEMP_FOLDER,local_filename)}" )+
           %Q(-U "#{USER_AGENT}" "#{escape_quote URI.parse(url)}"  2>&1)
       end
     when 'sftp'
@@ -117,7 +118,7 @@ class Downloader
     url = options[:url]
     local_filename = options[:local_filename]
     _command = command(url, local_filename, options)
-    application = _command.slice /\S+/
+    application = _command.slice(/\S+/).split("/").last
       logger.info _command
     p = progress = nil; # to force 0% update
     IO.popen(_command) do |pipe|

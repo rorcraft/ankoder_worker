@@ -1,6 +1,12 @@
 require "json"
 
 class MockController < ApplicationController
+  ACTION_TO_PROCESSOR = {
+    "transcode" => TranscodeWorkerProcessor,
+    "download"  => DownloaderProcessor,
+    "upload"    => UploaderProcessor
+  }
+
   include Spawn
   before_filter :parse_params
 
@@ -22,36 +28,27 @@ class MockController < ApplicationController
   end
 
   def download
-    render :text => "Yo!\n"
+    send_to("download", params["message"])
   end
 
   def upload
-    render :text => "Yo!\n"
+    send_to("upload", params["message"])
   end
 
   def transcode
-    render :text => (rand*10000).ceil
-    spawn do
+    send_to("transcode", params["message"])
+  end
+
+  private
+  def send_to(processor_action, message)
+    spawn_id = spawn do
       begin
-        job = Job.find @msg["job_id"]
-        job.set_status(Job::PROCESSING)
-        one_third_sleeping_time = (
-          job.original_file.size.to_i/\
-          1024.0/1024.0/700.0*3600.0*rand
-        ).ceil
-        (1 + one_third_sleeping_time).times do |i|
-          sleep 3
-          job.convert_progress = i*100/one_third_sleeping_time
-          job.save
-        end
-        job.set_status(Job::COMPLETED)
+        ACTION_TO_PROCESSOR[processor_action].new.on_message(message)
       rescue
-        logger.debug $!.to_yaml
-        logger.debug $!.backtrace.to_yaml
-      ensure
-        me = WorkerProcess.find(@msg["worker_process_id"])
-        me.destroy
-      end
-    end
+        Transcoder.logger.error $!
+        Transcoder.logger.error $!.backtrace.to_yaml
+      end 
+    end 
+    render :text => spawn_id.handle
   end
 end

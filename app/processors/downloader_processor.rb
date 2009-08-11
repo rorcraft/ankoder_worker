@@ -70,7 +70,7 @@ class DownloaderProcessor < ApplicationProcessor
       File.delete(temp_filepath) if File.exist?(temp_filepath)
 
       video.set_status Video::FAILED
-      
+
       error_message = case e
                       when HttpError
                         "HTTP status #{e.message}"
@@ -90,6 +90,14 @@ class DownloaderProcessor < ApplicationProcessor
                         'Ankoder internal error'
                       end
       Postback.post_back('download', video,'fail',error_message)
+    ensure
+      # tell scaler of my own death.
+      if (JSON.parse(message)["worker_process_id"] rescue false)
+        me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
+        me.destroy
+      else
+        logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
+      end
     end
   end
 
