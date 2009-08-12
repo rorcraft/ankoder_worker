@@ -25,7 +25,7 @@ namespace :app do
     run "cd #{current_path} && rake config:messaging:#{rails_env}"
     run "cd #{current_path} && rake config:environment:#{rails_env}"
     run "cd #{current_path} && sudo rake gems:install"
-    # run "cd #{current_path} && #{whenever} --update-crontab #{application}"
+    run "cd #{current_path} && #{whenever} --update-crontab #{application}"
   end
 end         
 

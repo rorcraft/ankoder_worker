@@ -3,6 +3,11 @@ require 'open-uri'
 
 module VideoSiteUrlParse
   include REXML
+
+  def curl_path
+    defined?(CURL) ? CURL : "/usr/bin/curl"
+  end
+
   # get the flv download address from the url
   def parse_video_url(url)
     url_video = case url.downcase
@@ -38,22 +43,9 @@ module VideoSiteUrlParse
   # flv
   #request# GET http://www.youtube.com/get_video?video_id=Sex4w4h7Tqk&t=vjVQa1PpcFNJPzyA7gOYrRM6W1vsCckhpKDdwfMJUqQ=  
   def parse_youtube(url)
-     youtube = "http://www.youtube.com/"
-     # url =~ /(?:http\:\/\/.*youtube.com\/(?:watch\?v=|v\/))?(.*)$/
-     url =~ /watch\?v=(.*)/ 
-     video_id = $1
-     video_id = video_id.split("&")[0]
-     flv_url = nil
-     open("#{youtube}watch\?v=#{video_id}") do |f|
-       f.each_line do |line|
-         if line =~/watch_fullscreen\?(.*?)video_id=([\w-]+)&(.*?)&t=([\w-]+\%3D)&hl/
-           # p line
-           flv_url = "#{youtube}get_video?video_id=#{$2}&t=#{$4};auto"
-           break
-         end
-       end
-     end
-     flv_url
+    source = `#{curl_path} "http://kej.tw/flvretriever/" -d "videoUrl=#{url}" -A "foo"`
+    raise "Cannot parse youtube URL" unless(source =~ /<textarea id="outputfield">([^<]+)<\/textarea>/)
+    $1
   end
   
   #no longer works
