@@ -31,7 +31,7 @@ class UploaderProcessor < ApplicationProcessor
       end
 
       # upload the video
-      Uploader.upload(
+      upload_options = {
         :video_id              => video.id,
         :upload_url            => upload_url,
         :local_file_path       => local_file_path,
@@ -39,7 +39,9 @@ class UploaderProcessor < ApplicationProcessor
         :username              => username,
         :password              => password,
         :destination_s3_public => destination_s3_public
-      )
+      }
+      upload_options.merge!({:content_type => video.content_type}) unless video.content_type.blank?
+      Uploader.upload(upload_options)
       video.set_status ConvertFile::UPLOADED
       # postback
       Postback.post_back('upload', job, 'success')

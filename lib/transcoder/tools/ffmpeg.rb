@@ -1,4 +1,3 @@
-
 module Transcoder
   module Tools
     class FFmpeg
@@ -92,9 +91,10 @@ module Transcoder
         cmd = ''
         cmd += " -y "
 
-        cmd += " -f #{job.profile.video_format} -vcodec #{job.profile.video_codec}"
+        cmd += " -f #{job.profile.video_format}"
+        cmd += " -vcodec #{job.profile.video_codec}" unless job.profile.video_codec.blank?
         cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
-        cmd += " -acodec #{job.profile.audio_codec}"
+        cmd += " -acodec #{job.profile.audio_codec}" unless job.profile.audio_codec.blank?
         cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
         cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
         cmd += " -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?

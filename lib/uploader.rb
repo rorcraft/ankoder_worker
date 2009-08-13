@@ -93,6 +93,7 @@ class Uploader
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\
              #{"--acl public-read" if options[:destination_s3_public]}\
+             #{"--contentType #{options[:content_type]}" if options[:content_type]}\
             -- "#{url}#{s3_file ? '' : options[:remote_filename]}"]) +
             " #{curl_flags} -L -v 2>&1"
       elsif url =~ %r[^s3://]
@@ -105,6 +106,7 @@ class Uploader
         return S3Curl.get_curl_command(
           %Q[#{S3Curl::S3CURL} #{S3Curl.access_param} --put="#{tmp_path}"\
              #{"--acl public-read" if options[:destination_s3_public]}\
+             #{"--contentType #{options[:content_type]}" if options[:content_type]}\
             -- "http://s3.amazonaws.com/#{bucket}#{file.blank? ? options[:remote_filename] : file}"]) +
             " #{curl_flags}  2>&1"
       else
