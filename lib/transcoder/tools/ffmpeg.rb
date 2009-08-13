@@ -59,6 +59,8 @@ module Transcoder
 
       # this mainly is ued to deal with theora's not being able to do padding and video triming
       def self.preprocess_command(job)
+        dim_info = get_dim_info(job)
+
         cmd = ''
         cmd += " -y "
 
@@ -70,9 +72,9 @@ module Transcoder
         cmd += trimming_command(job.profile, job.original_file)
 
         if job.profile.add_padding == "true"
-          cmd += padding_command(job.profile, job.original_file) 
+          cmd += padding_command(dim_info)
         elsif job.profile.width.to_i > 0
-          cmd += "-s #{job.profile.width}x#{job.profile.height}"
+          cmd += "-s #{dim_info["profile_width"]}x#{dim_info["profile_height"]}"
         end
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
@@ -85,6 +87,8 @@ module Transcoder
       end
 
       def self.command(job)
+        dim_info = get_dim_info(job)
+
         cmd = ''
         cmd += " -y "
 
@@ -94,6 +98,8 @@ module Transcoder
         cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
         cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
         cmd += " -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
+        cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
+        cmd += aspect_ratio_command(dim_info)
 
         # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
 
@@ -109,8 +115,6 @@ module Transcoder
 
         if job.profile.add_padding?
           cmd += padding_command(job.profile, job.original_file) 
-        elsif job.profile.width.to_i > 0
-          cmd += "-s #{job.profile.width}x#{job.profile.height}"
         end
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
@@ -143,15 +147,16 @@ module Transcoder
         cmd
       end
 
-      def self.padding_command(profile, video)        
+      def self.aspect_ratio_command(dim_info)
+        " -aspect #{dim_info["aspect_ratio"]} "
+      end
+
+      def self.padding_command(dim_info)
         cmd = ""
-        padding_info = padding(profile.width, profile.height, video.width, video.height)
-        cmd += " -padleft #{padding_info["padleft"]} " unless padding_info["padleft"].blank? 
-        cmd += " -padright #{padding_info["padright"]} " unless padding_info["padright"].blank? 
-        cmd += " -padtop #{padding_info["padtop"]} " unless padding_info["padtop"].blank? 
-        cmd += " -padbottom #{padding_info["padbottom"]} " unless padding_info["padbottom"].blank? 
-        cmd += " -aspect #{padding_info["aspect_ratio"]} " unless padding_info["aspect_ratio"].blank? 
-        cmd += " -s #{padding_info["result_width"]}x#{padding_info["result_height"]} "
+        cmd += " -padleft #{dim_info["padleft"]} " unless dim_info["padleft"].blank? 
+        cmd += " -padright #{dim_info["padright"]} " unless dim_info["padright"].blank? 
+        cmd += " -padtop #{dim_info["padtop"]} " unless dim_info["padtop"].blank? 
+        cmd += " -padbottom #{dim_info["padbottom"]} " unless dim_info["padbottom"].blank? 
         return cmd
       end
 

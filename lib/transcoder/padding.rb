@@ -49,51 +49,37 @@ module Transcoder
       size
     end
 
+    def get_dim_info(job)
+      padding(job.profile.width,job.profile.height,job.original_file.width,job.original_file.height)
+    end
+
     def padding(profile_width, profile_height, video_width, video_height)
-      return {"result_width" => 320, "result_height" => 240} if profile_width.to_i <= 0 && video_width.to_i <= 0
-      return {"result_width" => video_width, "result_height" => video_height} if profile_width.to_i <= 0 && profile_height.to_i <= 0
-      return {"result_width" => profile_width, "result_height" => profile_height} if video_width.to_i < 0 or video_height.to_i < 0
-      return {"result_width" => profile_width, "result_height" => even_size(profile_width * video_height / video_width) } if profile_width.to_i > 0 && profile_height.to_i == 0
-      return {"result_width" => even_size(profile_height * video_width / video_height), "result_height" => profile_height } if profile_width.to_i == 0 && profile_height.to_i > 0
-      return {"result_width" => profile_width, "result_height" => profile_height } if video_width.to_f / video_height.to_f == profile_width.to_f / profile_height.to_f
-
       result = {}
-      %w{profile_width profile_height video_width video_height}.each do |measure|
-        eval "#{measure} = #{measure}.to_f"
-      end
-      ratio_width , ratio_height  = profile_width / video_width , profile_height / video_height
-      result_width, result_height = profile_width, profile_height
-
-      ratio = even_size(profile_width).to_f / even_size(profile_height).to_f
-      video_ratio = even_size(video_width).to_f / even_size(video_height).to_f
-
-      if (ratio > 1.555)
-        result["aspect_ratio"] = "16:9"
-        ratio_width = 16
-        ratio_height = 9
-      else
-        result["aspect_ratio"] = "4:3"
-        ratio_width = 4
-        ratio_height = 3
-      end
-
-      if profile_height == 0 #auto get height
-        result_height = profile_width * video_height / video_width.to_i
-      else
-        # pad top and bottom; profile too high
-        if profile_width*video_height < profile_height*video_width
-          result["padtop"], result["padbottom"], result_height = split_padding(video_height, video_width, profile_height, profile_width)
-        # pad left and right; profile too wide
-        elsif profile_width*video_height > profile_height*video_width
-          result["padleft"], result["padright"], result_width = split_padding(video_width, video_height, profile_width, profile_height)
+      profile_width, profile_height, video_width, video_height = [profile_width, profile_height, video_width, video_height].map(&:to_f)
+      profile_width, profile_height =
+        case [profile_width > 0.0, profile_height > 0.0]
+        when [false, false] then [video_width, video_height]
+        when [false, true ] then [even_size(profile_height*video_width/video_height),profile_height]
+        when [true , false] then [profile_width, even_size(profile_width*video_height/video_width)]
+        when [true , true ] then [profile_width, profile_height]
         end
+      profile_width, profile_height = 320.0, 240.0 if profile_width <= 0.0 || profile_height <= 0.0
+
+      result_width, result_height = profile_width, profile_height
+      # pad top and bottom; profile too high
+      if profile_width*video_height < profile_height*video_width
+        result["padtop"], result["padbottom"], result_height = split_padding(video_height, video_width, profile_height, profile_width)
+      # pad left and right; profile too wide
+      elsif profile_width*video_height > profile_height*video_width
+        result["padleft"], result["padright"], result_width = split_padding(video_width, video_height, profile_width, profile_height)
       end
 
       result["result_width"], result["result_height"] = result_width.to_i, result_height.to_i
+      result["profile_width"],result["profile_height"]= profile_width.to_i,profile_height.to_i
+      result["aspect_ratio"] = "#{result["result_width"]+result["padleft"].to_i+result["padright"].to_i}:#{result["result_height"]+result["padtop"].to_i+result["padbottom"].to_i}"
 
       return result
     end
-
 
   end
 
