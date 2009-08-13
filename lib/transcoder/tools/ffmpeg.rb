@@ -88,20 +88,12 @@ module Transcoder
       def self.command(job)
         dim_info = get_dim_info(job)
 
-        cmd = ''
+        cmd = ""
         cmd += " -y "
 
         cmd += " -f #{job.profile.video_format}"
-        cmd += " -vcodec #{job.profile.video_codec}" unless job.profile.video_codec.blank?
-        cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
-        cmd += " -acodec #{job.profile.audio_codec}" unless job.profile.audio_codec.blank?
-        cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
-        cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
-        cmd += " -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
-        cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
-        cmd += aspect_ratio_command(dim_info)
-
-        # cmd += " -vhook '/home/ffmpeg/usr/local/lib/vhook/watermark.so -f #{File.join(FILE_FOLDER,@profile.watermark)}' " if download_watermark
+        cmd += video_command(dim_info, job)
+        cmd += audio_command(job)
 
         # trimming
         cmd += trimming_command(job.profile, job.original_file)
@@ -147,8 +139,16 @@ module Transcoder
         cmd
       end
 
-      def self.aspect_ratio_command(dim_info)
-        " -aspect #{dim_info["aspect_ratio"]} "
+      def self.video_command(dim_info, job)
+        unless job.profile.video_codec.blank?
+          cmd = ""
+          cmd += " -vcodec #{job.profile.video_codec}"
+          cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
+          cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
+          cmd += " -aspect #{dim_info["aspect_ratio"]} "
+        else
+          " -vn"
+        end
       end
 
       def self.padding_command(dim_info)
@@ -160,34 +160,18 @@ module Transcoder
         return cmd
       end
 
+      def self.audio_command(job)
+        if job.profile.audio_channel.to_i > 0
+          cmd = ""
+          cmd += " -acodec #{job.profile.audio_codec}" unless job.profile.audio_codec.blank?
+          cmd += " -ab #{job.profile.audio_bitrate}k" unless job.profile.audio_bitrate.blank?
+          cmd += " -ar #{job.profile.audio_rate}" unless job.profile.audio_rate.blank?
+          cmd += " -ac #{job.profile.audio_channel}" unless job.profile.audio_channel.blank?
+        else
+          " -an"
+        end
+      end
 
-      # def create_thumbnail( time = nil, sizes = Video::SIZES)
-      #   return unless file_exist?
-      #   time = default_sec(time)    
-      #     
-      #   ffmpeg_thumbnail(time)
-      #     
-      #   sizes.each do |key,value|
-      #     image_resize(time, key, value)
-      #   end
-      #     
-      #   if S3_ON
-      #     s3_connect
-      #     AWS::S3::S3Object.store(thumbnail_name(time), open(self.thumbnail_full_path(time)), ::S3_BUCKET ,  :access => :public_read)
-      #     
-      #     sizes.each { |key,value|
-      #       count = 0
-      #       begin
-      #         AWS::S3::S3Object.store(thumbnail_name(time,key), open(self.thumbnail_full_path(time,key)), ::S3_BUCKET ,  :access => :public_read)
-      #       rescue
-      #         count += 1
-      #         retry if count < 3
-      #         raise
-      #       end
-      #     }
-      #     self.thumbnail_uploaded = true
-      #   end
-      # end
 
       private
 
