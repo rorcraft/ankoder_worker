@@ -100,7 +100,7 @@ module Transcoder
 
         # bitrate
         if job.profile.keep_quality?
-          cmd += " -sameq " 
+          cmd += " -sameq "
         elsif job.profile.video_bitrate.to_i > 0
           cmd += " -b #{job.profile.video_bitrate}k " 
         end
@@ -118,23 +118,14 @@ module Transcoder
       end
 
       def self.trimming_command(profile,video)
-        trim_begin = profile.trim_begin.blank? || (profile.trim_begin.to_i < 0) ? 0 : profile.trim_begin.to_i
-        trim_end = profile.trim_end.blank? || (profile.trim_end.to_i < 0) ? 0 : profile.trim_end.to_i
-
-        return '' unless (trim_begin > 0 || trim_end > 0)
         current_duration = video.duration.nil? ? 0 : (video.duration.to_i / 1000)
 
         # there is no more time, so give zero length video
-        return ' -t 0' if (trim_begin > trim_end) || (current_duration < trim_begin)
+        return ' -t 0' if (profile.trim_begin.to_i > current_duration)
 
         cmd = ''
-
-        cmd += " -ss #{trim_begin}"
-
-        if current_duration > trim_end
-          new_duration = trim_end - trim_begin
-          cmd += " -t #{new_duration}"
-        end
+        cmd += " -ss #{profile.trim_begin}" unless profile.trim_begin.to_i < 1
+        cmd += " -t #{profile.trim_end}" unless profile.trim_end.to_i < 1
 
         cmd
       end
@@ -154,9 +145,9 @@ module Transcoder
       def self.padding_command(dim_info)
         cmd = ""
         cmd += " -padleft #{dim_info["padleft"]} " unless dim_info["padleft"].blank? 
-        cmd += " -padright #{dim_info["padright"]} " unless dim_info["padright"].blank? 
+        cmd += " -padright #{dim_info["padright"]} " unless dim_info["padright"].blank?
         cmd += " -padtop #{dim_info["padtop"]} " unless dim_info["padtop"].blank? 
-        cmd += " -padbottom #{dim_info["padbottom"]} " unless dim_info["padbottom"].blank? 
+        cmd += " -padbottom #{dim_info["padbottom"]} " unless dim_info["padbottom"].blank?
         return cmd
       end
 
@@ -200,7 +191,6 @@ module Transcoder
         raise_media_format_exception if line =~ /maybe incorrect parameters such as bit_rate, rate, width or height/
       end
 
-
       def self.parse_duration(line)
         if line =~ /Duration: (\d{2}):(\d{2}):(\d{2}).(\d{2})/m
           (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 1000 + $4.to_i
@@ -208,8 +198,6 @@ module Transcoder
           nil
         end
       end
-
-
 
     end
   end
