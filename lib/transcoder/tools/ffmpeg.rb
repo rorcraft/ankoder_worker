@@ -106,7 +106,7 @@ module Transcoder
         end
 
         if job.profile.add_padding?
-          cmd += padding_command(job.profile, job.original_file) 
+          cmd += padding_command(dim_info) 
         end
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
