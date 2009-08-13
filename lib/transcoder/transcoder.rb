@@ -85,7 +85,7 @@ module Transcoder
       end
       
       Transcoder.logger.debug "generate thumbnail for converted file"
-      job.generate_thumbnails
+      job.generate_thumbnails if job.get_thumbnail_upload_url
 
       if S3_ON
         Transcoder.logger.debug "upload converted file back to S3"
