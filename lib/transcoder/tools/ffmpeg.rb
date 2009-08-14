@@ -99,10 +99,10 @@ module Transcoder
         cmd += trimming_command(job.profile, job.original_file)
 
         # bitrate
-        if job.profile.keep_quality?
-          cmd += " -sameq "
-        elsif job.profile.video_bitrate.to_i > 0
+        if job.profile.video_bitrate.to_i > 0
           cmd += " -b #{job.profile.video_bitrate}k " 
+        else
+          cmd += " -sameq "
         end
 
         if job.profile.add_padding?
