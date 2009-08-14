@@ -103,7 +103,7 @@ module Transcoder
       converted_video.original_filename = job.generate_convert_file_original_filename
       converted_video.size              = File.size(job.convert_file_full_path)  
       converted_video.user_id           = job.user_id
-      converted_video.content_type      = job.profile.content_type unless job.profile.content_type.blank?
+      converted_video.content_type      = job.profile.content_type if job.profile.attributes.include?("content_type")
       converted_video.read_metadata
       converted_video.save
       Transcoder.logger.debug converted_video.inspect     

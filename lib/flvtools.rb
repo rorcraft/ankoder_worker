@@ -15,7 +15,7 @@ module Flvtools
       io = IO.popen(command) do |pipe|
         pipe.read
       end
-      raise FlvtoolError::MetaInjectionException if $?.exitstatus != 0
+      raise FlvtoolError::MetaInjectionException.new(command) if $?.exitstatus != 0
     end
 
     def self.add_hint_command(path)

@@ -99,8 +99,8 @@ module Transcoder
         cmd += trimming_command(job.profile, job.original_file)
 
         # bitrate
-        if job.profile.video_bitrate.to_i > 0
-          cmd += " -b #{job.profile.video_bitrate}k " 
+        if job.profile.video_bitrate.to_f > 0.0
+          cmd += " -b #{job.profile.video_bitrate}k -bt #{job.profile.video_bitrate.to_f/15.0} "
         else
           cmd += " -sameq "
         end
