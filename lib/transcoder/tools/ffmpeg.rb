@@ -24,7 +24,7 @@ module Transcoder
         IO.popen(command) do |pipe|
           duration = nil
           @ffmpeg_output = ""
-          pipe.each("\r") do |line|          
+          pipe.each("\r") do |line|
             @ffmpeg_output += line + "\n"
             parse_line(line)
             duration = parse_duration(line) if duration.nil?
@@ -47,7 +47,7 @@ module Transcoder
           block_given? ? yield(progress) : stdout_progress(progress)
         end
 
-        # Fixme: When doing 2-pass the output is not the job.generate_convert_filename
+        # FIXME: When doing 2-pass the output is not the job.generate_convert_filename
         # not supporting 2-pass for now.
 #        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       end
@@ -117,6 +117,8 @@ module Transcoder
         cmd
       end
 
+      private
+
       def self.trimming_command(profile,video)
         current_duration = video.duration.nil? ? 0 : (video.duration.to_i / 1000)
 
@@ -162,9 +164,6 @@ module Transcoder
           " -an"
         end
       end
-
-
-      private
 
       def self.parse_progress(line,duration)
         if line =~ /time=\s*(\d+).(\d+)/  
