@@ -36,6 +36,7 @@ class UploaderProcessor < ApplicationProcessor
         :upload_url            => upload_url,
         :local_file_path       => local_file_path,
         :remote_filename       => "#{video.id}_#{video.filename}",
+        :original_name         => "#{video.id}_#{video.filename}",
         :username              => username,
         :password              => password,
         :destination_s3_public => destination_s3_public

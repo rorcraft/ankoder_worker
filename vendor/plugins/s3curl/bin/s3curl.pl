@@ -41,7 +41,7 @@ my $fileToPut;
 my $createBucket;
 my $doDelete;
 my $doHead;
-my $original_name="";
+my $original_name;
 my $debug = 0;
 my $execute = 0;
 

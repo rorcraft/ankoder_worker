@@ -21,7 +21,8 @@ class TranscodeWorkerProcessor < ApplicationProcessor
           :upload_url            => job.get_thumbnail_upload_url,
           :local_file_path       => thumbnail.file_path,
           :remote_filename       => thumbnail.filename,
-          :destination_s3_public => destination_s3_public
+          :destination_s3_public => destination_s3_public,
+          :content_type          => 'image/png'
         )
         thumbnail.uploaded = true
       end if job.get_thumbnail_upload_url && job.thumbnails
