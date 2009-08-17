@@ -4,6 +4,7 @@ require "transcoder/tools/ffmpeg2theora"
 
 class TranscodeWorkerProcessor < ApplicationProcessor
 
+  include Transcoder
   include Transcoder::InstanceMethods
   include ActiveMessaging::MessageSender
 
@@ -17,13 +18,17 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       # upload thumbnails to external storage
       job.thumbnails.each do |thumbnail|
         next unless File.exist?(thumbnail.file_path)
-        Uploader.upload(
-          :upload_url            => job.get_thumbnail_upload_url,
-          :local_file_path       => thumbnail.file_path,
-          :remote_filename       => thumbnail.filename,
-          :destination_s3_public => destination_s3_public
-        )
-        thumbnail.uploaded = true
+        begin
+          Uploader.upload(
+            :upload_url            => job.get_thumbnail_upload_url,
+            :local_file_path       => thumbnail.file_path,
+            :remote_filename       => thumbnail.filename,
+            :destination_s3_public => destination_s3_public
+          )
+          thumbnail.uploaded = true
+        rescue
+          thumbnail.uploaded = false
+        end
       end if job.get_thumbnail_upload_url && job.thumbnails
 
       # postback? - job complete
@@ -33,7 +38,12 @@ class TranscodeWorkerProcessor < ApplicationProcessor
         job.convert_file.set_status ConvertFile::QUEUEING
       end
     rescue
-      Postback.post_back 'convert', job, 'fail'
+      error = case $!
+              when TranscoderError::MediaFormatException then "conversion failure"
+              when TranscoderError::MPrBoxHintingException then "hinting failure"
+              else "ankoder internal error"
+              end
+      Postback.post_back 'convert', job, 'fail', error
       logger.error " ------------- !!!!!!!!!!!!!! -------------"
       error_msg = $!.class.to_s
       error_msg += $!.message
