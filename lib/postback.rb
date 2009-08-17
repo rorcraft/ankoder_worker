@@ -36,7 +36,7 @@ class Postback
         'type'    => 'Convert',
         'Job'     =>  model.id,
         'original_video_id'     => model.original_file.id,
-        'is_trimmed' => ((model.profile.trim_begin || model.profile.trim_end) && (model.convert_file.duration == model.original_file.duration)),
+        'is_trimmed' => {true => true, nil => false, false => false}[((model.profile.trim_begin || model.profile.trim_end) && (model.convert_file.duration == model.original_file.duration))],
     }
     if result   == 'success'
       message['convert_video_id'] = model.convert_file.id

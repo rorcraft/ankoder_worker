@@ -4,6 +4,7 @@ require "transcoder/tools/ffmpeg2theora"
 
 class TranscodeWorkerProcessor < ApplicationProcessor
 
+  include Transcoder
   include Transcoder::InstanceMethods
   include ActiveMessaging::MessageSender
 
@@ -25,6 +26,9 @@ class TranscodeWorkerProcessor < ApplicationProcessor
           :content_type          => 'image/png'
         )
         thumbnail.uploaded = true
+        rescue
+          thumbnail.uploaded = false
+        end
       end if job.get_thumbnail_upload_url && job.thumbnails
 
       # postback? - job complete
@@ -34,7 +38,12 @@ class TranscodeWorkerProcessor < ApplicationProcessor
         job.convert_file.set_status ConvertFile::QUEUEING
       end
     rescue
-      Postback.post_back 'convert', job, 'fail'
+      error = case $!
+              when TranscoderError::MediaFormatException then "conversion failure"
+              when TranscoderError::MPrBoxHintingException then "hinting failure"
+              else "ankoder internal error"
+              end
+      Postback.post_back 'convert', job, 'fail', error
       logger.error " ------------- !!!!!!!!!!!!!! -------------"
       error_msg = $!.class.to_s
       error_msg += $!.message
@@ -63,4 +72,4 @@ class TranscodeWorkerProcessor < ApplicationProcessor
   end
 
 
-end                          
+end
