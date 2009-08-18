@@ -70,10 +70,10 @@ module Transcoder
         # trimming
         cmd += trimming_command(job.profile, job.original_file)
 
-        if job.profile.add_padding == "true"
+        cmd += size_command(dim_info, job)
+        cmd += audio_command(job)
+        if job.profile.add_padding?
           cmd += padding_command(dim_info)
-        elsif job.profile.width.to_i > 0
-          cmd += "-s #{dim_info["profile_width"]}x#{dim_info["profile_height"]}"
         end
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
@@ -137,15 +137,20 @@ module Transcoder
           cmd = ""
           cmd += " -vcodec #{job.profile.video_codec}"
           cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
-          if job.profile.add_padding?
-            cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
-          else
-            cmd += " -s #{dim_info["profile_width"]}x#{dim_info["profile_height"]} "
-          end
-          cmd += " -aspect #{dim_info["aspect_ratio"]} "
+          size_command(dim_info, job)
         else
           " -vn"
         end
+      end
+
+      def self.size_command(dim_info,job)
+        cmd = ""
+        if job.profile.add_padding? || job.profile.keep_aspect?
+          cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
+        else
+          cmd += " -s #{dim_info["profile_width"]}x#{dim_info["profile_height"]} "
+        end
+        cmd += " -aspect #{dim_info["aspect_ratio"]} "
       end
 
       def self.padding_command(dim_info)

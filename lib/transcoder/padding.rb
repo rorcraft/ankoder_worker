@@ -50,10 +50,10 @@ module Transcoder
     end
 
     def get_dim_info(job)
-      padding(job.profile.width,job.profile.height,job.original_file.width,job.original_file.height)
+      padding(job.profile.width,job.profile.height,job.original_file.width,job.original_file.height,job.profile.add_padding?,job.profile.keep_aspect?)
     end
 
-    def padding(profile_width, profile_height, video_width, video_height)
+    def padding(profile_width, profile_height, video_width, video_height, add_padding=true, keep_aspect=false)
       result = {}
       profile_width, profile_height, video_width, video_height = [profile_width, profile_height, video_width, video_height].map(&:to_f)
       profile_width, profile_height =
@@ -76,7 +76,11 @@ module Transcoder
 
       result["result_width"], result["result_height"] = result_width.to_i, result_height.to_i
       result["profile_width"],result["profile_height"]= profile_width.to_i,profile_height.to_i
-      result["aspect_ratio"] = "#{result["result_width"]+result["padleft"].to_i+result["padright"].to_i}:#{result["result_height"]+result["padtop"].to_i+result["padbottom"].to_i}"
+      if add_padding || !keep_aspect
+        result["aspect_ratio"] = "#{result["result_width"]+result["padleft"].to_i+result["padright"].to_i}:#{result["result_height"]+result["padtop"].to_i+result["padbottom"].to_i}"
+      else
+        result["aspect_ratio"] = "#{result["result_width"]}:#{result["result_height"]}"
+      end
 
       return result
     end
