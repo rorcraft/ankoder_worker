@@ -137,7 +137,11 @@ module Transcoder
           cmd = ""
           cmd += " -vcodec #{job.profile.video_codec}"
           cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
-          cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
+          if job.profile.add_padding?
+            cmd += " -s #{dim_info["result_width"]}x#{dim_info["result_height"]} "
+          else
+            cmd += " -s #{dim_info["profile_width"]}x#{dim_info["profile_height"]} "
+          end
           cmd += " -aspect #{dim_info["aspect_ratio"]} "
         else
           " -vn"
