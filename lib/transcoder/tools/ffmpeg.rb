@@ -100,7 +100,7 @@ module Transcoder
 
         # bitrate
         if job.profile.video_bitrate.to_f > 0.0
-          cmd += " -b #{job.profile.video_bitrate}k -bt #{job.profile.video_bitrate.to_f/15.0}k "
+          cmd += " -b #{job.profile.video_bitrate}k -bt #{job.profile.video_bitrate.to_f/10.0}k "
         else
           cmd += " -sameq "
         end
