@@ -41,7 +41,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
     rescue
       error = case $!
               when TranscoderError::MediaFormatException then "conversion failure"
-              when TranscoderError::MPrBoxHintingException then "hinting failure"
+              when TranscoderError::MP4BoxHintingException then "hinting failure"
               else "ankoder internal error"
               end
       Postback.post_back 'convert', job, 'fail', error

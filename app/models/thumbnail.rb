@@ -1,4 +1,8 @@
 class Thumbnail < ActiveResource::Base
+
+  EVEN = "even"
+  RAND = "rand"
+
   self.site = AR_SITE
   attr_accessor :video, :uploaded
 

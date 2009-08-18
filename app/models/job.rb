@@ -86,12 +86,39 @@ class Job < ActiveResource::Base
 
   # generate thumbnails for converted file
   def generate_thumbnails
-    self.thumbnails = [
-      Thumbnail.generate(
+    self.thumbnails = []
+
+    # generate from thumb_moments
+    (JSON.parse(profile.thumb_moments) rescue []).each do |time|
+      self.thumbnails << Thumbnail.generate(
         newly_converted,
-        :width         => profile.thumbnail_width,
-        :height        => profile.thumbnail_height)
-    ]
+        :width  => profile.thumbnail_width,
+        :height => profile.thumbnail_height,
+        :time   => time) if time <= newly_converted.duration_in_secs
+    end
+
+    # generate from thumb_way
+    thumb_start  = profile.thumb_start.to_f  > 0.0 ? profile.thumb_start.to_f  : 0.0
+    thumb_end    = profile.thumb_end  .to_f  > 0.0 ? profile.thumb_end  .to_f  : newly_converted.duration_in_secs
+    thumb_amount = profile.thumb_amount.to_i > 0   ? profile.thumb_amount.to_i : 0
+
+    thumb_start = newly_converted.duration_in_secs if thumb_start > newly_converted.duration_in_secs
+    thumb_end   = newly_converted.duration_in_secs if thumb_end   > newly_converted.duration_in_secs
+
+    thumb_amount.times do |i|
+      time =
+        case profile.thumb_way
+        when Thumbnail::RAND
+          thumb_start + rand*(thumb_end-thumb_start)
+        else#Thumbnail::EVEN
+          thumb_start + (i+1)*(thumb_end-thumb_start)/(thumb_amount+1)
+        end
+      self.thumbnails << Thumbnail.generate(
+        newly_converted,
+        :width  => profile.thumbnail_width,
+        :height => profile.thumbnail_height,
+        :time   => time)
+    end if thumb_start <= thumb_end
   end
 
 end
