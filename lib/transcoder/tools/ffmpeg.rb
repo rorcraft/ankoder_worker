@@ -72,9 +72,8 @@ module Transcoder
 
         cmd += size_command(dim_info, job)
         cmd += audio_command(job)
-        if job.profile.add_padding?
-          cmd += padding_command(dim_info)
-        end
+        cmd += padding_command(dim_info) if job.profile.add_padding?
+
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
         temp_file_path = "#{Time.now.to_i}#{job.generate_convert_filename}"
@@ -97,6 +96,9 @@ module Transcoder
 
         # trimming
         cmd += trimming_command(job.profile, job.original_file)
+
+        # x264 options
+        cmd += x264_command(job.profile.x264_options) if job.profile.video_codec == "libx264"
 
         # bitrate
         if job.profile.video_bitrate.to_f > 0.0
@@ -172,6 +174,14 @@ module Transcoder
         else
           " -an"
         end
+      end
+
+      def self.x264_command(x264_options)
+        cmd = ""
+        (x264_options.blank? ? {} : JSON.parse(x264_options)).each do |option, values|
+          values.each{|v| cmd += " -#{option} #{v}" }
+        end
+        cmd
       end
 
       def self.parse_progress(line,duration)
