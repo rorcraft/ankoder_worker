@@ -37,19 +37,20 @@ class Postback
         'Job'     =>  model.id,
         'original_video_id'     => model.original_file.id,
         'is_trimmed' => {true => true, nil => false, false => false}[((model.profile.trim_begin || model.profile.trim_end) && (model.convert_file.duration == model.original_file.duration))],
-    }
-    if result   == 'success'
-      message['convert_video_id'] = model.convert_file.id
-      message['s3_name'] = model.convert_file.s3_name
-      message['name'] = "#{model.convert_file.id}_#{model.convert_file.filename}"
-      tus = model.thumbnails.map &:uploaded # tus == thumbnail_upload_status
-      message['thumbnail_result'] = 
-        case [tus.inject{|i,j|i&&j}, tus.inject{|i,j|i||j}]
-        when [true, true ] then 'success'
-        when [false,false] then 'fail'
-        else 'partial_success'
-        end unless tus.blank?
-    end
+      }
+      if result   == 'success'
+        message['convert_video_id'] = model.convert_file.id
+        message['s3_name'] = model.convert_file.s3_name
+        message['name'] = "#{model.convert_file.id}_#{model.convert_file.filename}"
+        tus = model.thumbnails.map &:uploaded # tus == thumbnail_upload_status
+        message['thumbnail_result'] = 
+          case [tus.inject{|i,j|i&&j}, tus.inject{|i,j|i||j}]
+          when [true, true ] then 'success'
+          when [false,false] then 'fail'
+          when [nil,  nil  ] then ''
+          else 'partial_success'
+          end
+      end
 
     when 'test'
       message = {
