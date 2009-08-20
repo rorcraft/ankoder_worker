@@ -137,7 +137,7 @@ module Transcoder
           cmd = ""
           cmd += " -vcodec #{job.profile.video_codec}"
           cmd += " -r #{job.profile.video_fps}" unless job.profile.video_fps.blank?
-          size_command(dim_info, job)
+          cmd += size_command(dim_info, job)
         else
           " -vn"
         end

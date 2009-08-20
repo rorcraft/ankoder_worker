@@ -48,7 +48,7 @@ class Postback
         when [true, true ] then 'success'
         when [false,false] then 'fail'
         else 'partial_success'
-        end
+        end unless tus.blank?
     end
 
     when 'test'
