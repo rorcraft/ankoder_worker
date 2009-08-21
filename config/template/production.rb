@@ -36,6 +36,7 @@ CURL            = "/usr/bin/curl"
 FILE_FOLDER   = "/var/www/ankoderworker/current/file_system"
 PUBLIC_FOLDER = "/var/www/ankoderworker/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
+SEGMENTER_PATH = "/usr/local/commit.segfault"
 
 S3_ON         = true
 S3BUCKET = S3_BUCKET = "download.ankoder.com"

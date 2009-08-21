@@ -98,13 +98,18 @@ module Transcoder
         cmd += trimming_command(job.profile, job.original_file)
 
         # x264 options
-        cmd += x264_command(job.profile.x264_options) if job.profile.video_codec == "libx264"
+        if job.profile.video_codec == "libx264"
+          cmd += x264_command(job.profile.x264_options)
+          cmd += " -maxrate #{job.profile.max_video_bitrate}k" if job.profile.max_video_bitrate
+          cmd += " -minrate #{job.profile.min_video_bitrate}k" if job.profile.min_video_bitrate
+        end
 
         # bitrate
         if job.profile.video_bitrate.to_f > 0.0
-          cmd += " -b #{job.profile.video_bitrate}k -bt #{job.profile.video_bitrate.to_f/10.0}k "
+          cmd += " -b #{job.profile.video_bitrate}k -bt #{job.profile.bitrate_tolerance || job.profile.video_bitrate}k "
         else
-          cmd += " -sameq "
+          optimum = optimal_bitrate(dim_info, job)
+          cmd += " -b #{optimum}k -bt #{job.profile.bitrate_tolerance || optimum}k"
         end
 
         if job.profile.add_padding?

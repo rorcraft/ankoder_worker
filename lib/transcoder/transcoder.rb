@@ -31,7 +31,9 @@ module Transcoder
     class UnknownError < TranscoderError
     end
     
-    class UnknownEncoder < TranscoderError ;end
+    class UnknownEncoder < TranscoderError; end
+
+    class SegmenterFault < TranscoderError; end
 
   end
   
@@ -71,7 +73,7 @@ module Transcoder
       
       
       # if MP4 for Flash
-      if convert_file.video_codec == "h264" && job.profile.video_format = "mp4"
+      if convert_file.video_codec == "h264" && job.profile.video_format == "mp4"
         Transcoder.logger.debug "hinting the converted filei (mp4)"
         Tools::Mp4box.run(job.convert_file_full_path)  
       end
@@ -97,15 +99,32 @@ module Transcoder
     end
     
     def create_convert_file(job)
-      converted_video = ConvertFile.new
-      converted_video.s3_upload_trials  = 0
-      converted_video.filename          = job.generate_convert_filename
-      converted_video.original_filename = job.generate_convert_file_original_filename
-      converted_video.size              = File.size(job.convert_file_full_path)  
-      converted_video.user_id           = job.user_id
-      converted_video.content_type      = job.profile.content_type if job.profile.attributes.include?("content_type")
-      converted_video.read_metadata
-      converted_video.save
+      converted_video = nil
+      if job.profile.segment_duration
+        Segmenter.segment(job)
+        v                       = ConvertFile.new
+        v.s3_upload_trials      = 0
+        v.filename              = job.theoretic_convert_filename
+        v.original_filename     = job.generate_convert_file_original_filename
+        v.size                  = File.size(job.convert_file_full_path)
+        v.user_id               = job.user_id
+        v.content_type          = job.profile.content_type if job.profile.respond_to?("content_type")
+        v.read_metadata         :can_mv => false
+        v.filename              = job.segment_index
+        v.segments              = Dir.glob(File.join(FILE_FOLDER, job.segment_prefix + "-*.ts")).map{|path|path[File.dirname(path).length+1, path.length]}.to_json
+        v.save
+        converted_video = v
+      else # no segmentation case
+        converted_video = ConvertFile.new
+        converted_video.s3_upload_trials  = 0
+        converted_video.filename          = job.generate_convert_filename
+        converted_video.original_filename = job.generate_convert_file_original_filename
+        converted_video.size              = File.size(job.convert_file_full_path)
+        converted_video.user_id           = job.user_id
+        converted_video.content_type      = job.profile.content_type if job.profile.respond_to?("content_type")
+        converted_video.read_metadata
+        converted_video.save
+      end
       Transcoder.logger.debug converted_video.inspect     
       job.convert_file_id = converted_video.id
       job.convert_file = converted_video

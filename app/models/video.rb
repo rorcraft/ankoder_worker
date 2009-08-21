@@ -40,14 +40,15 @@ class Video < ActiveResource::Base
     end
   end
     
-  def read_metadata
+  def read_metadata *argv
     return unless file_exist?
+    options = {:can_mv => true}.merge argv.extract_options!
     f = inspector
     %w(width height duration video? audio? audio_codec video_codec fps bitrate).each do |attr|
       eval("self.#{attr.delete('?')} = f.send(attr)") rescue false 
     end   
     self.readable = f.valid?     
-    unless filename_has_container?
+    if !filename_has_container? && options[:can_mv]
       raise BadVideoError.new unless f.container
       old_file_path = file_path
       extension = f.container.split(",").first

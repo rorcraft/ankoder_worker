@@ -32,12 +32,24 @@ class Job < ActiveResource::Base
     nil
   end
 
+  def segment_prefix
+    "#{original_file.prefix}_#{id}"
+  end
+
+  def segment_index
+    segment_prefix+".m3u8"
+  end
+
   def generate_convert_filename
     if !respond_to?('convert_file') || convert_file.nil? || convert_file.filename.nil?
-      "#{original_file.filename.split(".")[0]}_#{id}.#{profile.suffix}" 
+      theoretic_convert_filename
     else
       convert_file.filename
     end
+  end
+
+  def theoretic_convert_filename
+    "#{original_file.filename.split(".")[0]}_#{id}.#{profile.suffix}" 
   end
 
   def generate_convert_file_original_filename
