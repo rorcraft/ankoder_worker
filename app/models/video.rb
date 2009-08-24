@@ -19,7 +19,7 @@ class Video < ActiveResource::Base
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
-  EXCLUDE_WHEN_SAVING = [:thumb, :thumbnail_name, :profile]
+  EXCLUDE_WHEN_SAVING = [:thumb, :thumbnail_name, :profile, :thumbnail_count]
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(_filename = nil)
@@ -72,7 +72,12 @@ class Video < ActiveResource::Base
     
   def s3_url(option = {})
     s3_connect
-    AWS::S3::S3Object.url_for(self.s3_name, S3_BUCKET, option)    
+    AWS::S3::S3Object.url_for(self.s3_name, S3_BUCKET, option)
+  end
+
+  def s3_url_from_name name
+    s3_connect
+    AWS::S3::S3Object.url_for(name, S3_BUCKET, {})
   end
   
   def s3_exist?
@@ -82,6 +87,10 @@ class Video < ActiveResource::Base
   
   def s3_name
     "#{self.id}_#{self.filename}"
+  end
+
+  def s3_names
+    get_segments.map{|i|segment_s3_name i} << s3_name
   end
 
   def file_exist?
@@ -104,7 +113,10 @@ class Video < ActiveResource::Base
   def upload_to_s3
     TryAFewTimes.do(MAX_S3_UPLOAD_TRIES) do |i|
       increment_s3_upload_trials
-      S3Curl.upload(s3_name, file_path, {"original_filename"=> original_filename})
+      S3Curl.upload(s3_name, file_path, {"original_filename" => original_filename})
+      get_segments.each do |name|
+        S3Curl.upload(segment_s3_name(name), segment_path(name), {"original_filename" => original_filename})
+      end
     end
     if s3_exist?
       self.uploaded = true
@@ -135,6 +147,22 @@ class Video < ActiveResource::Base
       @user ||= User.find(self.user_id)
     end
     return @user
+  end
+
+  def local_names
+    get_segments << filename
+  end
+  
+  def get_segments
+    @segments ||= (JSON.parse(segments) rescue [])
+  end
+
+  def segment_s3_name segment_name
+    "#{id}_#{segment_name}"
+  end
+
+  def segment_path segment_name
+    File.join(FILE_FOLDER, segment_name)
   end
 
   def logger

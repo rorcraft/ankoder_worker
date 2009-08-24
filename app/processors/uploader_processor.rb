@@ -1,7 +1,4 @@
 class UploaderProcessor < ApplicationProcessor
-  subscribes_to :uploader_worker
-
-  #  include PostbackHelper
 
   def on_message(message)
     logger.debug "UploaderProcessor received #{message}"
@@ -15,34 +12,39 @@ class UploaderProcessor < ApplicationProcessor
     uploader_temp_file = nil
     thumbnail_destination = job.get_thumbnail_upload_url
     destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
+    file_map = {}
 
     begin
 
       video.set_status ConvertFile::UPLOADING
 
       if S3_ON
-        #local_file_path = Uploader.download s3_url, Uploader.make_temp_filename
-        local_file_path = uploader_temp_file = Downloader.download(
-          :url => video.s3_url,
-          :local_filename => Uploader.make_temp_filename 
-        )
+        video.s3_names.each do |name|
+          file_map[name] = Downloader.download(
+            :url => video.s3_url_from_name(name),
+            :local_filename => Uploader.make_temp_filename)
+        end
       else
-        local_file_path = video.file_path
+        video.local_names.each do |name|
+          file_map[video.segment_s3_name(name)] = video.segment_path(name)
+        end
       end
 
       # upload the video
-      upload_options = {
-        :video_id              => video.id,
-        :upload_url            => upload_url,
-        :local_file_path       => local_file_path,
-        :remote_filename       => "#{video.id}_#{video.filename}",
-        :original_name         => "#{video.id}_#{video.filename}",
-        :username              => username,
-        :password              => password,
-        :destination_s3_public => destination_s3_public
-      }
-      upload_options.merge!({:content_type => video.content_type}) unless video.content_type.blank?
-      Uploader.upload(upload_options)
+      file_map.each do |s3_name, local_file_path|
+        upload_options = {
+          :video_id              => video.id,
+          :upload_url            => upload_url,
+          :local_file_path       => local_file_path,
+          :remote_filename       => s3_name,
+          :original_name         => s3_name,
+          :username              => username,
+          :password              => password,
+          :destination_s3_public => destination_s3_public
+        }
+        upload_options.merge!({:content_type => video.content_type}) if !video.content_type.blank?
+        Uploader.upload(upload_options)
+      end
       video.set_status ConvertFile::UPLOADED
       # postback
       Postback.post_back('upload', job, 'success')
@@ -60,21 +62,21 @@ class UploaderProcessor < ApplicationProcessor
                       when DownloadTimeoutError
                         'Upload connection timed out'
                       else
-                        logger.error e.to_yaml
-                        logger.error e.backtrace.to_yaml
                         'Ankoder internal error'
                       end
+      logger.error e.to_yaml
+      logger.error e.backtrace[0,20].to_yaml
       Postback.post_back('upload', job, 'fail', error_message)
     ensure
-      if S3_ON && uploader_temp_file && File.exist?(uploader_temp_file)
-        File.delete(uploader_temp_file)
-        # tell scaler of my own death.
+      if S3_ON
+        file_map.each do |s3_name, local_file_path|
+          File.delete(local_file_path) if File.exist?(local_file_path)
+        end
       end
+      # tell scaler of my own death.
       if (JSON.parse(message)["worker_process_id"] rescue false)
         me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
         me.destroy
-      else
-        logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
       end
     end
   end
