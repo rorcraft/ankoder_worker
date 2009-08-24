@@ -108,7 +108,7 @@ module Transcoder
         v.size                  = File.size(job.convert_file_full_path)
         v.user_id               = job.user_id
         v.content_type          = job.profile.content_type if job.profile.respond_to?("content_type")
-        v.read_metadata         :can_mv => false
+        v.read_metadata         :auto_file_extension => false
         v.filename              = job.segment_index
         v.segments              = Dir.glob(File.join(FILE_FOLDER, job.segment_prefix + "-*.ts")).map{|path|path[File.dirname(path).length+1, path.length]}.to_json
         v.save

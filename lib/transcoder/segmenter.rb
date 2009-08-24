@@ -7,7 +7,7 @@ module Transcoder
     end
 
     def self.command(job, video_id)
-      %Q[cd #{FILE_FOLDER} && #{SEGMENTER_PATH} "#{job.convert_file_full_path}" "#{job.profile.segment_duration}" "#{job.segment_prefix}" "#{job.segment_index}" "#{job.user.url_prefix}#{video_id}_"]
+      %Q[cd #{FILE_FOLDER} && #{SEGMENTER_PATH} "#{job.convert_file_full_path}" "#{job.profile.segment_duration}" "#{video_id}_#{job.segment_prefix}" "#{job.segment_index}" "#{job.user.url_prefix}"]
     end
 
   end

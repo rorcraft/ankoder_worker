@@ -42,13 +42,13 @@ class Video < ActiveResource::Base
     
   def read_metadata *argv
     return unless file_exist?
-    options = {:can_mv => true}.merge argv.extract_options!
+    options = {:auto_file_extension => true}.merge argv.extract_options!
     f = inspector
     %w(width height duration video? audio? audio_codec video_codec fps bitrate).each do |attr|
       eval("self.#{attr.delete('?')} = f.send(attr)") rescue false 
     end   
     self.readable = f.valid?     
-    if !filename_has_container? && options[:can_mv]
+    if !filename_has_container? && options[:auto_file_extension]
       raise BadVideoError.new unless f.container
       old_file_path = file_path
       extension = f.container.split(",").first
@@ -158,7 +158,7 @@ class Video < ActiveResource::Base
   end
 
   def segment_s3_name segment_name
-    "#{id}_#{segment_name}"
+    segment_name
   end
 
   def segment_path segment_name
