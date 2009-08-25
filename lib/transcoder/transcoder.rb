@@ -110,10 +110,11 @@ module Transcoder
         v.content_type          = job.profile.content_type if job.profile.respond_to?("content_type")
         v.read_metadata         :auto_file_extension => false
         v.filename              = job.segment_index
-        v.segments              = Dir.glob(File.join(FILE_FOLDER, job.segment_prefix + "-*.ts")).map{|path|path[File.dirname(path).length+1, path.length]}.to_json
         v.save
         converted_video = v
         Segmenter.segment(job, v.id)
+        v.segments              = Dir.glob(File.join(FILE_FOLDER, "*_" + job.segment_prefix + "-*.ts")).map{|path|path[File.dirname(path).length+1, path.length]}.to_json
+        v.save
       else # no segmentation case
         converted_video = ConvertFile.new
         converted_video.s3_upload_trials  = 0

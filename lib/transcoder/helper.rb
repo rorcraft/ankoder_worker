@@ -8,9 +8,18 @@ module Transcoder
     end
 
     private
+
+    PROGRESS_UPDATE_INTERVAL = 10 unless defined?(PROGRESS_UPDATE_INTERVAL)
     
     def progress_need_refresh?(current_progress, new_progress)
-      current_progress.nil? || (new_progress - current_progress) >= 10 || new_progress == 100
+      last_update = @last_update.to_f
+      current_time = Time.now.to_f
+      if current_progress != new_progress && current_time-last_update >= PROGRESS_UPDATE_INTERVAL
+        @last_update = current_time
+        return true
+      else
+        return false
+      end
     end
 
     def stdout_progress(progress)

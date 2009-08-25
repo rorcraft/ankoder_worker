@@ -39,6 +39,11 @@ class MockController < ApplicationController
     send_to("transcode", params["message"])
   end
 
+  def delay
+    spawn do sleep 10 end
+    render :text => proc{|r,o|o.write "super\n"; o.flush}
+  end
+
   private
   def send_to(processor_action, message)
     spawn_id = spawn do
