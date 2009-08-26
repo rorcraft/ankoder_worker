@@ -42,7 +42,7 @@ class Postback
         message['convert_video_id'] = model.convert_file.id
         message['s3_name'] = model.convert_file.s3_name
         message['name'] = "#{model.convert_file.id}_#{model.convert_file.filename}"
-        tus = model.thumbnails.map &:uploaded # tus == thumbnail_upload_status
+        tus = (model.thumbnails.map &:uploaded rescue [])
         message['thumbnail_result'] = 
           case [tus.inject{|i,j|i&&j}, tus.inject{|i,j|i||j}]
           when [true, true ] then 'success'
