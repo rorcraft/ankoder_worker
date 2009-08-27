@@ -12,55 +12,60 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       logger.debug "TranscodeWorkerProcessor received: " + message
       job = Job.find(get_job_id(message))
       destination_s3_public = job.profile.destination_s3_public || job.user.destination_s3_public
-    begin
-      transcode(job)
-
-      # upload thumbnails to external storage
-      job.thumbnails.each do |thumbnail|
-        next unless File.exist?(thumbnail.file_path)
-        begin
-          Uploader.upload(
-            :upload_url            => job.get_thumbnail_upload_url,
-            :local_file_path       => thumbnail.file_path,
-            :remote_filename       => thumbnail.filename,
-            :destination_s3_public => destination_s3_public,
-            :content_type          => 'image/png'
-          )
-          thumbnail.uploaded = true
-        rescue
-          thumbnail.uploaded = false
+      begin
+        unless job.profile.watermark_url.blank?
+          job.watermark_image = Downloader.download :url => job.profile.watermark_url, :local_filename => Uploader.make_temp_filename
         end
-      end if job.get_thumbnail_upload_url && job.thumbnails
+        transcode(job)
 
-      # postback? - job complete
-      Postback.post_back 'convert', job, 'success'
-      # also upload completed video if upload_url is not null.
-      if job.get_upload_url
-        job.convert_file.set_status ConvertFile::QUEUEING
+        # upload thumbnails to external storage
+        job.thumbnails.each do |thumbnail|
+          next unless File.exist?(thumbnail.file_path)
+          begin
+            Uploader.upload(
+              :upload_url            => job.get_thumbnail_upload_url,
+              :local_file_path       => thumbnail.file_path,
+              :remote_filename       => thumbnail.filename,
+              :destination_s3_public => destination_s3_public,
+              :content_type          => 'image/png'
+            )
+            thumbnail.uploaded = true
+          rescue
+            thumbnail.uploaded = false
+          end
+        end if job.get_thumbnail_upload_url && job.thumbnails
+
+        # postback? - job complete
+        Postback.post_back 'convert', job, 'success'
+        # also upload completed video if upload_url is not null.
+        if job.get_upload_url
+          job.convert_file.set_status ConvertFile::QUEUEING
+        end
+      rescue
+        error = case $!
+                when TranscoderError::MediaFormatException then "conversion failure"
+                when TranscoderError::MP4BoxHintingException then "hinting failure"
+                else "ankoder internal error"
+                end
+        Postback.post_back 'convert', job, 'fail', error
+        logger.error " ------------- !!!!!!!!!!!!!! -------------"
+        error_msg = $!.class.to_s
+        error_msg += $!.message
+        error_msg += $!.backtrace[0,20].to_yaml
+        job.set_error(error_msg)
+        job.set_status Job::FAILED
+        logger.error error_msg
+      ensure
+        # remove temp watermark file
+        File.delete(job.watermark_image) if job.watermark_image && File.exist?(job.watermark_image)
+        # tell scaler of my own death.
+        if (JSON.parse(message)["worker_process_id"] rescue false)
+          me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
+          me.destroy
+        else
+          logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
+        end
       end
-    rescue
-      error = case $!
-              when TranscoderError::MediaFormatException then "conversion failure"
-              when TranscoderError::MP4BoxHintingException then "hinting failure"
-              else "ankoder internal error"
-              end
-      Postback.post_back 'convert', job, 'fail', error
-      logger.error " ------------- !!!!!!!!!!!!!! -------------"
-      error_msg = $!.class.to_s
-      error_msg += $!.message
-      error_msg += $!.backtrace[0,20].to_yaml
-      job.set_error(error_msg)
-      job.set_status Job::FAILED
-      logger.error error_msg
-    ensure
-      # tell scaler of my own death.
-      if (JSON.parse(message)["worker_process_id"] rescue false)
-        me=WorkerProcess.find(JSON.parse(message)["worker_process_id"])
-        me.destroy
-      else
-        logger.fatal "\n\n\n\nCan't parse JSON\n\n\n\n"
-      end
-    end
   end
 
   #  {"type": "ASSIGN", "content": {"config": {"OriginalFile": "1", "ConvertJob": "1"}, "node_name": "Converter"}}

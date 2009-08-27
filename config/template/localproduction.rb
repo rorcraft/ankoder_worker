@@ -36,7 +36,7 @@ CURL            = "/usr/bin/curl"
 FILE_FOLDER   = "/var/www/api_ankoder/current/file_system"
 PUBLIC_FOLDER = "/var/www/api_ankoder/current/public"
 THUMBNAIL_FOLDER = "/thumbnail"
-SEGMENTER_PATH = "/usr/local/commit.segfault"
+SEGMENTER_PATH = "/usr/local/bin/commit.segfault"
 
 S3_ON         = false
 S3BUCKET = S3_BUCKET = "devbucket.ankoder.com"

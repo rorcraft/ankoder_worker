@@ -1,6 +1,6 @@
 class Job < ActiveResource::Base
   self.site = AR_SITE
-  attr_accessor :newly_converted, :thumbnails
+  attr_accessor :newly_converted, :thumbnails, :watermark_image
 
   SUBMITTING = "submitting"
   QUEUEING = "queuing"
