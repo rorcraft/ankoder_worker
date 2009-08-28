@@ -96,7 +96,8 @@ module Transcoder
       
       loop do
         begin
-          job.set_status("completed")
+          job.status = "completed"
+          job.save
           break
         rescue Exception => e
           Transcoder.logger.info "job set completion retry"
