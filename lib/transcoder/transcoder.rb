@@ -53,12 +53,12 @@ module Transcoder
         Transcoder.logger.debug "download from S3"
         S3Curl.download(job.original_file.s3_name,job.original_file.file_path) 
       end
-      # download watermark
       
       case job.original_file.video_codec
       when /iv.0/i # iv30 iv40 iv50
         Tools::Mencoder.preprocess(job)        
       end
+      Watermark.generate(job) if job.watermark_image
       
       case job.profile.video_codec
       when /theora/i

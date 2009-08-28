@@ -39,10 +39,11 @@ class Uploader
     url.to_s.sub(/"/,'\"')
   end
 
-  def self.make_temp_filename
+  def self.make_temp_filename ext=nil
     filename = nil
+    ext = "." + ext if ext && !(ext =~ /^\./)
     loop do
-      filename = "uploader_temp_file#{rand*Time.now.to_i}"
+      filename = "uploader_temp_file#{rand*Time.now.to_i}#{ext}"
       break unless File.exist?(path(filename))
     end
     return filename

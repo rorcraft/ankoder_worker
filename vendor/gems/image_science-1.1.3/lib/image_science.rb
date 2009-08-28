@@ -12,12 +12,17 @@ require 'inline'
 
 class ImageScience
   VERSION = '1.1.3'
+  FREE_IMAGE_FORMAT = ["bmp", "ico", "jpeg", "jng", "koala", "lbm", "mng", "pbm", "pbmraw", "pcd", "pcx", "pgm", "pgmraw", "png", "ppm", "ppmraw", "ras", "targa", "tiff", "wbmp", "psd", "cut", "xbm", "xpm", "dds", "gif", "hdr", "faxg3", "sgi", "exr", "j2k", "jp2", "unknown"]
 
   ##
   # The top-level image loader opens +path+ and then yields the image.
 
   def self.with_image(path) # :yields: image
   end
+
+  def self.format(path); FREE_IMAGE_FORMAT[rorcraft_get_image_format(path)] end
+
+  def self.rorcraft_get_image_format(path); end #:yields: FREE_IMAGE_FORMAT:FIF_ENUM
 
   ##
   # Crops an image to +left+, +top+, +right+, and +bottom+ and then
@@ -187,6 +192,11 @@ class ImageScience
         return FreeImage_GetWidth(bitmap);
       }
     END
+
+    builder.c_singleton <<-"BY_RORCRAFT_INTERN_CAIYUFEI"
+      int rorcraft_get_image_format(char* input){
+        return FreeImage_GetFileType(input, 0);}
+    BY_RORCRAFT_INTERN_CAIYUFEI
 
     builder.c <<-"END"
       VALUE resize(long w, long h) {

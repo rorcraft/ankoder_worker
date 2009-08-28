@@ -12,6 +12,11 @@ class Job < ActiveResource::Base
 
   EXCLUDE_WHEN_SAVING = [:profile, :convert_file, :original_file]
     
+  def regulate_watermark_format
+    correct_format_path = File.join Uploader::TEMP_FOLDER,Uploader.make_temp_filename(ImageScience.format(watermark_image))
+    `mv #{watermark_image} #{correct_format_path}`
+    self.watermark_image = correct_format_path
+  end
 
   def encode(options={})
     save_attributes = self.attributes.except(*EXCLUDE_WHEN_SAVING)

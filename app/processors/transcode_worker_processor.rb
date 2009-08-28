@@ -15,6 +15,7 @@ class TranscodeWorkerProcessor < ApplicationProcessor
       begin
         unless job.profile.watermark_url.blank?
           job.watermark_image = Downloader.download :url => job.profile.watermark_url, :local_filename => Uploader.make_temp_filename
+          job.regulate_watermark_format
         end
         transcode(job)
 

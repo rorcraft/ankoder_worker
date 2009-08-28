@@ -118,7 +118,11 @@ module Transcoder
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
         temp_file_path = "#{Time.now.to_i}#{job.generate_convert_filename}"
-        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        if job.watermark_image
+          cmd = "#{FFMPEG_WITH_VHOOK_PATH} -i #{job.original_file.file_path} #{cmd} #{watermark_command(job)} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        else
+          cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        end
         cmd += ";mv #{File.join(FILE_FOLDER, temp_file_path)} #{File.join(FILE_FOLDER, job.generate_convert_filename)}"
         Transcoder.logger.debug cmd
         cmd
@@ -137,6 +141,10 @@ module Transcoder
         cmd += " -t #{profile.trim_end}" unless profile.trim_end.to_i < 1
 
         cmd
+      end
+
+      def self.watermark_command(job)
+        %Q[-vhook "#{VHOOK_WATERMARK_PATH} -m #{job.profile.watermark_mode} -t #{job.profile.watermark_effective_bgcolor} -f #{job.watermark_image}"]
       end
 
       def self.video_command(dim_info, job)
