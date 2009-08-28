@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   #protect_from_forgery # only scaler can see workers
 
-  before_filter :workflow_required
+  before_filter :workflow_required, :except => :gth
   include Spawn
 
   def workflow_required

@@ -27,6 +27,10 @@ class MockController < ApplicationController
     render :text => "OK"
   end
 
+  def self_defense
+    head :"404"
+  end
+
   def download
     send_to("download", params["message"])
   end
