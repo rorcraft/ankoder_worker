@@ -1,7 +1,5 @@
 class DownloaderProcessor < ApplicationProcessor
 
-  subscribes_to :downloader_worker
-
   def on_message(message)
     temp_filepath = ''
     logger.debug "DownloaderProcessor received #{message.class}: " + message
@@ -55,13 +53,20 @@ class DownloaderProcessor < ApplicationProcessor
 
       video.set_status Video::DOWNLOADED
 
-      profile = find_custom_profile video.custom_profile unless video.custom_profile.nil?
+      profile = video.custom_profile.nil? ? nil : find_custom_profile(video.custom_profile)
 
+      if video.custom_recipe_id # create recipe job
+        r = RecipeJob.new
+        r.user_id = video.user_id
+        r.original_file_id = video.id
+        r.recipe_id = video.custom_recipe_id
+        r.save
       # create job and send it to queue.
-      if profile # silently ignores invalid custom_profile
+      elsif profile # silently ignores invalid custom_profile
         job = Job.create :user_id => video.user.id, :original_file_id => video.id, :profile_id => profile.id
         job.send_to_queue
       end    
+
 
       # postback? - file downloaded
       Postback.post_back('download', video, 'success')
