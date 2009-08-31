@@ -4,12 +4,13 @@ module Transcoder
       include Transcoder
 
       class << self 
+        attr_reader :ffmpeg_output
         include Transcoder::Padding
         include Transcoder::Helper
       end
 
       def self.run(job)
-        run_command command(job) do |progress|
+        run_command(command(job), job.profile) do |progress|
           job.convert_progress = progress
           job.save
         end
@@ -19,7 +20,7 @@ module Transcoder
         raise TranscoderError::MediaFormatException.new(@ffmpeg_output)
       end
 
-      def self.run_command(command)
+      def self.run_command(command, profile)
         progress = 0
         IO.popen(command) do |pipe|
           duration = nil
@@ -27,7 +28,7 @@ module Transcoder
           pipe.each("\r") do |line|
             @ffmpeg_output += line + "\n"
             parse_line(line)
-            duration = parse_duration(line) if duration.nil?
+            duration = parse_duration(line, profile) if duration.nil?
             p = parse_progress(line,duration)
             if p >= progress && progress_need_refresh?(progress, p)
               progress = p 
@@ -197,20 +198,6 @@ module Transcoder
         cmd
       end
 
-      def self.parse_progress(line,duration)
-        if line =~ /time=\s*(\d+).(\d+)/  
-          if duration.nil? or duration == 0
-            p = 0
-          else
-            p = ($1.to_i * 1000 + $2.to_i.to_f) * 100 / duration
-          end
-          p = 100 if p > 100
-          p.to_i
-        else 
-          0
-        end
-      end
-
       def self.progress_finalise
         block_given? ? yield(100) : stdout_progress(100)
       end
@@ -222,11 +209,36 @@ module Transcoder
         raise_media_format_exception if line =~ /maybe incorrect parameters such as bit_rate, rate, width or height/
       end
 
-      def self.parse_duration(line)
-        if line =~ /Duration: (\d{2}):(\d{2}):(\d{2}).(\d{2})/m
-          (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 1000 + $4.to_i
+      # changes mantissa (e.g. "123.(45678)"; see
+      # http://wikipedia.org/wiki/Significand
+      # ) to the number of one-thousandth
+      def self.mantissa_to_milli mantissa
+        (mantissa.to_i*10**(3-mantissa.length)).to_i
+      end
+
+      def self.parse_duration(line, profile)
+        if line =~ /Duration: (\d{2}):(\d{2}):(\d{2})\.(\d{2})/m
+          total = (($1.to_i * 60 + $2.to_i) * 60 + $3.to_i) * 1000 + mantissa_to_milli($4)
+          seek  = profile.trim_begin.to_i*1000
+          duration = (profile.trim_end.to_i>0 ? profile.trim_end.to_i*1000 : total)
+          [total-seek, duration-seek].min
         else
           nil
+        end
+      end
+
+      def self.parse_progress(line,duration)
+        if line =~ /time=\s*(\d+).(\d+)/  
+          # the last condition occurs @ seeking
+          if duration.nil? || duration == 0 || $1 == "10000000000"
+            p = 0
+          else
+            p = ($1.to_i * 1000 + mantissa_to_milli($2)) * 100 / duration
+          end
+          p = 100 if p > 100
+          p.to_i
+        else 
+          0
         end
       end
 
