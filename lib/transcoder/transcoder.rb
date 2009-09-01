@@ -94,16 +94,7 @@ module Transcoder
         convert_file.upload_to_s3
       end
       
-      loop do
-        begin
-          job.status = "completed"
-          job.save
-          break
-        rescue Exception => e
-          Transcoder.logger.info "job set completion retry"
-          sleep 10*rand
-        end
-      end
+      job.set_status Job::COMPLETED
       
     end
     
