@@ -131,7 +131,7 @@ module Transcoder
         current_duration = video.duration.nil? ? 0 : (video.duration.to_i / 1000)
 
         # there is no more time, so give zero length video
-        return " -ss #{current_duration > 0.5 ? current_duration - 0.5 : current_duration} -" if (profile.trim_begin.to_i > current_duration)
+        return " -ss #{current_duration > 0.5 ? current_duration - 0.5 : current_duration} -an -vframes 1" if (profile.trim_begin.to_i > current_duration)
 
         cmd = ""
         cmd += " -ss #{profile.trim_begin}" unless profile.trim_begin.to_i < 1
