@@ -47,10 +47,6 @@ module Transcoder
           progress = 100 
           block_given? ? yield(progress) : stdout_progress(progress)
         end
-
-        # FIXME: When doing 2-pass the output is not the job.generate_convert_filename
-        # not supporting 2-pass for now.
-#        raise TranscoderError::MediaFormatException unless File.exist?(File.join(FILE_FOLDER, job.generate_convert_filename))
       end
 
       def self.preprocess(job)
@@ -135,9 +131,9 @@ module Transcoder
         current_duration = video.duration.nil? ? 0 : (video.duration.to_i / 1000)
 
         # there is no more time, so give zero length video
-        return ' -t 0' if (profile.trim_begin.to_i > current_duration)
+        return " -ss #{current_duration > 0.5 ? current_duration - 0.5 : current_duration} -" if (profile.trim_begin.to_i > current_duration)
 
-        cmd = ''
+        cmd = ""
         cmd += " -ss #{profile.trim_begin}" unless profile.trim_begin.to_i < 1
         cmd += " -t #{profile.trim_end}" unless profile.trim_end.to_i < 1
 
