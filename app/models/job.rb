@@ -111,7 +111,7 @@ class Job < ActiveResource::Base
         newly_converted,
         :width  => profile.thumbnail_width,
         :height => profile.thumbnail_height,
-        :time   => time) if time <= newly_converted.duration_in_secs
+        :time   => time) if time.to_f <= newly_converted.duration_in_secs
     end
 
     # generate from thumb_way
