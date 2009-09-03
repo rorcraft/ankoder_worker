@@ -1,8 +1,16 @@
 #!/usr/bin/env ruby
 require File.dirname(__FILE__) + '/../config/environment'
 
-me = Ec2Instance.find ARGV[0].to_i
-me.aws_state = Ec2Instance::RUNNING
-me.private_dns_name = `hostname`.strip
-me.finished_booting_at = Time.now
-me.save
+loop do
+  begin
+    me = Ec2Instance.find ARGV[0].to_i
+    me.aws_state = Ec2Instance::RUNNING
+    me.private_dns_name = `hostname`.strip
+    me.finished_booting_at = Time.now
+
+    me.save
+    break
+  rescue
+    sleep 10*rand
+  end
+end
