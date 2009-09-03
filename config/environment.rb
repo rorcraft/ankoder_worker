@@ -18,4 +18,4 @@ end
 
 Rails.logger.auto_flushing = 1
 
-MAX_S3_UPLOAD_TRIES = 3
+MAX_S3_UPLOAD_TRIES = 5
