@@ -4,7 +4,7 @@ class UploaderProcessor < ApplicationProcessor
     logger.debug "UploaderProcessor received #{message}"
     params = JSON.parse message
     job = Job.find params['job_id']
-    video = Video.find job.convert_file.id
+    video = job.convert_file
     user = video.user
     upload_url = job.get_upload_url
     username = user.upload_username
