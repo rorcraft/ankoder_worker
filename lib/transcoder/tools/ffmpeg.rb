@@ -12,7 +12,7 @@ module Transcoder
       def self.run(job)
         run_command(command(job), job.profile) do |progress|
           job.convert_progress = progress
-          job.save
+          job.save rescue nil
         end
       end
 
