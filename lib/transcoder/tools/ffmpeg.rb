@@ -74,7 +74,11 @@ module Transcoder
 
         cmd += " #{job.profile.extra_param}" # can use S3 link directly here? if the file is public
         temp_file_path = "#{Time.now.to_i}#{job.generate_convert_filename}"
-        cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        if job.watermark_image
+          cmd = "#{FFMPEG_WITH_VHOOK_PATH} -i #{job.original_file.file_path} #{cmd} #{watermark_command(job)} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        else
+          cmd = "#{FFMPEG_PATH} -i #{job.original_file.file_path} #{cmd} #{File.join(FILE_FOLDER, temp_file_path)} 2>&1"
+        end
         cmd += " && mv #{File.join(FILE_FOLDER, temp_file_path)} #{job.original_file.file_path}"
         Transcoder.logger.debug cmd
         cmd

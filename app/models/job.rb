@@ -98,7 +98,7 @@ class Job < ActiveResource::Base
   end
 
   def preprocess?
-     add_trimming? || profile.add_padding?
+     add_trimming? || profile.add_padding? || watermark_image
   end
 
   # generate thumbnails for converted file
