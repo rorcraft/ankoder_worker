@@ -105,6 +105,14 @@ class Video < ActiveResource::Base
   def partitioned_path(*args)
     ("%08d" % self.id).scan(/..../) + args
   end  
+
+  def s3_name
+    if filename =~ /^\d+_(.+)/
+      "#{id}_#{$1}"
+    else
+      "#{id}_#{filename}"
+    end
+  end
   
   def upload_to_s3
     TryAFewTimes.do(MAX_S3_UPLOAD_TRIES) do |i|
