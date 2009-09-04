@@ -55,7 +55,7 @@ class DownloaderProcessor < ApplicationProcessor
 
       profile = video.custom_profile.nil? ? nil : find_custom_profile(video.custom_profile)
 
-      if video.custom_recipe_id # create recipe job
+      if video.custom_recipe_id.to_i > 0 # create recipe job
         r = RecipeJob.new
         r.user_id = video.user_id
         r.original_file_id = video.id
