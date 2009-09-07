@@ -19,7 +19,7 @@ class Video < ActiveResource::Base
   self.site = AR_SITE
   DEFAULT_SEC = 0
   SIZES = {:medium=>300,:small=>150, :tiny => 50}
-  EXCLUDE_WHEN_SAVING = [:s3_name, :thumb, :thumbnail_name, :profile, :thumbnail_count]
+  EXCLUDE_WHEN_SAVING = [:s3_name, :thumb, :thumbnail_name, :profile, :thumbnail_count, :thumbnail]
 
   # TODO: should put this into a module as these are common to trunk/video and worker/video
   def file_path(_filename = nil)
