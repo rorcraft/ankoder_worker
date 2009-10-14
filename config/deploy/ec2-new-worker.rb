@@ -1,4 +1,4 @@
-NEW_WORKER_HOSTNAME = "ec2-174-129-141-222.compute-1.amazonaws.com"
+NEW_WORKER_HOSTNAME = "ec2-72-44-58-98.compute-1.amazonaws.com"
 
 set :rails_env,   "production"
 set :application, "ankoderworker"

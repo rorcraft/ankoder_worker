@@ -58,6 +58,9 @@ module Transcoder
       when /iv.0/i # iv30 iv40 iv50
         Tools::Mencoder.preprocess(job)        
       end
+      if job.original_file.audio_codec =~ /0x0162/i
+        Tools::Mencoder.preprocess(job)        
+      end
       Watermark.generate(job) if job.watermark_image
       
       case job.profile.video_codec

@@ -17,6 +17,7 @@ module Transcoder
         cmd = "#{MENCODER_PATH} -vf lavcdeint,hqdn3d #{job.original_file.file_path} -o #{job.original_file.file_path}.preprocess -oac pcm -ovc lavc -lavcopts " 
         cmd += "vcodec=ffvhuff:vstrict=-1:vhq:psnr -of avi"
         cmd += " && mv #{job.original_file.file_path}.preprocess #{job.original_file.file_path}"
+        Transcoder.logger.debug cmd
         cmd
       end
       
