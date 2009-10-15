@@ -204,7 +204,7 @@ module Transcoder
 
       def self.parse_line(line)
         raise_media_format_exception if line =~ /frame decoding failed: Array index out of range/
-        raise_media_format_exception if line =~ /MV errors/
+        # raise_media_format_exception if line =~ /MV errors/
         raise_media_format_exception if line =~ /Could not write header for output file/
         raise_media_format_exception if line =~ /maybe incorrect parameters such as bit_rate, rate, width or height/
       end
